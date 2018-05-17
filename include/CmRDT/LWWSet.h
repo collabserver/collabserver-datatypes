@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <utility> // std::pair
+#include <cassert>
 #include <ostream>
 
 namespace CRDT {
@@ -51,9 +52,13 @@ class LWWSet {
 
             public:
                 friend bool operator==(const Metadata& lhs, const Metadata& rhs) {
-                    return (lhs._timestamp == rhs._timestamp)
-                            && (lhs._isRemoved == rhs._isRemoved);
+                    // Required for equality test of maps.
+                    // We only care about the keys.
+                    // Two key with different metadata are still same from the
+                    // end user point of view.
+                    return true;
                 }
+
                 friend bool operator!=(const Metadata& lhs, const Metadata& rhs) {
                     return !(lhs == rhs);
                 }
@@ -92,6 +97,7 @@ class LWWSet {
             U keyStamp      = keyElt._timestamp;
 
             if(!keyAdded) {
+                assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = false;
@@ -120,6 +126,7 @@ class LWWSet {
             U keyStamp      = keyElt._timestamp;
 
             if(!keyAdded) {
+                assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = true;
@@ -136,13 +143,12 @@ class LWWSet {
 
         /**
          * Check if lhs and rhs are equals.
-         * Two LWWSet are equal if their internal map are equal.
-         * Removed elements are used to determine equality.
+         * Two sets are equal if their 'living' set of key are equal.
          *
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWSet& lhs, const LWWSet& rhs) {
-            return lhs._map == rhs._map;
+            return (lhs._map == rhs._map);
         }
 
         /**

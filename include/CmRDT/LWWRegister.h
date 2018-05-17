@@ -88,12 +88,13 @@ class LWWRegister {
 
         /**
          * Check if two registers are equal.
-         * Two registers are equal if their data and timestamp are equal.
+         * Two registers are equal if their data are equal.
+         * Timestamps is not used for equality.
          *
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWRegister& lhs, const LWWRegister& rhs) {
-            return (lhs._reg == rhs._reg) && (lhs._timestamp == rhs._timestamp);
+            return (lhs._reg == rhs._reg);
         }
 
         /**
