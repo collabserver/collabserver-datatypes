@@ -1,26 +1,34 @@
-# CRDT Examples
-Examples of CRDTs implementations in C++.
-These are for educational purpose only and are not designed to work in real world.
-(Ex: use fixed number of process, fake timestamp).
-They may be however use as a starting point or reference.
+# CRDTs
+
+# Description
+Defines a set of basic CRDTs that may be used to build your more complex data (on top of these structures).
+CRDTs stands for Conflict-free Replicated Data Structure.
+Note that the C may either stands for "Commutative" or "Convergent".
+Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent is the State based (CvRDT).
+To learn more about CRDTs, checkout the links at the end of this readme.
 
 
 # Features
 
-## CvRDT (State-based)
-- GCounterInt: Grow-only Integer Counter
-- PNCounterInt: Increment / Decrement Integer Counter
-- GVectorInt: Grow-only Integer Vector
-- PNVectorInt: Increment / Decrement Integer Vector
-- GSetInt: Grow-only Integer set
-- USetInt: Grow-only Integet 2P-Set
-- LWWRegister: Last-Write-Wins Register
-
 ## CmRDT (Operation-based)
-- GCounterInt: Grow-only Integer Counter
+- LWWGraph: Last-Write-Wins Graph
+- LWWMap: Last-Write-Wins Map
+- LWWRegister: Last-Write-Wins Register
+- LWWSet: Last-Write-Wins Set
+
+## CvRDT (State-based)
+- 2PSet: Add / Remove set
+- GCounter: Grow-only counter
+- GGraph: Grow-only graph
+- GMap: Grow-only map
+- GSet: Grow-only set
+- LWWRegister: Last-Write-Wins Register
+- PNCounter: Increment / Decrement counter
+
+> Warning: I wrote the CvRDTs as an example and they may not fit actual use.
 
 
-# Operations
+# CRDTs operation / academic description
 
 ## State-based object (CvRDT)
     Convergent Replicated Data Types (CvRDT)
@@ -42,6 +50,12 @@ They may be however use as a starting point or reference.
         P   -> Delivery relation P for communication protocol
 
 
+# Author
+- Constantin Masson ([constantinmasson.com](http://constantinmasson.com/))
+
+
 # Papers and resources
 - Conflict-free Replicated Data Types (https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf)
 - A comprehensive study of Convergent and Commutative Replicated Data Types (https://pages.lip6.fr/Marc.Shapiro/papers/Comprehensive-CRDTs-RR7506-2011-01.pdf)
+
+
