@@ -9,6 +9,10 @@ namespace CmRDT {
 // Class method tests
 // -----------------------------------------------------------------------------
 
+TEST(LWWSet, queryTest) {
+    ASSERT_TRUE(false) << "TODO Test";
+}
+
 TEST(LWWSet, addTest) {
     LWWSet<std::string, int> data0;
 
@@ -67,7 +71,7 @@ TEST(LWWSet, operatorEQTest) {
 // Use case Tests
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, useCaseNormalTest) {
+TEST(LWWSet, useCaseAddRemoveTest) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 

@@ -148,6 +148,7 @@ class LWWSet {
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWSet& lhs, const LWWSet& rhs) {
+            // TODO This is not doing the actual job said in the doc.
             return (lhs._map == rhs._map);
         }
 

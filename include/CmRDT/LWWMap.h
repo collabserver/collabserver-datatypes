@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <cassert>
 #include <ostream>
 
 namespace CRDT {
@@ -13,9 +14,8 @@ namespace CmRDT {
  *
  * Associative container that contains key-value pairs with unique keys.
  * Timestamps is assigned to each add / remove operation to create total order
- * of operations.
- * Remove operation does not actually remove the key-value but only mark it
- * as deleted.
+ * of operations. Internally, remove operation does not actually remove 
+ * the key-value but only mark it as deleted.
  *
  * \note
  * CRDT Map only deals with concurrent add / remove of keys. The content for 

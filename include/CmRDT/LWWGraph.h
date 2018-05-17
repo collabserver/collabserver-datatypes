@@ -115,12 +115,13 @@ class LWWGraph {
 
         /**
          * Check if lhs and rhs are equals.
-         * Two LWWGraph are equal if their internal content are equal.
-         * Removed elements are used to determine equality.
+         * Two LWWGraphs are equal if their map of 'living' keys are equal.
+         * (Regardless removed keys).
          *
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
+            // TODO This is not doing the actual job said in the doc.
             return lhs._adj == rhs._adj;
         }
 
