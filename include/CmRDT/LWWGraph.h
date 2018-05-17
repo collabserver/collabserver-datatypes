@@ -3,6 +3,8 @@
 #include "LWWMap.h"
 #include "LWWSet.h"
 
+#include <ostream>
+
 namespace CRDT {
 namespace CmRDT {
 

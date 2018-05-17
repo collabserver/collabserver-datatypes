@@ -1,3 +1,9 @@
+# Custom ignore
+bin/
+build/
+
+
+
 # Created by https://www.gitignore.io/api/c,vim,c++,visualstudiocode
 
 ### C ###

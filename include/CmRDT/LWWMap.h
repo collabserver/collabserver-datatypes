@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <ostream>
 
 namespace CRDT {
 namespace CmRDT {

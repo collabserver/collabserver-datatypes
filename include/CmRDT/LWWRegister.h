@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <ostream>
 
 namespace CRDT {
 namespace CmRDT {

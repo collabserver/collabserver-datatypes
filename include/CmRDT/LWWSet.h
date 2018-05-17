@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <utility> // std::pair
+#include <ostream>
 
 namespace CRDT {
 namespace CmRDT {
