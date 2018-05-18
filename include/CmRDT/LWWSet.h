@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <set>
 #include <utility> // std::pair
 #include <cassert>
 #include <ostream>
@@ -45,26 +46,7 @@ namespace CmRDT {
 template<typename Key, typename U>
 class LWWSet {
     private:
-        class Metadata {
-            public:
-                U       _timestamp;
-                bool    _isRemoved;
-
-            public:
-                friend bool operator==(const Metadata& lhs, const Metadata& rhs) {
-                    // Required for equality test of maps.
-                    // We only care about the keys.
-                    // Two key with different metadata are still same from the
-                    // end user point of view.
-                    return true;
-                }
-
-                friend bool operator!=(const Metadata& lhs, const Metadata& rhs) {
-                    return !(lhs == rhs);
-                }
-        };
-
-    private:
+        class Metadata;
         std::unordered_map<Key, Metadata> _map;
 
 
@@ -136,6 +118,22 @@ class LWWSet {
 
 
     // -------------------------------------------------------------------------
+    // Iterators
+    // -------------------------------------------------------------------------
+
+    public:
+        class iterator;
+
+        iterator begin() {
+            return iterator(*this);
+        }
+
+        iterator end() {
+            return iterator(*this, _map.end());
+        }
+
+
+    // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
@@ -179,6 +177,90 @@ class LWWSet {
                 }
             }
             return out;
+        }
+};
+
+
+// -----------------------------------------------------------------------------
+// Nested classes
+// -----------------------------------------------------------------------------
+
+
+// Internal representation of metadata for each key in the set.
+template<typename Key, typename U>
+class LWWSet<Key,U>::Metadata {
+    public:
+        U       _timestamp;
+        bool    _isRemoved;
+
+    public:
+        friend bool operator==(const Metadata& lhs, const Metadata& rhs) {
+            // Required for equality test of maps.
+            // We only care about the keys.
+            // Two key with different metadata are still same from the
+            // end user point of view.
+            return true;
+        }
+
+        friend bool operator!=(const Metadata& lhs, const Metadata& rhs) {
+            return !(lhs == rhs);
+        }
+};
+
+
+/**
+ * Iterator for LWWSet.
+ * Iterate over all keys that are in set and are NOT marked as removed.
+ */
+template<typename Key, typename U>
+class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Key> {
+    private:
+        typedef typename std::unordered_map<Key, Metadata>::iterator internal_iterator;
+
+        LWWSet& _data;
+        internal_iterator _it;
+
+    public:
+
+        iterator(LWWSet& set) : _data(set) {
+            _it = _data._map.begin();
+
+            // If first elt is already removed, skipp it
+            if(_it != _data._map.end() && _it->second._isRemoved) {
+                ++_it;
+            }
+        }
+
+        /**
+         * Create an iterator for a set and place it at specific position.
+         * Given position may be a removed key.
+         * (Though ++it will iterate with normal behavior).
+         *
+         * This is made for internal use.
+         */
+        iterator(LWWSet& set, internal_iterator begin)
+            : _data(set), _it(begin) {
+        }
+
+        iterator& operator++() {
+            ++_it;
+
+            while(_it != _data._map.end() && _it->second._isRemoved == true) {
+                ++_it;
+            }
+            return *this;
+        }
+
+        bool operator==(const iterator& other) const {
+            return _it == other._it;
+        }
+
+        bool operator!=(const iterator& other) const {
+            return !(*this == other);
+        }
+
+        const Key& operator*() {
+            return _it->first;
         }
 };
 

@@ -17,7 +17,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 - LWWSet: Last-Write-Wins Set
 
 ## CvRDT (State-based)
-- 2PSet: Add / Remove set
+- 2PSet: Add / Remove set (Two-phases Set)
 - GCounter: Grow-only counter
 - GGraph: Grow-only graph
 - GMap: Grow-only map

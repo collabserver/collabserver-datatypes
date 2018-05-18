@@ -6,7 +6,7 @@ namespace CmRDT {
 
 
 // -----------------------------------------------------------------------------
-// Class method tests
+// CRDT method tests
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, queryTest) {
@@ -34,6 +34,61 @@ TEST(LWWSet, removeTest) {
 
 
 // -----------------------------------------------------------------------------
+// Iterator Tests
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, iteratorTest) {
+    LWWSet<int, int> data0;
+
+    // Add normal
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+
+    int k = 3;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        EXPECT_EQ(*it, k);
+        --k;
+    }
+
+    data0.remove(0, 20);
+    data0.remove(1, 21);
+
+    k = 3;
+    for(auto& elt : data0) {
+        EXPECT_EQ(elt, k);
+        --k;
+    }
+}
+
+TEST(LWWSet, iteratorEmptyTest) {
+    LWWSet<int, int> data0;
+    for(auto& elt : data0) {
+        EXPECT_TRUE(false) << "Iterated over ghost element?";
+    }
+
+    // Add some
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+    data0.add(4, 14);
+
+    // Remove all
+    data0.remove(0, 20);
+    data0.remove(1, 21);
+    data0.remove(2, 22);
+    data0.remove(3, 23);
+    data0.remove(4, 24);
+
+    for(auto& elt : data0) {
+        EXPECT_TRUE(false) << "Iterated over ghost element?";
+    }
+}
+
+
+// -----------------------------------------------------------------------------
 // Operator Tests
 // -----------------------------------------------------------------------------
 
@@ -44,24 +99,29 @@ TEST(LWWSet, operatorEQTest) {
     // Simple add
     data0.add("v1", 1);
     data1.add("v1", 1);
+
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
 
     // Removed elt doesn't count
     data0.remove("v2", 2);
+
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
 
     // Back to same
     data1.remove("v2", 2);
+
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
 
     // Internal metadata such as Timestamp doesn't count
     LWWSet<std::string, int> data2;
     LWWSet<std::string, int> data3;
+
     data2.add("v1", 1);
     data3.add("v1", 2);
+
     EXPECT_TRUE(data2 == data3);
     EXPECT_FALSE(data2 != data3);
 }

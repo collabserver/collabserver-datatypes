@@ -1,4 +1,3 @@
-// CvRDT (State-based)
 #include "CvRDT/GCounter_Example.h"
 #include "CvRDT/PNCounter_Example.h"
 #include "CvRDT/LWWRegister_Example.h"
