@@ -45,7 +45,7 @@ TEST(LWWGraph, operatorEQTest) {
 // Use Case Tests
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, useCaseTest) {
+TEST(LWWGraph, usecaseGeneralTest) {
     LWWGraph<std::string, int, int> data0; // Data at replicate 0
     LWWGraph<std::string, int, int> data1; // Data at replicate 1
 

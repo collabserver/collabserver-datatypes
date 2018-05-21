@@ -120,7 +120,7 @@ class LWWGraph {
          */
         friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
             // TODO This is not doing the actual job said in the doc.
-            return lhs._adj == rhs._adj;
+            return (lhs._adj == rhs._adj);
         }
 
         /**
@@ -140,7 +140,7 @@ class LWWGraph {
         friend std::ostream& operator<<(std::ostream& out,
                                         const LWWGraph<Key,T,U>& o) {
             out << "CmRDT::LWWGraph = Not Implemented Yet";
-            // TODO
+            // TODO To implements
             return out;
         }
 };

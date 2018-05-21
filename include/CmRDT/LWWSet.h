@@ -47,10 +47,10 @@ namespace CmRDT {
 template<typename Key, typename U>
 class LWWSet {
     public:
-        class iterator;
+        class const_iterator;
         class Metadata;
 
-        typedef typename std::unordered_map<Key, Metadata>::iterator load_iterator;
+        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_load_iterator;
 
     private:
         std::unordered_map<Key, Metadata> _map;
@@ -74,7 +74,7 @@ class LWWSet {
          * \param key The key to find.
          * \return Iterator to the key with CRDT metadata or end() if not found.
          */
-        load_iterator query(const Key& key) {
+        const_load_iterator query(const Key& key) const {
             return _map.find(key);
         }
 
@@ -123,7 +123,7 @@ class LWWSet {
             elt._isRemoved  = true;
 
             auto res        = _map.insert(std::make_pair(key, elt));
-            bool isKeyAdded   = res.second;
+            bool isKeyAdded = res.second;
             Metadata& keyElt= res.first->second;
             U keyStamp      = keyElt._timestamp;
 
@@ -144,36 +144,36 @@ class LWWSet {
     public:
 
         /**
-         * Returns an iterator to the beginning.
+         * Returns a constant iterator to the beginning.
          */
-        iterator begin() {
-            return iterator(*this);
+        const_iterator begin() const noexcept {
+            return const_iterator(*this);
         }
 
         /**
-         * Returns an iterator to the end.
+         * Returns a constant iterator to the end.
          */
-        iterator end() {
-            iterator it(*this);
+        const_iterator end() const noexcept {
+            const_iterator it(*this);
             it._it = _map.end();
             return it;
         }
 
         /**
-         * Returns a load iterator to the beginning.
+         * Returns a constant load iterator to the beginning.
          *
          * \see load_iterator
          */
-        load_iterator lbegin() {
+        const_load_iterator lbegin() const noexcept {
             return _map.begin();
         }
 
         /**
-         * Returns a load iterator to the end.
+         * Returns a constant load iterator to the end.
          *
          * \see load_iterator
          */
-        load_iterator lend() {
+        const_load_iterator lend() const noexcept {
             return _map.end();
         }
 
@@ -256,22 +256,20 @@ class LWWSet<Key,U>::Metadata {
 
 
 /**
- * Iterator for LWWSet.
+ * Constant iterator for LWWSet.
  * Iterate over all keys that are in set and are NOT marked as removed.
  */
 template<typename Key, typename U>
-class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Key> {
+class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_tag, Key> {
     private:
         friend LWWSet;
-        typedef typename std::unordered_map<Key, Metadata>::iterator internal_iterator;
-
-        LWWSet& _data;
-        internal_iterator _it;
+        const LWWSet& _data;
+        typename std::unordered_map<Key, Metadata>::const_iterator _it;
 
 
     public:
 
-        iterator(LWWSet& set) : _data(set) {
+        const_iterator(const LWWSet& set) : _data(set) {
             _it = _data._map.begin();
 
             // If first element is already removed, skip it
@@ -280,7 +278,7 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
             }
         }
 
-        iterator& operator++() {
+        const_iterator& operator++() {
             ++_it;
 
             while(_it != _data._map.end() && _it->second._isRemoved) {
@@ -289,16 +287,15 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
             return *this;
         }
 
-        bool operator==(const iterator& other) const {
+        bool operator==(const const_iterator& other) const {
             return _it == other._it;
         }
 
-        bool operator!=(const iterator& other) const {
+        bool operator!=(const const_iterator& other) const {
             return !(*this == other);
         }
 
-        const Key& operator*() {
-            // TODO: remove this const (But _it is const_iterator atm.. :/ )
+        const Key& operator*() const {
             return _it->first;
         }
 };
