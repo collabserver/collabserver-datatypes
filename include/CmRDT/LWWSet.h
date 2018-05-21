@@ -48,9 +48,11 @@ template<typename Key, typename U>
 class LWWSet {
     public:
         class iterator;
+        class Metadata;
+
+        typedef typename std::unordered_map<Key, Metadata>::iterator load_iterator;
 
     private:
-        class Metadata;
         std::unordered_map<Key, Metadata> _map;
 
 
@@ -132,7 +134,17 @@ class LWWSet {
         }
 
         iterator end() {
-            return iterator(*this, _map.end());
+            iterator it(*this);
+            it._it = _map.end();
+            return it;
+        }
+
+        load_iterator lbegin() {
+            return _map.begin();
+        }
+
+        load_iterator lend() {
+            return _map.end();
         }
 
 
@@ -189,7 +201,9 @@ class LWWSet {
 // *****************************************************************************
 
 
-// Internal representation of metadata for each key in the set.
+/**
+ * Represents the CRDT state of the elements.
+ */
 template<typename Key, typename U>
 class LWWSet<Key,U>::Metadata {
     public:
@@ -221,21 +235,8 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
         friend LWWSet;
         typedef typename std::unordered_map<Key, Metadata>::iterator internal_iterator;
 
-    private:
         LWWSet& _data;
         internal_iterator _it;
-
-    private:
-        /**
-         * Create an iterator for a set and place it at specific position.
-         * Given position may be a removed key.
-         * (Though ++it will iterate with normal behavior).
-         *
-         * This is made for internal use.
-         */
-        iterator(LWWSet& set, internal_iterator begin)
-            : _data(set), _it(begin) {
-        }
 
 
     public:
@@ -248,9 +249,6 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
                 ++_it;
             }
         }
-
-
-    public:
 
         iterator& operator++() {
             ++_it;

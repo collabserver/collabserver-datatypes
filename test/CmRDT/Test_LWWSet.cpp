@@ -122,6 +122,105 @@ TEST(LWWSet, iteratorEmptySetTest) {
 
 
 // -----------------------------------------------------------------------------
+// Iterator Tests (Load iterator)
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, loadIteratorAddRemoveTest) {
+    LWWSet<int, int> data0;
+
+    // Add some elements and test iteration
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+    int k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        // Dev note: I'm not sure order is predictable. I use nb of iteration instead.
+        ++k;
+    }
+    EXPECT_EQ(k, 4);
+
+    // Remove elements, should not impact load iterator
+    data0.remove(0, 20);
+    data0.remove(1, 21);
+    k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ++k;
+    }
+    EXPECT_EQ(k, 4);
+
+    // Add / remove some more
+    data0.add(4, 30);
+    data0.add(5, 31);
+    data0.add(6, 32);
+    data0.add(7, 33);
+    data0.remove(4, 34);
+    data0.remove(5, 35);
+    k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ++k;
+    }
+    EXPECT_EQ(k, 8);
+}
+
+TEST(LWWSet, loadIteratorEmptyTest) {
+    LWWSet<int, int> data0;
+
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ASSERT_TRUE(false) << "Load Iterator should be empty";;
+    }
+}
+
+TEST(LWWSet, loadIteratorRemovedTest) {
+    LWWSet<int, int> data0;
+
+    // Fill set with removed elt (Yes, we don't even need add before).
+    data0.remove(1, 10);
+    data0.remove(2, 11);
+    data0.remove(3, 12);
+    data0.remove(4, 13);
+    data0.remove(5, 14);
+    data0.remove(5, 15);
+    int k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ++k;
+    }
+    ASSERT_EQ(k, 5);
+}
+
+TEST(LWWSet, loadIteratorReferenceTest) {
+    LWWSet<int, int> data0;
+
+    // Simple test add then remove
+    data0.add(1, 10);
+    auto it = data0.lbegin();
+    EXPECT_FALSE(it->second._isRemoved);
+    data0.remove(1, 20);
+    EXPECT_TRUE(it->second._isRemoved);
+
+    // Add all
+    data0.add(1, 21);
+    data0.add(2, 22);
+    data0.add(3, 23);
+    data0.add(4, 24);
+    data0.add(5, 25);
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        EXPECT_FALSE(it->second._isRemoved);
+    }
+
+    // Remove all
+    data0.remove(1, 31);
+    data0.remove(2, 32);
+    data0.remove(3, 33);
+    data0.remove(4, 34);
+    data0.remove(5, 35);
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        EXPECT_TRUE(it->second._isRemoved);
+    }
+}
+
+
+// -----------------------------------------------------------------------------
 // Operator Tests
 // -----------------------------------------------------------------------------
 
@@ -160,10 +259,10 @@ TEST(LWWSet, operatorEQTest) {
 
 
 // -----------------------------------------------------------------------------
-// Use case Tests
+// Use cases Tests
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, useCaseAddRemoveTest) {
+TEST(LWWSet, usecaseAddRemoveTest) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
