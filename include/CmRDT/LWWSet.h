@@ -1,7 +1,7 @@
 #pragma once
+#include <iostream>
 
 #include <unordered_map>
-#include <set>
 #include <utility> // std::pair
 #include <cassert>
 #include <ostream>
@@ -17,6 +17,7 @@ namespace CmRDT {
  * Associative container that contains unique keys.
  * Timestamps is assigned to each add / remove operation to create total order
  * of operations.
+ *
  *
  * \warning
  * Timestamps are strictly unique with total order.
@@ -45,6 +46,9 @@ namespace CmRDT {
  */
 template<typename Key, typename U>
 class LWWSet {
+    public:
+        class iterator;
+
     private:
         class Metadata;
         std::unordered_map<Key, Metadata> _map;
@@ -122,7 +126,6 @@ class LWWSet {
     // -------------------------------------------------------------------------
 
     public:
-        class iterator;
 
         iterator begin() {
             return iterator(*this);
@@ -181,9 +184,9 @@ class LWWSet {
 };
 
 
-// -----------------------------------------------------------------------------
+// *****************************************************************************
 // Nested classes
-// -----------------------------------------------------------------------------
+// *****************************************************************************
 
 
 // Internal representation of metadata for each key in the set.
@@ -215,22 +218,14 @@ class LWWSet<Key,U>::Metadata {
 template<typename Key, typename U>
 class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Key> {
     private:
+        friend LWWSet;
         typedef typename std::unordered_map<Key, Metadata>::iterator internal_iterator;
 
+    private:
         LWWSet& _data;
         internal_iterator _it;
 
-    public:
-
-        iterator(LWWSet& set) : _data(set) {
-            _it = _data._map.begin();
-
-            // If first elt is already removed, skipp it
-            if(_it != _data._map.end() && _it->second._isRemoved) {
-                ++_it;
-            }
-        }
-
+    private:
         /**
          * Create an iterator for a set and place it at specific position.
          * Given position may be a removed key.
@@ -241,6 +236,21 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
         iterator(LWWSet& set, internal_iterator begin)
             : _data(set), _it(begin) {
         }
+
+
+    public:
+
+        iterator(LWWSet& set) : _data(set) {
+            _it = _data._map.begin();
+
+            // If first elt is already removed, skipp it
+            while(_it != _data._map.end() && _it->second._isRemoved) {
+                ++_it;
+            }
+        }
+
+
+    public:
 
         iterator& operator++() {
             ++_it;
