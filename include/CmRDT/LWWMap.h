@@ -51,24 +51,10 @@ namespace CmRDT {
  */
 template<typename Key, typename T, typename U>
 class LWWMap {
-    private:
-        /** Map cell component */
-        class Element {
-            public:
-                T       _content;
-                U       _timestamp;
-                bool    _isRemoved;
+    public:
+        class Element;
 
-            public:
-                friend bool operator==(const Element& lhs, const Element& rhs) {
-                    return (lhs._content == rhs._content)
-                            && (lhs._timestamp == rhs._timestamp)
-                            && (lhs._isRemoved == rhs._isRemoved);
-                }
-                friend bool operator!=(const Element& lhs, const Element& rhs) {
-                    return !(lhs == rhs);
-                }
-        };
+        typedef typename std::unordered_map<Key, Element>::iterator load_iterator;
 
     private:
         std::unordered_map<Key, Element> _map;
@@ -81,33 +67,19 @@ class LWWMap {
     public:
 
         /**
-         * TODO Doc
+         * Query a key-element and its internal CRDT metadata.
+         * This means, query on a removed key will return this key with 
+         * removed metadata to true. This may be useful to have CRDT update
+         * (Query will return the key-elt, whereas it has been deleted or not).
+         *
+         * If this key has never been added in set, returns past-the-end
+         * (See end()) iterator.
+         *
+         * \param key The key to find.
+         * \return Iterator to the key-element or end() if not found.
          */
-        T query(const Key& key) const {
-            auto it = _map.find(key);
-            if(it == _map.end()) {
-                // See comment in "T& query(const Key& key)"
-                return {}; // Note: Default constructor must exists
-            }
-            return it->second._content;
-        }
-
-        /**
-         * TODO Doc
-         */
-        T& query(const Key& key) {
-            auto it = _map.find(key);
-            if(it == _map.end()) {
-                /*
-                 * Dev note: this is ugly, another way would be to use iterator.
-                 * I did this because simple iterator would show the internal
-                 * content (class Element).
-                 * This solution 'works' but should be updated later.
-                 */
-                static T t = {};
-                return t;
-            }
-            return it->second._content;
+        load_iterator query(const Key& key) {
+            return _map.find(key);
         }
 
         /**
@@ -168,6 +140,27 @@ class LWWMap {
 
 
     // -------------------------------------------------------------------------
+    // Iterator
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Returns a load iterator to the beginning.
+         */
+        load_iterator lbegin() {
+            return _map.begin();
+        }
+
+        /**
+         * Returns a load iterator to the end.
+         */
+        load_iterator lend() {
+            return _map.end();
+        }
+
+
+    // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
@@ -175,12 +168,13 @@ class LWWMap {
 
         /**
          * Check if lhs and rhs are equals.
-         * Two LWWMap are equal if their internal map are equal.
-         * Removed elements are used to determine equality.
+         * Two LWWMap are equal if their map of 'living' keys are equal.
          *
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWMap& lhs, const LWWMap& rhs) {
+            // TODO: should only test for living elements.
+            // atm: doesn't do the job specified by the doc.
             return lhs._map == rhs._map;
         }
 
@@ -213,6 +207,32 @@ class LWWMap {
                 }
             }
             return out;
+        }
+};
+
+
+// *****************************************************************************
+// Nested classes
+// *****************************************************************************
+
+/**
+ * Map cell component.
+ */
+template<typename Key, typename T, typename U>
+class LWWMap<Key, T, U>::Element {
+    public:
+        T       _content;
+        U       _timestamp;
+        bool    _isRemoved;
+
+    public:
+        friend bool operator==(const Element& lhs, const Element& rhs) {
+            return (lhs._content == rhs._content)
+                    && (lhs._timestamp == rhs._timestamp)
+                    && (lhs._isRemoved == rhs._isRemoved);
+        }
+        friend bool operator!=(const Element& lhs, const Element& rhs) {
+            return !(lhs == rhs);
         }
 };
 

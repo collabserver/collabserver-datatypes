@@ -63,7 +63,7 @@ class LWWSet {
     public:
 
         /**
-         * Query a key with internal CRDT metadata.
+         * Query a key and its internal CRDT metadata.
          * This means, query on a removed key will return this key with 
          * removed metadata to true. This may be useful to have CRDT update
          * (Query will return the key, whereas it has been deleted or not).
@@ -94,11 +94,11 @@ class LWWSet {
             elt._isRemoved  = false;
 
             auto res        = _map.insert(std::make_pair(key, elt));
-            bool keyAdded   = res.second;
+            bool isKeyAdded = res.second;
             Metadata& keyElt= res.first->second;
             U keyStamp      = keyElt._timestamp;
 
-            if(!keyAdded) {
+            if(!isKeyAdded) {
                 assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
                     keyElt._timestamp = stamp;
@@ -110,7 +110,7 @@ class LWWSet {
         /**
          * Remove a key from the container.
          *
-         * If key doesn't exists, add it first with removed state true.
+         * If key doesn't exists, internally add it first (with removed flag).
          * This is because remove / add are commutative and remove may be
          * received before add.
          *
@@ -123,11 +123,11 @@ class LWWSet {
             elt._isRemoved  = true;
 
             auto res        = _map.insert(std::make_pair(key, elt));
-            bool keyAdded   = res.second;
+            bool isKeyAdded   = res.second;
             Metadata& keyElt= res.first->second;
             U keyStamp      = keyElt._timestamp;
 
-            if(!keyAdded) {
+            if(!isKeyAdded) {
                 assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
                     keyElt._timestamp = stamp;

@@ -82,28 +82,26 @@ class LWWGraph {
          * TODO doc
          */
         void addEdge(const Key& from, const Key& to, const U& stamp) {
-            if(from == to) {
-                return;
-            }
+            /*
             _adj.add(from, stamp);
             _adj.add(to, stamp);
 
             Vertex &v = _adj.query(from);
             v._edges.add(to, stamp);
+            */
         }
 
         /**
          * TODO doc
          */
         void removeEdge(const Key& from, const Key& to, const U& stamp) {
-            if(from == to) {
-                return;
-            }
+            /*
             _adj.remove(from, 0);
             _adj.remove(to, 0);
 
             Vertex &v = _adj.query(from);
             v._edges.remove(to, stamp);
+            */
         }
 
 

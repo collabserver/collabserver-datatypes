@@ -36,25 +36,19 @@ TEST(LWWSet, queryTest) {
 }
 
 TEST(LWWSet, addTest) {
-    LWWSet<std::string, int> data0;
+    LWWSet<int, int> data0;
 
     // Add normal
-    data0.add("e1", 1);
-    data0.add("e2", 2);
-    data0.add("e3", 3);
-    data0.add("e4", 4);
-
-    auto res = data0.query("e1");
-    EXPECT_TRUE(res != data0.lend() && res->first == "e1" && res->second._isRemoved == false);
-
-    res = data0.query("e2");
-    EXPECT_TRUE(res != data0.lend() && res->first == "e2" && res->second._isRemoved == false);
-
-    res = data0.query("e3");
-    EXPECT_TRUE(res != data0.lend() && res->first == "e3" && res->second._isRemoved == false);
-
-    res = data0.query("e4");
-    EXPECT_TRUE(res != data0.lend() && res->first == "e4" && res->second._isRemoved == false);
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+    for(int k = 0; k < 4; ++k) {
+        auto res = data0.query(k);
+        EXPECT_TRUE(res != data0.lend());
+        EXPECT_EQ(res->first, k);
+        EXPECT_FALSE(res->second._isRemoved);
+    }
 }
 
 TEST(LWWSet, removeTest) {
@@ -63,7 +57,9 @@ TEST(LWWSet, removeTest) {
     // Remove before add is valid
     data0.remove("e1", 10);
     auto res = data0.query("e1");
-    EXPECT_TRUE(res != data0.lend() && res->first == "e1" && res->second._isRemoved == true);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->first, "e1");
 
     // Add then remove
     data0.add("e1", 21);
@@ -86,20 +82,34 @@ TEST(LWWSet, removeTest) {
 
 TEST(LWWSet, addRemoveTest) {
     LWWSet<std::string, int> data0;
-    LWWSet<std::string, int> data1;
 
-    // User1 flow (Normal order)
-    data0.add("v1", 1);
-    data0.add("v2", 3);
-    data0.remove("v1", 4);
+    // Remove elt before even added. (Is technically removed)
+    data0.remove("v1", 1000);
+    auto res = data0.query("v1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_TRUE(res->second._isRemoved == true);
 
-    // User1 flow (Remove before add)
-    data1.remove("v1", 4);
-    data1.add("v2", 3);
-    data1.add("v1", 1);
+    // Add this element, but remove was done later (Still removed)
+    data0.add("v1", 10);
+    res = data0.query("v1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_TRUE(res->second._isRemoved == true);
 
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
+    // Re-add this element after the remove
+    data0.add("v1", 1001);
+    res = data0.query("v1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_TRUE(res->second._isRemoved == false);
+
+    // Remove this element before the last add: do nothing (Still added)
+    data0.remove("v1", 20);
+    res = data0.query("v1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_TRUE(res->second._isRemoved == false);
 }
 
 
@@ -214,7 +224,8 @@ TEST(LWWSet, loadIteratorAddRemoveTest) {
     data0.add(3, 13);
     int k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        // Dev note: I'm not sure order is predictable. I use nb of iteration instead.
+        // Dev note: I'm not sure order is predictable.
+        // I use number of iterations instead.
         ++k;
     }
     EXPECT_EQ(k, 4);
@@ -311,18 +322,18 @@ TEST(LWWSet, operatorEQTest) {
     // Simple add, both are same (Timestamp doesn't count)
     data0.add("v1", 1);
     data1.add("v1", 2);
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
 
     // Removed elt not used in equality
     data0.remove("v2", 3);
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
 
-    // Back to same
+    // Remove in all
     data1.remove("v2", 3);
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
 
     // Some more add
     data0.add("v3", 4);
@@ -330,9 +341,32 @@ TEST(LWWSet, operatorEQTest) {
     data0.add("v5", 6);
     data1.add("v3", 7);
     data1.add("v4", 8);
-    EXPECT_FALSE(data0 == data1);
-    EXPECT_TRUE(data0 != data1);
+    ASSERT_FALSE(data0 == data1);
+    ASSERT_TRUE(data0 != data1);
     data1.add("v5", 9);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
+}
+
+
+// -----------------------------------------------------------------------------
+// Use cases Tests
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, usecasesAddRemoveTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // User1 flow (Normal order)
+    data0.add("v1", 1);
+    data0.add("v2", 3);
+    data0.remove("v1", 4);
+
+    // User1 flow (Remove before add)
+    data1.remove("v1", 4);
+    data1.add("v2", 3);
+    data1.add("v1", 1);
+
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
 }
