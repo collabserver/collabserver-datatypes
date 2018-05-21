@@ -3,10 +3,6 @@ dist: trusty
 sudo: required
 os: linux
 
-before_install:
-    - sudo apt-get update
-    - sudo apt-get upgrade
-
 compiler:
     - gcc
     - clang
