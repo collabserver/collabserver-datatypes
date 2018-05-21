@@ -1,5 +1,10 @@
 # CRDTs
 
+[![release-version](https://img.shields.io/badge/release-beta--version-red.svg)]()
+[![build-status](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
+[![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
+
+
 # Description
 Defines a set of basic CRDTs that may be used to build your more complex data (on top of these structures).
 CRDTs stands for Conflict-free Replicated Data Structure.
@@ -17,6 +22,9 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 - LWWSet: Last-Write-Wins Set
 
 ## CvRDT (State-based)
+> Warning: I wrote the CvRDTs as an example and are not meant to be used.
+> (At least, some change may be required).
+
 - 2PSet: Add / Remove set (Two-phases Set)
 - GCounter: Grow-only counter
 - GGraph: Grow-only graph
@@ -24,8 +32,6 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 - GSet: Grow-only set
 - LWWRegister: Last-Write-Wins Register
 - PNCounter: Increment / Decrement counter
-
-> Warning: I wrote the CvRDTs as an example and they may not fit actual use.
 
 
 # CRDTs operation / academic description

@@ -99,8 +99,6 @@ class LWWGraph {
         }
 
         /**
-         * TODO doc
-         *
          * Add edge from a vertex to another.
          * This always perform a 'addVertex' on from and to. This means, if a
          * removeVertex operation is applied, then addEdge is applied, the
