@@ -56,6 +56,8 @@ class LWWGraph {
         class Vertex;
         LWWMap<Key, Vertex, U> _adj;
 
+        typedef typename LWWMap<Key,Vertex,U>::load_iterator load_iterator;
+
 
     // -------------------------------------------------------------------------
     // CRDT methods
@@ -64,7 +66,25 @@ class LWWGraph {
     public:
 
         /**
-         * TODO doc
+         * Query a vertex and its internal CRDT metadata.
+         * Query a removed vertex returns this vertex with removed flag true.
+         * This is meant to be used for CRDT uses such as update.
+         *
+         * \param key   Vertex's key to find.
+         * \return      Iterator to the vertex or past-the-end if not found.
+         */
+        load_iterator queryVertex(const Key& key) {
+            return _adj.query(key);
+        }
+
+        /**
+         * Add a new vertex in the graph.
+         *
+         * If vertex already exists, update timestamps if was smaller.
+         * This is required for CRDT properties and commutativity.
+         *
+         * \param key   The unique vertex's key.
+         * \param stamp Timestamp of this operation.
          */
         void addVertex(const Key& key, const U& stamp) {
             _adj.add(key, stamp);
@@ -80,28 +100,57 @@ class LWWGraph {
 
         /**
          * TODO doc
+         *
+         * Add edge from a vertex to another.
+         * This always perform a 'addVertex' on from and to. This means, if a
+         * removeVertex operation is applied, then addEdge is applied, the
+         * edge is added and the vertex re-added with this edge.
+         *
+         * If this edge already exists, update timestamps.
+         * 
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
          */
         void addEdge(const Key& from, const Key& to, const U& stamp) {
-            /*
             _adj.add(from, stamp);
             _adj.add(to, stamp);
 
-            Vertex &v = _adj.query(from);
+            auto res = _adj.query(from);
+            Vertex &v = res->second._content;
             v._edges.add(to, stamp);
-            */
         }
 
         /**
          * TODO doc
          */
         void removeEdge(const Key& from, const Key& to, const U& stamp) {
-            /*
             _adj.remove(from, 0);
             _adj.remove(to, 0);
 
-            Vertex &v = _adj.query(from);
+            auto res = _adj.query(from);
+            Vertex &v = res->second._content;
             v._edges.remove(to, stamp);
-            */
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Iterator
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Returns a load iterator to the beginning.
+         */
+        load_iterator lbegin() {
+            return _adj.lbegin();
+        }
+
+        /**
+         * Returns a load iterator to the end.
+         */
+        load_iterator lend() {
+            return _adj.lend();
         }
 
 
@@ -113,13 +162,12 @@ class LWWGraph {
 
         /**
          * Check if lhs and rhs are equals.
-         * Two LWWGraphs are equal if their map of 'living' keys are equal.
-         * (Regardless removed keys).
+         * Two LWWGraphs are equal if their adjacency list of 'living' vertex
+         * are equal.
          *
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
-            // TODO This is not doing the actual job said in the doc.
             return (lhs._adj == rhs._adj);
         }
 
@@ -152,7 +200,6 @@ class LWWGraph {
 template<typename Key, typename T, typename U>
 class LWWGraph<Key,T,U>::Vertex {
     public:
-        Key             _id;
         T               _content;
         LWWSet<Key,U>   _edges;
 

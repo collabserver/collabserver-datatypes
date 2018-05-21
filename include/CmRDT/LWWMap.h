@@ -73,10 +73,10 @@ class LWWMap {
          * (Query will return the key-elt, whereas it has been deleted or not).
          *
          * If this key has never been added in set, returns past-the-end
-         * (See end()) iterator.
+         * (See lend()) iterator.
          *
          * \param key The key to find.
-         * \return Iterator to the key-element or end() if not found.
+         * \return Iterator to the key-element or past-the-end if not found.
          */
         load_iterator query(const Key& key) {
             return _map.find(key);

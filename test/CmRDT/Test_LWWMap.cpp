@@ -12,7 +12,7 @@ namespace CmRDT {
 TEST(LWWMap, queryTest) {
     LWWMap<int, int, int> data0;
 
-    // Query before event added
+    // Query before even exists
     auto res = data0.query(1);
     EXPECT_TRUE(res == data0.lend());
 

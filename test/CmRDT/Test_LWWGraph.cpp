@@ -10,27 +10,76 @@ namespace CmRDT {
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, queryVertexTest) {
-    EXPECT_TRUE(false) << "TODO Test";
-}
+    LWWGraph<int, int, int> data0;
 
-TEST(LWWGraph, queryEdgeTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    // Query before exists
+    auto res = data0.queryVertex(1);
+    EXPECT_TRUE(res == data0.lend());
+
+    // Add vertex
+    data0.addVertex(1, 10);
+    res = data0.queryVertex(1);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 1);
+    EXPECT_FALSE(res->second._isRemoved);
+
+    // Remove element. Query still works
+    data0.removeVertex(1, 20);
+    res = data0.queryVertex(1);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 1);
+    EXPECT_TRUE(res->second._isRemoved);
+
+    // Query another element before even added
+    res = data0.queryVertex(2);
+    EXPECT_TRUE(res == data0.lend());
+
+    // Add this element
+    data0.addVertex(2, 30);
+    res = data0.queryVertex(2);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 2);
+    EXPECT_FALSE(res->second._isRemoved);
 }
 
 TEST(LWWGraph, addVertexTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    LWWGraph<int, int, int> data0;
+
+    // Add some vertex
+    data0.addVertex(0, 10);
+    data0.addVertex(1, 11);
+    data0.addVertex(2, 12);
+    data0.addVertex(3, 13);
+    for(int k = 0; k < 4; ++k) {
+        auto res = data0.queryVertex(k);
+        EXPECT_TRUE(res != data0.lend());
+        EXPECT_EQ(res->first, k);
+        EXPECT_FALSE(res->second._isRemoved);
+    }
+
+    // Add duplicat (With various timestamp, in the end, change nothing)
+    data0.addVertex(0, 0);
+    data0.addVertex(1, 21);
+    data0.addVertex(2, 2);
+    data0.addVertex(3, 23);
+    for(int k = 0; k < 4; ++k) {
+        auto res = data0.queryVertex(k);
+        EXPECT_TRUE(res != data0.lend());
+        EXPECT_EQ(res->first, k);
+        EXPECT_FALSE(res->second._isRemoved);
+    }
 }
 
 TEST(LWWGraph, removeVertexTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
 }
 
 TEST(LWWGraph, addEdgeTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
 }
 
 TEST(LWWGraph, removeEdgeTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
 }
 
 // -----------------------------------------------------------------------------
@@ -38,7 +87,7 @@ TEST(LWWGraph, removeEdgeTest) {
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, operatorEQTest) {
-    EXPECT_TRUE(false) << "TODO Test";
+    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
 }
 
 // -----------------------------------------------------------------------------
