@@ -10,7 +10,29 @@ namespace CmRDT {
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, queryTest) {
-    ASSERT_TRUE(false) << "TODO Test";
+    LWWSet<std::string, int> data0;
+
+    // Query before exists
+    auto res = data0.query("e1");
+    EXPECT_TRUE(res == data0.lend());
+
+    // Add element and query
+    data0.add("e1", 10);
+    res = data0.query("e1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, "e1");
+    EXPECT_FALSE(res->second._isRemoved);
+
+    // Remove this element and query
+    data0.remove("e1", 20);
+    res = data0.query("e1");
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, "e1");
+    EXPECT_TRUE(res->second._isRemoved);
+
+    // Query invalid data
+    res = data0.query("xxx");
+    EXPECT_TRUE(res == data0.lend());
 }
 
 TEST(LWWSet, addTest) {
@@ -22,14 +44,62 @@ TEST(LWWSet, addTest) {
     data0.add("e3", 3);
     data0.add("e4", 4);
 
-    // TODO query
-    EXPECT_TRUE(false) << "TODO Query not implemented yet";
+    auto res = data0.query("e1");
+    EXPECT_TRUE(res != data0.lend() && res->first == "e1" && res->second._isRemoved == false);
+
+    res = data0.query("e2");
+    EXPECT_TRUE(res != data0.lend() && res->first == "e2" && res->second._isRemoved == false);
+
+    res = data0.query("e3");
+    EXPECT_TRUE(res != data0.lend() && res->first == "e3" && res->second._isRemoved == false);
+
+    res = data0.query("e4");
+    EXPECT_TRUE(res != data0.lend() && res->first == "e4" && res->second._isRemoved == false);
 }
 
 TEST(LWWSet, removeTest) {
-    EXPECT_TRUE(false) << "TODO test";
-    // TODO query
-    EXPECT_TRUE(false) << "TODO Query not implemented yet";
+    LWWSet<std::string, int> data0;
+
+    // Remove before add is valid
+    data0.remove("e1", 10);
+    auto res = data0.query("e1");
+    EXPECT_TRUE(res != data0.lend() && res->first == "e1" && res->second._isRemoved == true);
+
+    // Add then remove
+    data0.add("e1", 21);
+    data0.add("e2", 22);
+    data0.add("e3", 23);
+    data0.add("e4", 24);
+    data0.remove("e1", 31);
+    data0.remove("e2", 32);
+    data0.remove("e3", 33);
+    data0.remove("e4", 34);
+    auto res1 = data0.query("e1");
+    auto res2 = data0.query("e2");
+    auto res3 = data0.query("e3");
+    auto res4 = data0.query("e4");
+    EXPECT_TRUE(res1 != data0.lend() && res1->first == "e1" && res1->second._isRemoved == true);
+    EXPECT_TRUE(res2 != data0.lend() && res2->first == "e2" && res2->second._isRemoved == true);
+    EXPECT_TRUE(res3 != data0.lend() && res3->first == "e3" && res3->second._isRemoved == true);
+    EXPECT_TRUE(res4 != data0.lend() && res4->first == "e4" && res4->second._isRemoved == true);
+}
+
+TEST(LWWSet, addRemoveTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // User1 flow (Normal order)
+    data0.add("v1", 1);
+    data0.add("v2", 3);
+    data0.remove("v1", 4);
+
+    // User1 flow (Remove before add)
+    data1.remove("v1", 4);
+    data1.add("v2", 3);
+    data1.add("v1", 1);
+
+    EXPECT_TRUE(data0 == data1);
+    EXPECT_FALSE(data0 != data1);
 }
 
 
@@ -120,6 +190,15 @@ TEST(LWWSet, iteratorEmptySetTest) {
     }
 }
 
+TEST(LWWSet, iteratorReferenceTest) {
+    LWWSet<int, int> data0;
+
+    // Add all
+    data0.add(1, 1);
+    auto it = data0.begin();
+    EXPECT_EQ(*it, 1);
+}
+
 
 // -----------------------------------------------------------------------------
 // Iterator Tests (Load iterator)
@@ -195,6 +274,7 @@ TEST(LWWSet, loadIteratorReferenceTest) {
     data0.add(1, 10);
     auto it = data0.lbegin();
     EXPECT_FALSE(it->second._isRemoved);
+    it = data0.lbegin();
     data0.remove(1, 20);
     EXPECT_TRUE(it->second._isRemoved);
 
@@ -253,29 +333,6 @@ TEST(LWWSet, operatorEQTest) {
     EXPECT_FALSE(data0 == data1);
     EXPECT_TRUE(data0 != data1);
     data1.add("v5", 9);
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
-}
-
-
-// -----------------------------------------------------------------------------
-// Use cases Tests
-// -----------------------------------------------------------------------------
-
-TEST(LWWSet, usecaseAddRemoveTest) {
-    LWWSet<std::string, int> data0;
-    LWWSet<std::string, int> data1;
-
-    // User1 flow (Normal order)
-    data0.add("v1", 1);
-    data0.add("v2", 3);
-    data0.remove("v1", 4);
-
-    // User1 flow (Remove before add)
-    data1.remove("v1", 4);
-    data1.add("v2", 3);
-    data1.add("v1", 1);
-
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
 }

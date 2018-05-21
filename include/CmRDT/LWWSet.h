@@ -62,7 +62,21 @@ class LWWSet {
 
     public:
 
-        // TODO: function query
+        /**
+         * Query a key with internal CRDT metadata.
+         * This means, query on a removed key will return this key with 
+         * removed metadata to true. This may be useful to have CRDT update
+         * (Query will return the key, whereas it has been deleted or not).
+         *
+         * If this key has never been added in set, returns past-the-end
+         * (See end()) iterator.
+         *
+         * \param key The key to find.
+         * \return Iterator to the key with CRDT metadata or end() if not found.
+         */
+        load_iterator query(const Key& key) {
+            return _map.find(key);
+        }
 
         /**
          * Inserts new key in the container.
@@ -129,20 +143,36 @@ class LWWSet {
 
     public:
 
+        /**
+         * Returns an iterator to the beginning.
+         */
         iterator begin() {
             return iterator(*this);
         }
 
+        /**
+         * Returns an iterator to the end.
+         */
         iterator end() {
             iterator it(*this);
             it._it = _map.end();
             return it;
         }
 
+        /**
+         * Returns a load iterator to the beginning.
+         *
+         * \see load_iterator
+         */
         load_iterator lbegin() {
             return _map.begin();
         }
 
+        /**
+         * Returns a load iterator to the end.
+         *
+         * \see load_iterator
+         */
         load_iterator lend() {
             return _map.end();
         }
@@ -244,7 +274,7 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
         iterator(LWWSet& set) : _data(set) {
             _it = _data._map.begin();
 
-            // If first elt is already removed, skipp it
+            // If first element is already removed, skip it
             while(_it != _data._map.end() && _it->second._isRemoved) {
                 ++_it;
             }
@@ -253,7 +283,7 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
         iterator& operator++() {
             ++_it;
 
-            while(_it != _data._map.end() && _it->second._isRemoved == true) {
+            while(_it != _data._map.end() && _it->second._isRemoved) {
                 ++_it;
             }
             return *this;
@@ -268,6 +298,7 @@ class LWWSet<Key,U>::iterator : public std::iterator<std::input_iterator_tag, Ke
         }
 
         const Key& operator*() {
+            // TODO: remove this const (But _it is const_iterator atm.. :/ )
             return _it->first;
         }
 };
