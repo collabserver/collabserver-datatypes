@@ -19,27 +19,47 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 
 # Features
+- CmRDT (Operation-based)
+    - LWWGraph: Last-Write-Wins Graph
+    - LWWMap: Last-Write-Wins Map
+    - LWWRegister: Last-Write-Wins Register
+    - LWWSet: Last-Write-Wins Set
+- CvRDT (State-based)
+    - 2PSet: Add / Remove set (Two-phases Set)
+    - GCounter: Grow-only counter
+    - GGraph: Grow-only graph
+    - GMap: Grow-only map
+    - GSet: Grow-only set
+    - LWWRegister: Last-Write-Wins Register
+    - PNCounter: Increment / Decrement counter
+- custom (Custom data built in top of CRDTs)
+    - LWWViewMDE: custom data built for AToMPM software.
 
-## CmRDT (Operation-based)
-- LWWGraph: Last-Write-Wins Graph
-- LWWMap: Last-Write-Wins Map
-- LWWRegister: Last-Write-Wins Register
-- LWWSet: Last-Write-Wins Set
-
-## CvRDT (State-based)
-> Warning: I wrote the CvRDTs as an example and are not meant to be used.
-> (At least, some change may be required).
-
-- 2PSet: Add / Remove set (Two-phases Set)
-- GCounter: Grow-only counter
-- GGraph: Grow-only graph
-- GMap: Grow-only map
-- GSet: Grow-only set
-- LWWRegister: Last-Write-Wins Register
-- PNCounter: Increment / Decrement counter
+> Warning: I wrote the CvRDTs as an example. They are not meant to be used.
+> (At least, some changes may be required).
 
 
-# CRDTs operation / academic description
+# Dependencies
+> All dependencies are automatically downloaded by CMake.
+
+- [GoogleTest](https://github.com/google/googletest) (For unit tests).
+
+
+# Build and run with CMake (Linux only)
+> Requires C++11.
+
+> Requires "pragma once" support.
+
+```
+mkdir build
+cd build
+cmake ..
+make -j4
+make ./testAll
+```
+
+
+# CRDTs operations / Academic description
 
 ## State-based object (CvRDT)
     Convergent Replicated Data Types (CvRDT)

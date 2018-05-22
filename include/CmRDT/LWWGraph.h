@@ -108,7 +108,7 @@ class LWWGraph {
          * If after the 'addVertex' operation, any vertex is still marked as
          * removed. Meaning 'addEdge' was before 'removeVertex', this edge
          * is marked as removed (With the 'removeVertex' timestamp).
-         * 
+         *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
          */
