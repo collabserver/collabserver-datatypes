@@ -20,10 +20,10 @@ TEST(LWWMap, queryTest) {
     data0.add(1, 10);
     res = data0.query(1);
     EXPECT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 1);
     EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->first, 1);
 
-    // Remove element. Query still works
+    // Remove element. Query should still works (But removed flag)
     data0.remove(1, 20);
     res = data0.query(1);
     EXPECT_TRUE(res != data0.lend());
@@ -45,7 +45,7 @@ TEST(LWWMap, queryTest) {
 TEST(LWWMap, addTest) {
     LWWMap<int, int, int> data0;
 
-    // Replicate 0
+    // Some simple add
     data0.add(0, 10);
     data0.add(1, 11);
     data0.add(2, 12);
@@ -55,20 +55,35 @@ TEST(LWWMap, addTest) {
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
         EXPECT_FALSE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, (10+k));
     }
+
+    // Test duplicate add, keep max timestamps 
+    data0.add(4, 25);
+    data0.add(4, 24);
+    data0.add(4, 28);
+    data0.add(4, 29);
+    data0.add(4, 27);
+    data0.add(4, 20);
+    auto res = data0.query(4);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 4);
+    EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 29);
 }
 
 TEST(LWWMap, removeTest) {
     LWWMap<int, int, int> data0;
 
-    // Remove before even addded works
+    // Remove before even added works
     data0.remove(0, 10);
     auto res = data0.query(0);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 0);
     EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 10);
 
-    // Replicate 0
+    // Some remove after add. Check is marked as removed.
     data0.add(0, 20);
     data0.add(1, 21);
     data0.add(2, 22);
@@ -82,7 +97,22 @@ TEST(LWWMap, removeTest) {
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
         EXPECT_TRUE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, (k + 30));
     }
+
+    // Duplicate remove, set higher timestamps
+    data0.add(4, 30);
+    data0.remove(4, 43);
+    data0.remove(4, 42);
+    data0.remove(4, 47);
+    data0.remove(4, 42);
+    data0.remove(4, 49);
+    data0.remove(4, 41);
+    res = data0.query(4);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 4);
+    EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 49);
 }
 
 TEST(LWWMap, addRemoveTest) {
@@ -94,15 +124,17 @@ TEST(LWWMap, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->second._isRemoved);
     EXPECT_EQ(res->first, 42);
+    EXPECT_EQ(res->second._timestamp, 1000);
 
     // Receive add that was actually before (Stay removed)
-    data0.add(42, 10);
     data0.add(42, 11);
     data0.add(42, 12);
+    data0.add(42, 10);
     res = data0.query(42);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->second._isRemoved);
     EXPECT_EQ(res->first, 42);
+    EXPECT_EQ(res->second._timestamp, 1000);
 
     // Re-add element later (Is now added)
     data0.add(42, 1001);
@@ -110,6 +142,7 @@ TEST(LWWMap, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_FALSE(res->second._isRemoved);
     EXPECT_EQ(res->first, 42);
+    EXPECT_EQ(res->second._timestamp, 1001);
 
     // Receive remove that was older (Stay added)
     data0.remove(42, 20);
@@ -117,6 +150,7 @@ TEST(LWWMap, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_FALSE(res->second._isRemoved);
     EXPECT_EQ(res->first, 42);
+    EXPECT_EQ(res->second._timestamp, 1001);
 }
 
 
@@ -157,15 +191,6 @@ TEST(LWWMap, operatorEQTest) {
     data1.add("attr5", 50);
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
-}
-
-
-// -----------------------------------------------------------------------------
-// Use Case Tests
-// -----------------------------------------------------------------------------
-
-TEST(LWWMap, useCaseAddRemoveTest) {
-    // TODO test to do
 }
 
 

@@ -100,11 +100,14 @@ class LWWGraph {
 
         /**
          * Add edge from a vertex to another.
-         * This always perform a 'addVertex' on from and to. This means, if a
-         * removeVertex operation is applied, then addEdge is applied, the
-         * edge is added and the vertex re-added with this edge.
          *
-         * If this edge already exists, update timestamps.
+         * \warning
+         * This also performs a 'addVertex' for vertex 'from' and 'to'.
+         * All operations must be commutative and this ensure addEdge is
+         * commutative even if addEdge is received before the add operations.
+         * If after the 'addVertex' operation, any vertex is still marked as
+         * removed. Meaning 'addEdge' was before 'removeVertex', this edge
+         * is marked as removed (With the 'removeVertex' timestamp).
          * 
          * \param from  The origin vertex.
          * \param to    The destination vertex.
@@ -119,7 +122,15 @@ class LWWGraph {
         }
 
         /**
-         * TODO doc
+         * Remove the specific edge between two vertex.
+         *
+         * If from and/or to doesn't exists, create one with minimum possible
+         * timestamp. This create a temporary vertex. This is use in case of
+         * removeEdge is applied before 'addEdge'. (Required for CRDT
+         * commutativity).
+         *
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
          */
         void removeEdge(const Key& from, const Key& to, const U& stamp) {
             _adj.remove(from, 0);

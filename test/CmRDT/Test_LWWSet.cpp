@@ -48,36 +48,64 @@ TEST(LWWSet, addTest) {
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
         EXPECT_FALSE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, (10+k));
     }
+
+    // Test duplicate add, keep max timestamps 
+    data0.add(4, 25);
+    data0.add(4, 24);
+    data0.add(4, 28);
+    data0.add(4, 29);
+    data0.add(4, 27);
+    data0.add(4, 20);
+    auto res = data0.query(4);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 4);
+    EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 29);
 }
 
 TEST(LWWSet, removeTest) {
-    LWWSet<std::string, int> data0;
+    LWWSet<int, int> data0;
 
-    // Remove before add is valid
-    data0.remove("e1", 10);
-    auto res = data0.query("e1");
+    // Remove before even added works
+    data0.remove(0, 10);
+    auto res = data0.query(0);
     EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 0);
     EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->first, "e1");
+    EXPECT_EQ(res->second._timestamp, 10);
 
-    // Add then remove
-    data0.add("e1", 21);
-    data0.add("e2", 22);
-    data0.add("e3", 23);
-    data0.add("e4", 24);
-    data0.remove("e1", 31);
-    data0.remove("e2", 32);
-    data0.remove("e3", 33);
-    data0.remove("e4", 34);
-    auto res1 = data0.query("e1");
-    auto res2 = data0.query("e2");
-    auto res3 = data0.query("e3");
-    auto res4 = data0.query("e4");
-    EXPECT_TRUE(res1 != data0.lend() && res1->first == "e1" && res1->second._isRemoved == true);
-    EXPECT_TRUE(res2 != data0.lend() && res2->first == "e2" && res2->second._isRemoved == true);
-    EXPECT_TRUE(res3 != data0.lend() && res3->first == "e3" && res3->second._isRemoved == true);
-    EXPECT_TRUE(res4 != data0.lend() && res4->first == "e4" && res4->second._isRemoved == true);
+    // Some remove after add. Check is marked as removed.
+    data0.add(0, 20);
+    data0.add(1, 21);
+    data0.add(2, 22);
+    data0.add(3, 23);
+    data0.remove(0, 30);
+    data0.remove(1, 31);
+    data0.remove(2, 32);
+    data0.remove(3, 33);
+    for(int k = 0; k < 4; ++k) {
+        res = data0.query(k);
+        EXPECT_TRUE(res != data0.lend());
+        EXPECT_EQ(res->first, k);
+        EXPECT_TRUE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, (k + 30));
+    }
+
+    // Duplicate remove, set higher timestamps
+    data0.add(4, 30);
+    data0.remove(4, 43);
+    data0.remove(4, 42);
+    data0.remove(4, 47);
+    data0.remove(4, 42);
+    data0.remove(4, 49);
+    data0.remove(4, 41);
+    res = data0.query(4);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 4);
+    EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 49);
 }
 
 TEST(LWWSet, addRemoveTest) {
@@ -89,6 +117,7 @@ TEST(LWWSet, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == true);
+    EXPECT_EQ(res->second._timestamp, 1000);
 
     // Add this element, but remove was done later (Still removed)
     data0.add("v1", 10);
@@ -96,6 +125,7 @@ TEST(LWWSet, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == true);
+    EXPECT_EQ(res->second._timestamp, 1000);
 
     // Re-add this element after the remove
     data0.add("v1", 1001);
@@ -103,6 +133,7 @@ TEST(LWWSet, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == false);
+    EXPECT_EQ(res->second._timestamp, 1001);
 
     // Remove this element before the last add: do nothing (Still added)
     data0.remove("v1", 20);
@@ -110,6 +141,7 @@ TEST(LWWSet, addRemoveTest) {
     EXPECT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == false);
+    EXPECT_EQ(res->second._timestamp, 1001);
 }
 
 
@@ -127,7 +159,8 @@ TEST(LWWSet, iteratorAddRemoveTest) {
     data0.add(3, 13);
     int k = 0;
     for(auto it = data0.begin(); it != data0.end(); ++it) {
-        // Dev note: I'm not sure order is predictable. I use nb of iteration instead.
+        // Dev note: I'm not sure order is predictable.
+        // I use number of iteration instead.
         ++k;
     }
     EXPECT_EQ(k, 4);
@@ -219,14 +252,16 @@ TEST(LWWSet, loadIteratorAddRemoveTest) {
 
     // Add some elements and test iteration
     data0.add(0, 10);
-    data0.add(1, 11);
-    data0.add(2, 12);
-    data0.add(3, 13);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
     int k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         // Dev note: I'm not sure order is predictable.
         // I use number of iterations instead.
         ++k;
+        EXPECT_FALSE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 10);
     }
     EXPECT_EQ(k, 4);
 
@@ -266,14 +301,43 @@ TEST(LWWSet, loadIteratorRemovedTest) {
 
     // Fill set with removed elt (Yes, we don't even need add before).
     data0.remove(1, 10);
-    data0.remove(2, 11);
-    data0.remove(3, 12);
-    data0.remove(4, 13);
-    data0.remove(5, 14);
-    data0.remove(5, 15);
+    data0.remove(2, 10);
+    data0.remove(3, 10);
+    data0.remove(4, 10);
+    data0.remove(5, 10);
     int k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         ++k;
+        EXPECT_TRUE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 10);
+    }
+    ASSERT_EQ(k, 5);
+
+    // Add all
+    data0.add(1, 20);
+    data0.add(2, 20);
+    data0.add(3, 20);
+    data0.add(4, 20);
+    data0.add(5, 20);
+    k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ++k;
+        EXPECT_FALSE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 20);
+    }
+    ASSERT_EQ(k, 5);
+
+    // Add re-remove them all
+    data0.remove(1, 30);
+    data0.remove(2, 30);
+    data0.remove(3, 30);
+    data0.remove(4, 30);
+    data0.remove(5, 30);
+    k = 0;
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        ++k;
+        EXPECT_TRUE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 30);
     }
     ASSERT_EQ(k, 5);
 }
@@ -285,28 +349,32 @@ TEST(LWWSet, loadIteratorReferenceTest) {
     data0.add(1, 10);
     auto it = data0.lbegin();
     EXPECT_FALSE(it->second._isRemoved);
+    EXPECT_EQ(it->second._timestamp, 10);
     it = data0.lbegin();
     data0.remove(1, 20);
     EXPECT_TRUE(it->second._isRemoved);
+    EXPECT_EQ(it->second._timestamp, 20);
 
     // Add all
-    data0.add(1, 21);
-    data0.add(2, 22);
-    data0.add(3, 23);
-    data0.add(4, 24);
-    data0.add(5, 25);
+    data0.add(1, 30);
+    data0.add(2, 30);
+    data0.add(3, 30);
+    data0.add(4, 30);
+    data0.add(5, 30);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         EXPECT_FALSE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 30);
     }
 
     // Remove all
-    data0.remove(1, 31);
-    data0.remove(2, 32);
-    data0.remove(3, 33);
-    data0.remove(4, 34);
-    data0.remove(5, 35);
+    data0.remove(1, 40);
+    data0.remove(2, 40);
+    data0.remove(3, 40);
+    data0.remove(4, 40);
+    data0.remove(5, 40);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         EXPECT_TRUE(it->second._isRemoved);
+        EXPECT_EQ(it->second._timestamp, 40);
     }
 }
 
@@ -353,7 +421,7 @@ TEST(LWWSet, operatorEQTest) {
 // Use cases Tests
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, usecasesAddRemoveTest) {
+TEST(LWWSet, usecaseAddRemoveTest) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 

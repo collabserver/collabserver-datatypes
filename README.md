@@ -1,4 +1,4 @@
-# CRDTs
+# Conflict-free Replicated Data Types (CRDTs)
 
 [![release-version](https://img.shields.io/badge/release-beta--version-red.svg)]()
 [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)

@@ -79,6 +79,15 @@ class LWWRegister {
             }
         }
 
+        /**
+         * Get the internal current timestamps.
+         *
+         * \return Current timestamps associated with this register.
+         */
+        const U& timestamp() const {
+            return _timestamp;
+        }
+
 
     // -------------------------------------------------------------------------
     // Operators overload

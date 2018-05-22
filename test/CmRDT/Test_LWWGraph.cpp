@@ -55,9 +55,10 @@ TEST(LWWGraph, addVertexTest) {
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
         EXPECT_FALSE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, (10+k));
     }
 
-    // Add duplicat (With various timestamp, in the end, change nothing)
+    // Add duplicate (With various timestamps)
     data0.addVertex(0, 0);
     data0.addVertex(1, 21);
     data0.addVertex(2, 2);
@@ -68,6 +69,18 @@ TEST(LWWGraph, addVertexTest) {
         EXPECT_EQ(res->first, k);
         EXPECT_FALSE(res->second._isRemoved);
     }
+
+    // Add duplicate, check timestamps is the last value.
+    data0.addVertex(4, 38);
+    data0.addVertex(4, 33);
+    data0.addVertex(4, 39);
+    data0.addVertex(4, 32);
+    data0.addVertex(4, 33);
+    auto res = data0.queryVertex(4);
+    EXPECT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 4);
+    EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 39);
 }
 
 TEST(LWWGraph, removeVertexTest) {
