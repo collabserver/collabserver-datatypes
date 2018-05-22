@@ -60,23 +60,31 @@ make ./testAll
 # CRDTs operations / Academic description
 
 - State-based object (CvRDT)
-    Convergent Replicated Data Types (CvRDT)
-    State CvRDT is defined by (S s0 q u m)
-        S   -> Global State
-        s0  -> State at beginning
-        q   -> Query method
-        u   -> Update method
-        m   -> Merge method
+
+```
+Convergent Replicated Data Types (CvRDT)
+
+State CvRDT is defined by (S s0 q u m)
+    S   -> Global State
+    s0  -> State at beginning
+    q   -> Query method
+    u   -> Update method
+    m   -> Merge method
+```
 
 - Operation-based object (CmRDT)
-    Commutative Replicated Data Types (CmRDT)
-    Operation CmRDT is defined by (S s0 q t u P)
-        S   -> Global State
-        s0  -> State at beginning
-        q   -> Query method
-        t   -> Side-effect-free prepare update method
-        u   -> Effect update method (downstream)
-        P   -> Delivery relation P for communication protocol
+
+```
+Commutative Replicated Data Types (CmRDT)
+
+Operation CmRDT is defined by (S s0 q t u P)
+    S   -> Global State
+    s0  -> State at beginning
+    q   -> Query method
+    t   -> Side-effect-free prepare update method
+    u   -> Effect update method (downstream)
+    P   -> Delivery relation P for communication protocol
+```
 
 
 # Author
