@@ -32,7 +32,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
     - GSet: Grow-only set
     - LWWRegister: Last-Write-Wins Register
     - PNCounter: Increment / Decrement counter
-- custom (Custom data built in top of CRDTs)
+- Custom (Custom data built in top of CRDTs)
     - LWWViewMDE: custom data built for AToMPM software.
 
 > Warning: I wrote the CvRDTs as an example. They are not meant to be used.
@@ -46,9 +46,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 
 # Build and run with CMake (Linux only)
-> Requires C++11.
-
-> Requires "pragma once" support.
+> Requires C++11 and "pragma once" support.
 
 ```
 mkdir build
@@ -61,7 +59,7 @@ make ./testAll
 
 # CRDTs operations / Academic description
 
-## State-based object (CvRDT)
+- State-based object (CvRDT)
     Convergent Replicated Data Types (CvRDT)
     State CvRDT is defined by (S s0 q u m)
         S   -> Global State
@@ -70,7 +68,7 @@ make ./testAll
         u   -> Update method
         m   -> Merge method
 
-## Operation-based object (CmRDT)
+- Operation-based object (CmRDT)
     Commutative Replicated Data Types (CmRDT)
     Operation CmRDT is defined by (S s0 q t u P)
         S   -> Global State
