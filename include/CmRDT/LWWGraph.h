@@ -91,11 +91,26 @@ class LWWGraph {
         }
 
         /**
-         * TODO doc
+         * Remove a vertex from the graph. (Using LWW rule).
+         * Remove all edges that implies this vertex. (Using LWW rule).
+         * If vertex doesn't exists, create it first with removed flag to true.
+         * (CRDT commutativity).
+         *
+         * \note
+         * See addEdge documentation to understand concurrent operations
+         * addEdge | removeVertex.
+         *
+         * \param key   The unique vertex's key.
+         * \param stamp Timestamp of this operation.
          */
         void removeVertex(const Key& key, const U& stamp) {
             _adj.remove(key, stamp);
-            // TODO IMPORTANT: Remove from all edge links
+
+            // Remove all edge to this vertex (Even from 'removed' vertex)
+            for(auto it = _adj.lbegin(); it != _adj.lend(); ++it) {
+                auto& edges = it->second._content._edges;
+                edges.remove(key, stamp);
+            }
         }
 
         /**
@@ -108,6 +123,7 @@ class LWWGraph {
          * If after the 'addVertex' operation, any vertex is still marked as
          * removed. Meaning 'addEdge' was before 'removeVertex', this edge
          * is marked as removed (With the 'removeVertex' timestamp).
+         * This resolve the concurrent 'addEdge' | 'removeVertex'
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
@@ -119,6 +135,9 @@ class LWWGraph {
             auto res = _adj.query(from);
             Vertex &v = res->second._content;
             v._edges.add(to, stamp);
+
+            // TODO IMPORTANT: Check if from or/and to is removed
+            // If removed, also remove this edge with higher timestamp
         }
 
         /**
