@@ -443,19 +443,6 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, operatorEQTest) {
-    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
-}
-
-
-// -----------------------------------------------------------------------------
-// Use Case Tests
-// -----------------------------------------------------------------------------
-
-TEST(LWWGraph, addEdgeRemoveVertexConcurrentTest) {
-    EXPECT_TRUE(false) << "TODO: Test is not implemented yet";
-}
-
-TEST(LWWGraph, usecaseSimpleTest) {
     LWWGraph<std::string, int, int> data0; // Data at replicate 0
     LWWGraph<std::string, int, int> data1; // Data at replicate 1
 
@@ -468,6 +455,9 @@ TEST(LWWGraph, usecaseSimpleTest) {
     data0.addVertex("v5", 5);
     data0.addVertex("v6", 6);
 
+    EXPECT_FALSE(data0 == data1);
+    EXPECT_TRUE(data0 != data1);
+
     data0.addEdge("v1", "v3", 7);
     data0.addEdge("v2", "v1", 8);
     data0.addEdge("v2", "v4", 9);
@@ -476,9 +466,15 @@ TEST(LWWGraph, usecaseSimpleTest) {
     data0.addEdge("v6", "v3", 12);
     data0.addEdge("v6", "v4", 13);
 
+    EXPECT_FALSE(data0 == data1);
+    EXPECT_TRUE(data0 != data1);
+
     data0.removeEdge("v6", "v3", 14);
     data0.removeEdge("v6", "v4", 15);
     data0.removeEdge("v3", "v2", 16);
+
+    EXPECT_FALSE(data0 == data1);
+    EXPECT_TRUE(data0 != data1);
 
 
     // Replicate 1
@@ -489,6 +485,9 @@ TEST(LWWGraph, usecaseSimpleTest) {
     data1.addVertex("v5", 5);
     data1.addVertex("v6", 6);
 
+    EXPECT_FALSE(data0 == data1);
+    EXPECT_TRUE(data0 != data1);
+
     data1.addEdge("v1", "v3", 7);
     data1.addEdge("v2", "v1", 8);
     data1.addEdge("v2", "v4", 9);
@@ -497,12 +496,58 @@ TEST(LWWGraph, usecaseSimpleTest) {
     data1.addEdge("v6", "v3", 12);
     data1.addEdge("v6", "v4", 13);
 
+    EXPECT_FALSE(data0 == data1);
+    EXPECT_TRUE(data0 != data1);
+
     data1.removeEdge("v6", "v3", 14);
     data1.removeEdge("v6", "v4", 15);
     data1.removeEdge("v3", "v2", 16);
 
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
+}
+
+
+// -----------------------------------------------------------------------------
+// Use Case Tests
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, addEdgeRemoveVertexConcurrentTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Someone create a vertex and delete it.
+    data0.addVertex("v1", 10);
+    data0.removeVertex("v1", 100);
+
+    // Someone added the same vertex with edge (But earlier in time).
+    data0.addVertex("v1", 10);
+    data0.addVertex("v2", 11);
+    data0.addVertex("v3", 13);
+    data0.addEdge("v1", "v2", 21);
+    data0.addEdge("v1", "v3", 22);
+    data0.addEdge("v2", "v1", 23);
+    data0.addEdge("v2", "v3", 24);
+    data0.addEdge("v3", "v1", 25);
+
+    // Remove timestamp is last, addEdge must remove edges linked with v1
+    // Even if addEdge is called after remove (ex: network latency)
+
+    // V1 is deleted as well as all its edges
+    auto v1 = data0.queryVertex("v1");
+    EXPECT_TRUE(v1 != data0.lend());
+    EXPECT_EQ(v1->first, "v1");
+    EXPECT_EQ(v1->second._timestamp, 100);
+    EXPECT_TRUE(v1->second._isRemoved);
+    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+        auto& edges = it->second._content._edges;
+        auto edge_it = edges.query("v1");
+        bool isRemoved = edge_it->second._isRemoved;
+        int timestamp = edge_it->second._timestamp;
+
+        ASSERT_TRUE(edge_it != edges.lend()); // They all add edge with v1
+        ASSERT_TRUE(isRemoved);
+        ASSERT_EQ(timestamp, 100);
+    }
 }
 
 

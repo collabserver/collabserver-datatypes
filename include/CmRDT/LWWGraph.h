@@ -4,6 +4,7 @@
 #include "LWWSet.h"
 
 #include <ostream>
+#include <cassert>
 
 namespace CRDT {
 namespace CmRDT {
@@ -136,8 +137,25 @@ class LWWGraph {
             Vertex &v = res->second._content;
             v._edges.add(to, stamp);
 
-            // TODO IMPORTANT: Check if from or/and to is removed
-            // If removed, also remove this edge with higher timestamp
+            // If on vertex is removed, also remove this edge with highest U.
+            // This is really important for CRDT / Commutativity feature.
+            auto vertex_it_from = _adj.query(from);
+            auto vertex_it_to = _adj.query(to);
+            assert(vertex_it_from != _adj.lend());
+            assert(vertex_it_to != _adj.lend());
+            const bool from_removed = vertex_it_from->second._isRemoved;
+            const bool to_removed = vertex_it_to->second._isRemoved;
+
+            if(from_removed || to_removed) {
+                U from_time = vertex_it_from->second._timestamp;
+                U to_time   = vertex_it_to->second._timestamp;
+                assert(to_time != from_time);
+                U new_time  = (from_time > to_time) ? from_time : to_time;
+
+                auto res = _adj.query(from);
+                Vertex &v = res->second._content;
+                v._edges.remove(to, new_time);
+            }
         }
 
         /**
