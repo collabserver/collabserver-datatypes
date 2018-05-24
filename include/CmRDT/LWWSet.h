@@ -125,6 +125,28 @@ class LWWSet {
             return _map.find(key);
         }
 
+        /**
+         * Find a key in the container.
+         * This only lookup for key that are not internally deleted.
+         * (Like a normal set::find method).
+         * If key is internally removed (removed flag to true), find return
+         * past-the-end anyway (see end()).
+         *
+         * \param key Key value of the element to search for.
+         * \return Iterator to the element with key or past-the-end if not found.
+         */
+        const_iterator find(const Key& key) const {
+            auto elt_iterator = _map.find(key);
+            if(elt_iterator != _map.end() && !elt_iterator->second._isRemoved) {
+                const_iterator it(*this);
+                it._it = elt_iterator;
+                return it;
+            }
+            else {
+                return this->end();
+            }
+        }
+
 
     // -------------------------------------------------------------------------
     // Modifiers methods
@@ -254,6 +276,10 @@ class LWWSet {
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWSet& lhs, const LWWSet& rhs) {
+            if(lhs.size() != rhs.size()) {
+                return false;
+            }
+
             // TODO This is not doing the actual job said in the doc.
             return (lhs._map == rhs._map);
         }

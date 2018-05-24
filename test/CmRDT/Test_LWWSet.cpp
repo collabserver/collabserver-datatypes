@@ -2,6 +2,13 @@
 #include <gtest/gtest.h>
 
 
+#define _ASSERT_ELT_EQ(elt_it, key, isRemoved, timestamp) \
+    ASSERT_TRUE(elt_it != data0.lend()); \
+    EXPECT_EQ(elt_it->first, key); \
+    EXPECT_EQ(elt_it->second._isRemoved, isRemoved); \
+    EXPECT_EQ(elt_it->second._timestamp, timestamp) 
+
+
 namespace CRDT {
 namespace CmRDT {
 
@@ -163,26 +170,52 @@ TEST(LWWSet, queryTest) {
     LWWSet<std::string, int> data0;
 
     // Query before exists
-    auto res = data0.query("e1");
-    EXPECT_TRUE(res == data0.lend());
+    auto coco = data0.query("e1");
+    EXPECT_TRUE(coco == data0.lend());
 
     // Add element and query
     data0.add("e1", 10);
-    res = data0.query("e1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, "e1");
-    EXPECT_FALSE(res->second._isRemoved);
+    coco = data0.query("e1");
+    _ASSERT_ELT_EQ(coco, "e1", false, 10);
 
     // Remove this element and query
     data0.remove("e1", 20);
-    res = data0.query("e1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, "e1");
-    EXPECT_TRUE(res->second._isRemoved);
+    coco = data0.query("e1");
+    _ASSERT_ELT_EQ(coco, "e1", true, 20);
 
     // Query invalid data
-    res = data0.query("xxx");
-    EXPECT_TRUE(res == data0.lend());
+    coco = data0.query("xxx");
+    EXPECT_TRUE(coco == data0.lend());
+}
+
+
+// -----------------------------------------------------------------------------
+// find()
+// -----------------------------------------------------------------------------
+TEST(LWWSet, findTest) {
+    LWWSet<std::string, int> data0;
+
+    // Add all the crap there!
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+
+    // Find them all!
+    auto e1 = data0.find("e1");
+    auto e2 = data0.find("e2");
+    auto e3 = data0.find("e3");
+    EXPECT_EQ(*e1, "e1");
+    EXPECT_EQ(*e2, "e2");
+    EXPECT_EQ(*e3, "e3");
+}
+
+TEST(LWWSet, findRemovedElementTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.add("e1", 10);
+    data0.remove("e1", 20);
+    auto e1 = data0.find("e1");
+    EXPECT_EQ(e1, data0.end());
 }
 
 
@@ -195,15 +228,22 @@ TEST(LWWSet, addTest) {
 
     // Add normal
     data0.add(0, 10);
-    data0.add(1, 11);
-    data0.add(2, 12);
-    data0.add(3, 13);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
     for(int k = 0; k < 4; ++k) {
-        auto res = data0.query(k);
-        ASSERT_TRUE(res != data0.lend());
-        EXPECT_EQ(res->first, k);
-        EXPECT_FALSE(res->second._isRemoved);
-        EXPECT_EQ(res->second._timestamp, (10+k));
+        auto coco = data0.query(k);
+        _ASSERT_ELT_EQ(coco, k, false, 10);
+    }
+
+    // More add later
+    data0.add(0, 20);
+    data0.add(1, 20);
+    data0.add(2, 20);
+    data0.add(3, 20);
+    for(int k = 0; k < 4; ++k) {
+        auto coco = data0.query(k);
+        _ASSERT_ELT_EQ(coco, k, false, 20);
     }
 }
 
@@ -217,11 +257,8 @@ TEST(LWWSet, addDuplicateCallsTest) {
     data0.add(42, 19);
     data0.add(42, 17);
     data0.add(42, 10);
-    auto res = data0.query(42);
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 42);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 19);
+    auto carrot = data0.query(42);
+    _ASSERT_ELT_EQ(carrot, 42, false, 19);
 
     // Test duplicate add, keep max timestamps 
     data0.add(64, 28);
@@ -230,11 +267,8 @@ TEST(LWWSet, addDuplicateCallsTest) {
     data0.add(64, 22);
     data0.add(64, 27);
     data0.add(64, 25);
-    res = data0.query(64);
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 64);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 29);
+    carrot = data0.query(64);
+    _ASSERT_ELT_EQ(carrot, 64, false, 29);
 }
 
 
@@ -256,10 +290,7 @@ TEST(LWWSet, removeTest) {
     data0.remove(3, 20);
     for(int k = 0; k < 4; ++k) {
         auto res = data0.query(k);
-        ASSERT_TRUE(res != data0.lend());
-        EXPECT_EQ(res->first, k);
-        EXPECT_TRUE(res->second._isRemoved);
-        EXPECT_EQ(res->second._timestamp, 20);
+        _ASSERT_ELT_EQ(res, k, true, 20);
     }
 }
 
@@ -275,10 +306,7 @@ TEST(LWWSet, removeDuplicateCallsTest) {
     data0.remove(42, 29);
     data0.remove(42, 21);
     auto res = data0.query(42);
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 42);
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 29);
+    _ASSERT_ELT_EQ(res, 42, true, 29);
 }
 
 TEST(LWWSet, removeCalledBeforeAddCallTest) {
@@ -287,18 +315,12 @@ TEST(LWWSet, removeCalledBeforeAddCallTest) {
     // Remove before even added works
     data0.remove(42, 10);
     auto res = data0.query(42);
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 42);
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 10);
+    _ASSERT_ELT_EQ(res, 42, true, 10);
 
     // Re-removed later, change timestamps anyway
     data0.remove(42, 20);
     res = data0.query(42);
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 42);
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 20);
+    _ASSERT_ELT_EQ(res, 42, true, 20);
 }
 
 
@@ -312,18 +334,22 @@ TEST(LWWSet, addRemoveTest) {
     // Add element
     data0.add("v1", 10);
     auto res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 10);
+    _ASSERT_ELT_EQ(res, "v1", false, 10);
 
     // Remove this element
     data0.remove("v1", 20);
     res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 20);
+    _ASSERT_ELT_EQ(res, "v1", true, 20);
+
+    // Re-add
+    data0.add("v1", 30);
+    res = data0.query("v1");
+    _ASSERT_ELT_EQ(res, "v1", false, 30);
+
+    // Re-remove
+    data0.remove("v1", 40);
+    res = data0.query("v1");
+    _ASSERT_ELT_EQ(res, "v1", true, 40);
 }
 
 TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
@@ -332,34 +358,22 @@ TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
     // Remove elt before even added. (Is technically removed)
     data0.remove("v1", 1000);
     auto res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_TRUE(res->second._isRemoved == true);
-    EXPECT_EQ(res->second._timestamp, 1000);
+    _ASSERT_ELT_EQ(res, "v1", true, 1000);
 
     // Add this element, but remove was done later (Still removed)
     data0.add("v1", 10);
     res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_TRUE(res->second._isRemoved == true);
-    EXPECT_EQ(res->second._timestamp, 1000);
+    _ASSERT_ELT_EQ(res, "v1", true, 1000);
 
     // Re-add this element after the remove
     data0.add("v1", 1001);
     res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_TRUE(res->second._isRemoved == false);
-    EXPECT_EQ(res->second._timestamp, 1001);
+    _ASSERT_ELT_EQ(res, "v1", false, 1001);
 
     // Remove this element before the last add: do nothing (Still added)
     data0.remove("v1", 20);
     res = data0.query("v1");
-    ASSERT_TRUE(res != data0.lend());
-    EXPECT_TRUE(res->first == "v1");
-    EXPECT_TRUE(res->second._isRemoved == false);
-    EXPECT_EQ(res->second._timestamp, 1001);
+    _ASSERT_ELT_EQ(res, "v1", false, 1001);
 }
 
 TEST(LWWSet, addRemoveUseCaseTest) {
