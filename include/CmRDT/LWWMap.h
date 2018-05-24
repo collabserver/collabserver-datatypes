@@ -23,6 +23,15 @@ namespace CmRDT {
  * You may for instance use a LWWRegister. (In such case, after any add,
  * call register.update function to also update, if necessary, the content).
  *
+ * \note
+ * All operations on this set are commutative! You may receive a remove operation
+ * even before its create operation.
+ *
+ * \note
+ * Internally uses std::unordered_map (To store key and CRDT metadata).
+ * Insertion, deletion and query follow at least std::unordered_map complexity.
+ *
+ *
  * \warning
  * Timestamps are strictly unique with total order.
  * If (t1 == t2) is true, replicates may diverge.
@@ -55,13 +64,53 @@ class LWWMap {
         class Element;
 
         typedef typename std::unordered_map<Key, Element>::iterator load_iterator;
+        typedef typename std::unordered_map<Key, Element>::size_type size_type;
 
     private:
         std::unordered_map<Key, Element> _map;
+        size_type _sizeAlive = 0; // Nb of alive elts (Not marked as removed)
 
 
     // -------------------------------------------------------------------------
-    // CRDT methods
+    // Capacity methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Checks if the container has no 'alive' elements.
+         *
+         * \param true if the container is empty, false otherwise.
+         */
+        bool empty() const noexcept {
+            return _sizeAlive == 0;
+        }
+
+        /**
+         * Returns the number of 'alive' elements in the container.
+         *
+         * \return Number of alive elements in the container.
+         */
+        size_type size() const {
+            return _sizeAlive;
+        }
+
+        /**
+         * Returns the maximum number of elements the container is able to hold
+         * due to system or library implementation limitations,
+         * i.e. std::distance(begin(), end()) for the largest container.
+         *
+         * \see http://en.cppreference.com/w/cpp/container/unordered_map/max_size
+         *
+         * \return Maximum number of elements.
+         */
+        size_type max_size() const noexcept {
+            return _map.max_size();
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Lookup methods
     // -------------------------------------------------------------------------
 
     public:
@@ -104,9 +153,15 @@ class LWWMap {
 
             if(!keyAdded) {
                 if(keyStamp < stamp) {
+                    if(keyElt._isRemoved == true) {
+                        ++_sizeAlive;
+                    }
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = false;
                 }
+            }
+            else {
+                ++_sizeAlive;
             }
         }
 
@@ -132,10 +187,30 @@ class LWWMap {
 
             if(!keyAdded) {
                 if(keyStamp < stamp) {
+                    if(keyElt._isRemoved == false) {
+                        --_sizeAlive;
+                    }
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = true;
                 }
             }
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Hash policy methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Change capacity of the container.
+         * See cpp std::unordered_set::reserve
+         *
+         * \param count New capacity of the container.
+         */
+        void reserve(size_type count) {
+            _map.reserve(count);
         }
 
 
@@ -228,8 +303,7 @@ class LWWMap<Key, T, U>::Element {
     public:
         friend bool operator==(const Element& lhs, const Element& rhs) {
             return (lhs._content == rhs._content)
-                    && (lhs._timestamp == rhs._timestamp)
-                    && (lhs._isRemoved == rhs._isRemoved);
+                && (lhs._isRemoved == rhs._isRemoved);
         }
         friend bool operator!=(const Element& lhs, const Element& rhs) {
             return !(lhs == rhs);

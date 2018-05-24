@@ -95,6 +95,8 @@ class LWWSet {
          * due to system or library implementation limitations,
          * i.e. std::distance(begin(), end()) for the largest container.
          *
+         * \see http://en.cppreference.com/w/cpp/container/unordered_map/max_size
+         *
          * \return Maximum number of elements.
          */
         size_type max_size() const noexcept {
@@ -219,6 +221,23 @@ class LWWSet {
                     keyElt._isRemoved = true;
                 }
             }
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Hash policy methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Change capacity of the container.
+         * See cpp std::unordered_set::reserve
+         *
+         * \param count New capacity of the container.
+         */
+        void reserve(size_type count) {
+            _map.reserve(count);
         }
 
 

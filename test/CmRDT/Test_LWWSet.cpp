@@ -56,7 +56,6 @@ TEST(LWWSet, sizeTest) {
     data0.add(6, 15);
     ASSERT_EQ(data0.size(), 6);
 
-
     // Remove them all
     data0.remove(1, 20);
     ASSERT_EQ(data0.size(), 5);
@@ -70,7 +69,6 @@ TEST(LWWSet, sizeTest) {
     ASSERT_EQ(data0.size(), 1);
     data0.remove(6, 25);
     ASSERT_EQ(data0.size(), 0);
-
 }
 
 TEST(LWWSet, sizeWithDuplicateAddTest) {
@@ -193,6 +191,7 @@ TEST(LWWSet, queryTest) {
 // -----------------------------------------------------------------------------
 // find()
 // -----------------------------------------------------------------------------
+
 TEST(LWWSet, findTest) {
     LWWSet<std::string, int> data0;
 
@@ -393,6 +392,19 @@ TEST(LWWSet, addRemoveUseCaseTest) {
 
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
+}
+
+
+// -----------------------------------------------------------------------------
+// reserve()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, reserveTest) {
+    LWWSet<int, int> data0;
+
+    // Not sure how to test it at this exact terrible moment.
+    // For now, just do a call to be sure it compiles.
+    data0.reserve(10);
 }
 
 

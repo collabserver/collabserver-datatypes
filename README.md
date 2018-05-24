@@ -57,7 +57,7 @@ make ./testAll
 ```
 
 
-# CRDTs operations / Academic description
+# CRDTs academic description
 
 - State-based object (CvRDT)
 
