@@ -2,11 +2,12 @@
 #include <gtest/gtest.h>
 
 
+// Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it, key, isRemoved, timestamp) \
     ASSERT_TRUE(elt_it != data0.lend()); \
     EXPECT_EQ(elt_it->first, key); \
     EXPECT_EQ(elt_it->second._isRemoved, isRemoved); \
-    EXPECT_EQ(elt_it->second._timestamp, timestamp) 
+    EXPECT_EQ(elt_it->second._timestamp, timestamp)
 
 
 namespace CRDT {

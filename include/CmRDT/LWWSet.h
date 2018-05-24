@@ -280,8 +280,21 @@ class LWWSet {
                 return false;
             }
 
-            // TODO This is not doing the actual job said in the doc.
-            return (lhs._map == rhs._map);
+            // Dev note: in the worst case, this is N2 complexity.
+            // Better solution? Maybe. For now I don't have time to think about.
+            // Equality should not be called that often anyway (Since in
+            // collab environment, the local user has one replicate).
+            for(auto& elt : lhs) {
+                if(rhs.find(elt) == rhs.end()){
+                    return false;
+                }
+            }
+            for(auto& elt: rhs) {
+                if(lhs.find(elt) == lhs.end()) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /**
@@ -330,19 +343,6 @@ class LWWSet<Key,U>::Metadata {
     public:
         U       _timestamp;
         bool    _isRemoved;
-
-    public:
-        friend bool operator==(const Metadata& lhs, const Metadata& rhs) {
-            // Required for equality test of maps.
-            // We only care about the keys.
-            // Two key with different metadata are still same from the
-            // end user point of view.
-            return true;
-        }
-
-        friend bool operator!=(const Metadata& lhs, const Metadata& rhs) {
-            return !(lhs == rhs);
-        }
 };
 
 
