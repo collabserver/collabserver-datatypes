@@ -11,12 +11,20 @@ namespace CmRDT {
 
 
 /**
- * Last-Writer-Wins Set (LWW Set).
+ * Last-Writer-Wins Unordered Set.
  * CmRDT (Operation-based)
  *
  * Associative container that contains unique keys.
  * Timestamps is assigned to each add / remove operation to create total order
  * of operations.
+ *
+ * \note
+ * All operations on this set are commutative! You may receive a remove operation
+ * even before its create operation.
+ *
+ * \note
+ * Internally uses std::unordered_map (To store key and CRDT metadata).
+ * Insertion, deletion and query follow at least std::unordered_map complexity.
  *
  *
  * \warning
@@ -51,22 +59,61 @@ class LWWSet {
         class Metadata;
 
         typedef typename std::unordered_map<Key, Metadata>::const_iterator const_load_iterator;
+        typedef typename std::unordered_map<Key, Metadata>::size_type size_type;
 
     private:
         std::unordered_map<Key, Metadata> _map;
+        size_type _sizeAlive = 0; // Nb of alive elts (Not marked as removed)
 
 
     // -------------------------------------------------------------------------
-    // CRDT methods
+    // Capacity methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Checks if the container has no 'alive' elements.
+         *
+         * \param true if the container is empty, false otherwise.
+         */
+        bool empty() const noexcept {
+            return _sizeAlive == 0;
+        }
+
+        /**
+         * Returns the number of 'alive' elements in the container.
+         *
+         * \return Number of alive elements in the container.
+         */
+        size_type size() const {
+            return _sizeAlive;
+        }
+
+        /**
+         * Returns the maximum number of elements the container is able to hold
+         * due to system or library implementation limitations,
+         * i.e. std::distance(begin(), end()) for the largest container.
+         *
+         * \return Maximum number of elements.
+         */
+        size_type max_size() const noexcept {
+            return _map.max_size();
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Lookup methods
     // -------------------------------------------------------------------------
 
     public:
 
         /**
          * Query a key and its internal CRDT metadata.
-         * This means, query on a removed key will return this key with 
-         * removed metadata to true. This may be useful to have CRDT update
-         * (Query will return the key, whereas it has been deleted or not).
+         * This means, query a removed key will return this key with its
+         * internal CRDT metadata (isRemoved true). This may be useful
+         * for operation such as updates done in higher level. (Since update
+         * should be applied regardless key status.)
          *
          * If this key has never been added in set, returns past-the-end
          * (See end()) iterator.
@@ -77,6 +124,13 @@ class LWWSet {
         const_load_iterator query(const Key& key) const {
             return _map.find(key);
         }
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers methods
+    // -------------------------------------------------------------------------
+
+    public:
 
         /**
          * Inserts new key in the container.
@@ -101,9 +155,15 @@ class LWWSet {
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
+                    if(keyElt._isRemoved == true) {
+                        ++_sizeAlive;
+                    }
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = false;
                 }
+            }
+            else {
+                ++_sizeAlive;
             }
         }
 
@@ -130,6 +190,9 @@ class LWWSet {
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
+                    if(keyElt._isRemoved == false) {
+                        --_sizeAlive;
+                    }
                     keyElt._timestamp = stamp;
                     keyElt._isRemoved = true;
                 }
@@ -232,7 +295,9 @@ class LWWSet {
 
 
 /**
- * Represents the CRDT state of the elements.
+ * Represents the CRDT internal state of a key in set.
+ * Keys are never removed, only marked as removed with a timestamps.
+ * See CRDT articles.
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::Metadata {

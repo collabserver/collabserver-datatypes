@@ -1,3 +1,10 @@
+/*
+ * Dev note for all test files:
+ *
+ * The first word of test name is generally the tested methode.
+ * ex: addDuplicateCallsTest -> test function 'add'
+ */
+
 #include <gtest/gtest.h>
 
 

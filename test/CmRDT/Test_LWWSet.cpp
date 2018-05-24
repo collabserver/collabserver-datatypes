@@ -1,12 +1,162 @@
 #include "CmRDT/LWWSet.h"
 #include <gtest/gtest.h>
 
+
 namespace CRDT {
 namespace CmRDT {
 
 
 // -----------------------------------------------------------------------------
-// CRDT method tests
+// empty()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, emptyTest) {
+    LWWSet<int, int> data0;
+    ASSERT_TRUE(data0.empty());
+
+    data0.add(1, 10);
+    ASSERT_FALSE(data0.empty());
+    data0.remove(1, 20);
+    ASSERT_TRUE(data0.empty());
+    data0.add(1, 15);
+    data0.add(1, 17);
+    data0.add(1, 16);
+    ASSERT_TRUE(data0.empty());
+    data0.add(2, 30);
+    ASSERT_FALSE(data0.empty());
+}
+
+
+// -----------------------------------------------------------------------------
+// size()
+// -----------------------------------------------------------------------------
+TEST(LWWSet, sizeTest) {
+    LWWSet<int, int> data0;
+    ASSERT_EQ(data0.size(), 0);
+
+    // Add elements
+    data0.add(1, 10);
+    ASSERT_EQ(data0.size(), 1);
+    data0.add(2, 11);
+    ASSERT_EQ(data0.size(), 2);
+    data0.add(3, 12);
+    ASSERT_EQ(data0.size(), 3);
+    data0.add(4, 13);
+    ASSERT_EQ(data0.size(), 4);
+    data0.add(5, 14);
+    ASSERT_EQ(data0.size(), 5);
+    data0.add(6, 15);
+    ASSERT_EQ(data0.size(), 6);
+
+
+    // Remove them all
+    data0.remove(1, 20);
+    ASSERT_EQ(data0.size(), 5);
+    data0.remove(2, 21);
+    ASSERT_EQ(data0.size(), 4);
+    data0.remove(3, 22);
+    ASSERT_EQ(data0.size(), 3);
+    data0.remove(4, 23);
+    ASSERT_EQ(data0.size(), 2);
+    data0.remove(5, 24);
+    ASSERT_EQ(data0.size(), 1);
+    data0.remove(6, 25);
+    ASSERT_EQ(data0.size(), 0);
+
+}
+
+TEST(LWWSet, sizeWithDuplicateAddTest) {
+    LWWSet<int, int> data0;
+
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.add(1, 10);
+    data0.add(1, 18);
+    data0.add(1, 19);
+    data0.add(1, 11);
+    data0.add(1, 15);
+    ASSERT_EQ(data0.size(), 1);
+}
+
+TEST(LWWSet, sizeWithDuplicateAddRemoveTest) {
+    LWWSet<int, int> data0;
+
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.add(1, 11);
+    data0.add(1, 18);
+    ASSERT_EQ(data0.size(), 1);
+
+    data0.remove(1, 10);
+    ASSERT_EQ(data0.size(), 1);
+
+    data0.remove(1, 20);
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.remove(1, 32);
+    data0.remove(1, 38);
+    data0.remove(1, 39);
+    data0.remove(1, 35);
+    data0.remove(1, 31);
+    ASSERT_EQ(data0.size(), 0);
+}
+
+TEST(LWWSet, sizeWithRemoveFirstTest) {
+    LWWSet<int, int> data0;
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.remove(1, 22);
+    data0.remove(1, 28);
+    data0.remove(1, 29);
+    data0.remove(1, 25);
+    data0.remove(1, 21);
+    ASSERT_EQ(data0.size(), 0); // 0, not -5 or shit
+
+    data0.add(1, 10);
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.add(1, 30);
+    ASSERT_EQ(data0.size(), 1);
+
+    data0.remove(2, 10);
+    data0.remove(2, 45);
+    data0.remove(2, 40);
+    ASSERT_EQ(data0.size(), 1);
+}
+
+TEST(LWWSet, sizeWithOlderRemoveAfterAddTest) {
+    LWWSet<int, int> data0;
+    ASSERT_EQ(data0.size(), 0);
+
+    data0.remove(1, 10);
+    ASSERT_EQ(data0.size(), 0);
+    data0.add(1, 20);
+    ASSERT_EQ(data0.size(), 1);
+    data0.remove(1, 11);
+    data0.remove(1, 12);
+    data0.remove(1, 18);
+    ASSERT_EQ(data0.size(), 1); // Not removed (See timestamps)
+}
+
+
+// -----------------------------------------------------------------------------
+// max_size()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, max_sizeTest) {
+    // Well, this is not really a test, my goal here is just to call max_size
+    // (So that I'm sure it's compiling). But max_size itself is just a 
+    // 'foward' of unordered_map::max_size. See code.
+    LWWSet<int, int> data0;
+    LWWSet<int,int>::size_type t = data0.max_size();
+    ASSERT_TRUE(t > 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// query()
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, queryTest) {
@@ -19,14 +169,14 @@ TEST(LWWSet, queryTest) {
     // Add element and query
     data0.add("e1", 10);
     res = data0.query("e1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "e1");
     EXPECT_FALSE(res->second._isRemoved);
 
     // Remove this element and query
     data0.remove("e1", 20);
     res = data0.query("e1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "e1");
     EXPECT_TRUE(res->second._isRemoved);
 
@@ -34,6 +184,11 @@ TEST(LWWSet, queryTest) {
     res = data0.query("xxx");
     EXPECT_TRUE(res == data0.lend());
 }
+
+
+// -----------------------------------------------------------------------------
+// add()
+// -----------------------------------------------------------------------------
 
 TEST(LWWSet, addTest) {
     LWWSet<int, int> data0;
@@ -45,76 +200,139 @@ TEST(LWWSet, addTest) {
     data0.add(3, 13);
     for(int k = 0; k < 4; ++k) {
         auto res = data0.query(k);
-        EXPECT_TRUE(res != data0.lend());
+        ASSERT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
         EXPECT_FALSE(res->second._isRemoved);
         EXPECT_EQ(res->second._timestamp, (10+k));
     }
+}
+
+TEST(LWWSet, addDuplicateCallsTest) {
+    LWWSet<int, int> data0;
 
     // Test duplicate add, keep max timestamps 
-    data0.add(4, 25);
-    data0.add(4, 24);
-    data0.add(4, 28);
-    data0.add(4, 29);
-    data0.add(4, 27);
-    data0.add(4, 20);
-    auto res = data0.query(4);
-    EXPECT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 4);
+    data0.add(42, 15);
+    data0.add(42, 14);
+    data0.add(42, 18);
+    data0.add(42, 19);
+    data0.add(42, 17);
+    data0.add(42, 10);
+    auto res = data0.query(42);
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 42);
+    EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 19);
+
+    // Test duplicate add, keep max timestamps 
+    data0.add(64, 28);
+    data0.add(64, 29);
+    data0.add(64, 21);
+    data0.add(64, 22);
+    data0.add(64, 27);
+    data0.add(64, 25);
+    res = data0.query(64);
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 64);
     EXPECT_FALSE(res->second._isRemoved);
     EXPECT_EQ(res->second._timestamp, 29);
 }
 
+
+// -----------------------------------------------------------------------------
+// remove()
+// -----------------------------------------------------------------------------
+
 TEST(LWWSet, removeTest) {
     LWWSet<int, int> data0;
 
+    // Some remove after add. Check is marked as removed.
+    data0.add(0, 10);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+    data0.remove(0, 20);
+    data0.remove(1, 20);
+    data0.remove(2, 20);
+    data0.remove(3, 20);
+    for(int k = 0; k < 4; ++k) {
+        auto res = data0.query(k);
+        ASSERT_TRUE(res != data0.lend());
+        EXPECT_EQ(res->first, k);
+        EXPECT_TRUE(res->second._isRemoved);
+        EXPECT_EQ(res->second._timestamp, 20);
+    }
+}
+
+TEST(LWWSet, removeDuplicateCallsTest) {
+    LWWSet<int, int> data0;
+
+    // Duplicate remove, set higher timestamps
+    data0.add(42, 10);
+    data0.remove(42, 23);
+    data0.remove(42, 22);
+    data0.remove(42, 27);
+    data0.remove(42, 22);
+    data0.remove(42, 29);
+    data0.remove(42, 21);
+    auto res = data0.query(42);
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 42);
+    EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 29);
+}
+
+TEST(LWWSet, removeCalledBeforeAddCallTest) {
+    LWWSet<int, int> data0;
+
     // Remove before even added works
-    data0.remove(0, 10);
-    auto res = data0.query(0);
-    EXPECT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 0);
+    data0.remove(42, 10);
+    auto res = data0.query(42);
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 42);
     EXPECT_TRUE(res->second._isRemoved);
     EXPECT_EQ(res->second._timestamp, 10);
 
-    // Some remove after add. Check is marked as removed.
-    data0.add(0, 20);
-    data0.add(1, 21);
-    data0.add(2, 22);
-    data0.add(3, 23);
-    data0.remove(0, 30);
-    data0.remove(1, 31);
-    data0.remove(2, 32);
-    data0.remove(3, 33);
-    for(int k = 0; k < 4; ++k) {
-        res = data0.query(k);
-        EXPECT_TRUE(res != data0.lend());
-        EXPECT_EQ(res->first, k);
-        EXPECT_TRUE(res->second._isRemoved);
-        EXPECT_EQ(res->second._timestamp, (k + 30));
-    }
-
-    // Duplicate remove, set higher timestamps
-    data0.add(4, 30);
-    data0.remove(4, 43);
-    data0.remove(4, 42);
-    data0.remove(4, 47);
-    data0.remove(4, 42);
-    data0.remove(4, 49);
-    data0.remove(4, 41);
-    res = data0.query(4);
-    EXPECT_TRUE(res != data0.lend());
-    EXPECT_EQ(res->first, 4);
+    // Re-removed later, change timestamps anyway
+    data0.remove(42, 20);
+    res = data0.query(42);
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_EQ(res->first, 42);
     EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 49);
+    EXPECT_EQ(res->second._timestamp, 20);
 }
 
+
+// -----------------------------------------------------------------------------
+// add() + remove()
+// -----------------------------------------------------------------------------
+
 TEST(LWWSet, addRemoveTest) {
+    LWWSet<std::string, int> data0;
+
+    // Add element
+    data0.add("v1", 10);
+    auto res = data0.query("v1");
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_FALSE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 10);
+
+    // Remove this element
+    data0.remove("v1", 20);
+    res = data0.query("v1");
+    ASSERT_TRUE(res != data0.lend());
+    EXPECT_TRUE(res->first == "v1");
+    EXPECT_TRUE(res->second._isRemoved);
+    EXPECT_EQ(res->second._timestamp, 20);
+}
+
+TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
     LWWSet<std::string, int> data0;
 
     // Remove elt before even added. (Is technically removed)
     data0.remove("v1", 1000);
     auto res = data0.query("v1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == true);
     EXPECT_EQ(res->second._timestamp, 1000);
@@ -122,7 +340,7 @@ TEST(LWWSet, addRemoveTest) {
     // Add this element, but remove was done later (Still removed)
     data0.add("v1", 10);
     res = data0.query("v1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == true);
     EXPECT_EQ(res->second._timestamp, 1000);
@@ -130,7 +348,7 @@ TEST(LWWSet, addRemoveTest) {
     // Re-add this element after the remove
     data0.add("v1", 1001);
     res = data0.query("v1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == false);
     EXPECT_EQ(res->second._timestamp, 1001);
@@ -138,10 +356,28 @@ TEST(LWWSet, addRemoveTest) {
     // Remove this element before the last add: do nothing (Still added)
     data0.remove("v1", 20);
     res = data0.query("v1");
-    EXPECT_TRUE(res != data0.lend());
+    ASSERT_TRUE(res != data0.lend());
     EXPECT_TRUE(res->first == "v1");
     EXPECT_TRUE(res->second._isRemoved == false);
     EXPECT_EQ(res->second._timestamp, 1001);
+}
+
+TEST(LWWSet, addRemoveUseCaseTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // User1 flow (Normal order)
+    data0.add("v1", 1);
+    data0.add("v2", 3);
+    data0.remove("v1", 4);
+
+    // User1 flow (Remove before add)
+    data1.remove("v1", 4);
+    data1.add("v2", 3);
+    data1.add("v1", 1);
+
+    EXPECT_TRUE(data0 == data1);
+    EXPECT_FALSE(data0 != data1);
 }
 
 
@@ -403,7 +639,7 @@ TEST(LWWSet, operatorEQTest) {
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
 
-    // Some more add
+    // Some more add (Still not equal)
     data0.add("v3", 4);
     data0.add("v4", 5);
     data0.add("v5", 6);
@@ -411,32 +647,11 @@ TEST(LWWSet, operatorEQTest) {
     data1.add("v4", 8);
     ASSERT_FALSE(data0 == data1);
     ASSERT_TRUE(data0 != data1);
+
+    // Now are equal
     data1.add("v5", 9);
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
-}
-
-
-// -----------------------------------------------------------------------------
-// Use cases Tests
-// -----------------------------------------------------------------------------
-
-TEST(LWWSet, usecaseAddRemoveTest) {
-    LWWSet<std::string, int> data0;
-    LWWSet<std::string, int> data1;
-
-    // User1 flow (Normal order)
-    data0.add("v1", 1);
-    data0.add("v2", 3);
-    data0.remove("v1", 4);
-
-    // User1 flow (Remove before add)
-    data1.remove("v1", 4);
-    data1.add("v2", 3);
-    data1.add("v1", 1);
-
-    EXPECT_TRUE(data0 == data1);
-    EXPECT_FALSE(data0 != data1);
 }
 
 
