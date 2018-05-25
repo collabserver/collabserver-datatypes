@@ -86,7 +86,7 @@ class LWWSet {
          *
          * \return Number of alive elements in the container.
          */
-        size_type size() const {
+        size_type size() const noexcept {
             return _sizeAlive;
         }
 
@@ -139,7 +139,7 @@ class LWWSet {
          */
         const_iterator find(const Key& key) const {
             auto elt_iterator = _map.find(key);
-            if(elt_iterator != _map.end() && !elt_iterator->second._isRemoved) {
+            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
                 const_iterator it(*this);
                 it._it = elt_iterator;
                 return it;
@@ -174,7 +174,7 @@ class LWWSet {
             auto res        = _map.insert(std::make_pair(key, elt));
             bool isKeyAdded = res.second;
             Metadata& keyElt= res.first->second;
-            U keyStamp      = keyElt._timestamp;
+            U keyStamp      = keyElt.timestamp();
 
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
@@ -209,7 +209,7 @@ class LWWSet {
             auto res        = _map.insert(std::make_pair(key, elt));
             bool isKeyAdded = res.second;
             Metadata& keyElt= res.first->second;
-            U keyStamp      = keyElt._timestamp;
+            U keyStamp      = keyElt.timestamp();
 
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
@@ -338,8 +338,8 @@ class LWWSet {
             out << "CmRDT::LWWSet = ";
             for(const auto& elt : o._map) {
                 out << "(K=" << elt.first
-                    << ",U=" << elt.second._timestamp;
-                if(elt.second._isRemoved == true) {
+                    << ",U=" << elt.second.timestamp();
+                if(elt.second.isRemoved()) {
                     out << ",removed) ";
                 }
                 else {
@@ -369,7 +369,6 @@ class LWWSet<Key,U>::Metadata {
     private:
         friend LWWSet;
 
-    private:
         U    _timestamp;
         bool _isRemoved;
 
@@ -390,10 +389,12 @@ class LWWSet<Key,U>::Metadata {
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_tag, Key> {
+
     private:
         friend LWWSet;
-        const LWWSet& _data;
-        typename std::unordered_map<Key, Metadata>::const_iterator _it;
+
+        const LWWSet&       _data;
+        const_load_iterator _it;
 
 
     public:

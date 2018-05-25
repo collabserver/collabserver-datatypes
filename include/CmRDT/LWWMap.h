@@ -98,7 +98,7 @@ class LWWMap {
          *
          * \return Number of alive elements in the container.
          */
-        size_type size() const {
+        size_type size() const noexcept {
             return _sizeAlive;
         }
 
@@ -150,7 +150,7 @@ class LWWMap {
          */
         iterator find(const Key& key) {
             auto elt_iterator = _map.find(key);
-            if(elt_iterator != _map.end() && !elt_iterator->second._isRemoved) {
+            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
                 iterator it(*this);
                 it._it = elt_iterator;
                 return it;
@@ -185,7 +185,7 @@ class LWWMap {
             auto res        = _map.insert(std::make_pair(key, elt));
             bool keyAdded   = res.second;
             Element& keyElt = res.first->second;
-            U keyStamp      = keyElt._timestamp;
+            U keyStamp      = keyElt.timestamp();
 
             if(!keyAdded) {
                 if(keyStamp < stamp) {
@@ -219,7 +219,7 @@ class LWWMap {
             auto res        = _map.insert(std::make_pair(key, elt));
             bool keyAdded   = res.second;
             Element& keyElt = res.first->second;
-            U keyStamp      = keyElt._timestamp;
+            U keyStamp      = keyElt.timestamp();
 
             if(!keyAdded) {
                 if(keyStamp < stamp) {
@@ -324,9 +324,9 @@ class LWWMap {
             out << "CmRDT::LWWMap = ";
             for(const auto& elt : o._map) {
                 out << "(K=" << elt.first
-                    << ",T=" << elt.second._value
-                    << ",U=" << elt.second._timestamp;
-                if(elt.second._isRemoved == true) {
+                    << ",T=" << elt.second.value()
+                    << ",U=" << elt.second.timestamp();
+                if(elt.second.isRemoved()) {
                     out << ",removed) ";
                 }
                 else {
@@ -338,9 +338,11 @@ class LWWMap {
 };
 
 
+// /////////////////////////////////////////////////////////////////////////////
 // *****************************************************************************
 // Nested classes
 // *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
 
 /**
  * Map cell component.
@@ -386,9 +388,11 @@ class LWWMap<Key, T, U>::Element {
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag, T> {
+
     private:
         friend LWWMap;
-        LWWMap& _data;
+
+        LWWMap&       _data;
         load_iterator _it;
 
     public:
@@ -396,7 +400,7 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
             _it = _data._map.begin();
 
             // If first element is already removed, skip it
-            while(_it != _data._map.end() && _it->second._isRemoved) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
                 ++_it;
             }
         }
@@ -404,7 +408,7 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
         iterator& operator++() {
             ++_it;
 
-            while(_it != _data._map.end() && _it->second._isRemoved) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
                 ++_it;
             }
             return *this;
@@ -420,7 +424,7 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
 
         //reference operator*() {
         std::pair<const Key&, T&> operator*() {
-            return {_it->first, _it->second._value};
+            return {_it->first, _it->second.value()};
         }
 };
 
