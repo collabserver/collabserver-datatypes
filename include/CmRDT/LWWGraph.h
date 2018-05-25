@@ -109,7 +109,7 @@ class LWWGraph {
 
             // Remove all edge to this vertex (Even from 'removed' vertex)
             for(auto it = _adj.lbegin(); it != _adj.lend(); ++it) {
-                auto& edges = it->second._content._edges;
+                auto& edges = it->second.value()._edges;
                 edges.remove(key, stamp);
             }
         }
@@ -134,7 +134,7 @@ class LWWGraph {
             _adj.add(to, stamp);
 
             auto res = _adj.query(from);
-            Vertex &v = res->second._content;
+            Vertex &v = res->second.value();
             v._edges.add(to, stamp);
 
             // If on vertex is removed, also remove this edge with highest U.
@@ -143,17 +143,17 @@ class LWWGraph {
             auto vertex_it_to = _adj.query(to);
             assert(vertex_it_from != _adj.lend());
             assert(vertex_it_to != _adj.lend());
-            const bool from_removed = vertex_it_from->second._isRemoved;
-            const bool to_removed = vertex_it_to->second._isRemoved;
+            const bool from_removed = vertex_it_from->second.isRemoved();
+            const bool to_removed = vertex_it_to->second.isRemoved();
 
             if(from_removed || to_removed) {
-                U from_time = vertex_it_from->second._timestamp;
-                U to_time   = vertex_it_to->second._timestamp;
+                U from_time = vertex_it_from->second.timestamp();
+                U to_time   = vertex_it_to->second.timestamp();
                 assert(to_time != from_time);
                 U new_time  = (from_time > to_time) ? from_time : to_time;
 
                 auto res = _adj.query(from);
-                Vertex &v = res->second._content;
+                Vertex &v = res->second.value();
                 v._edges.remove(to, new_time);
             }
         }
@@ -174,7 +174,7 @@ class LWWGraph {
             _adj.remove(to, 0);
 
             auto res = _adj.query(from);
-            Vertex &v = res->second._content;
+            Vertex &v = res->second.value();
             v._edges.remove(to, stamp);
         }
 

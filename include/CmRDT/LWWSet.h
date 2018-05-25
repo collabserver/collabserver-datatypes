@@ -292,6 +292,8 @@ class LWWSet {
          * Check if lhs and rhs are equals.
          * Two sets are equal if their 'living' set of key are equal.
          *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWSet& lhs, const LWWSet& rhs) {
@@ -320,6 +322,8 @@ class LWWSet {
          * Check if lhs and rhs are not equals.
          * See operator == for further information about equality meaning.
          *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
          * \return True if not equal, otherwise, return false.
          */
         friend bool operator!=(const LWWSet& lhs, const LWWSet& rhs) {
@@ -347,9 +351,11 @@ class LWWSet {
 };
 
 
+// /////////////////////////////////////////////////////////////////////////////
 // *****************************************************************************
 // Nested classes
 // *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
 
 
 /**
@@ -359,9 +365,22 @@ class LWWSet {
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::Metadata {
+
+    private:
+        friend LWWSet;
+
+    private:
+        U    _timestamp;
+        bool _isRemoved;
+
     public:
-        U       _timestamp;
-        bool    _isRemoved;
+        const U& timestamp() const {
+            return _timestamp;
+        }
+
+        bool isRemoved() const {
+            return _isRemoved;
+        }
 };
 
 
@@ -383,7 +402,7 @@ class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_t
             _it = _data._map.begin();
 
             // If first element is already removed, skip it
-            while(_it != _data._map.end() && _it->second._isRemoved) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
                 ++_it;
             }
         }
@@ -391,7 +410,7 @@ class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_t
         const_iterator& operator++() {
             ++_it;
 
-            while(_it != _data._map.end() && _it->second._isRemoved) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
                 ++_it;
             }
             return *this;

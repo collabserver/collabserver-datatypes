@@ -324,7 +324,7 @@ class LWWMap {
             out << "CmRDT::LWWMap = ";
             for(const auto& elt : o._map) {
                 out << "(K=" << elt.first
-                    << ",T=" << elt.second._content
+                    << ",T=" << elt.second._value
                     << ",U=" << elt.second._timestamp;
                 if(elt.second._isRemoved == true) {
                     out << ",removed) ";
@@ -347,16 +347,33 @@ class LWWMap {
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::Element {
-    public:
-        T       _content;
+
+    private:
+        friend LWWMap;
+
+        T       _value;
         U       _timestamp;
         bool    _isRemoved;
 
     public:
-        friend bool operator==(const Element& lhs, const Element& rhs) {
-            return (lhs._content == rhs._content)
-                && (lhs._isRemoved == rhs._isRemoved);
+        T& value() {
+            return _value;
         }
+
+        const U& timestamp() const {
+            return _timestamp;
+        }
+
+        bool isRemoved() const {
+            return _isRemoved;
+        }
+
+    public:
+
+        friend bool operator==(const Element& lhs, const Element& rhs) {
+            return (lhs._value == rhs._value) && (lhs._isRemoved == rhs._isRemoved);
+        }
+
         friend bool operator!=(const Element& lhs, const Element& rhs) {
             return !(lhs == rhs);
         }
@@ -403,7 +420,7 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
 
         //reference operator*() {
         std::pair<const Key&, T&> operator*() {
-            return {_it->first, _it->second._content};
+            return {_it->first, _it->second._value};
         }
 };
 

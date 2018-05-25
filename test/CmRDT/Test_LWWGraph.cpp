@@ -22,16 +22,16 @@ TEST(LWWGraph, queryVertexTest) {
     res = data0.queryVertex(1);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 1);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 10);
+    EXPECT_FALSE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 10);
 
     // Remove element. Query still works
     data0.removeVertex(1, 20);
     res = data0.queryVertex(1);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 1);
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 20);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 20);
 
     // Query another element before even added
     res = data0.queryVertex(2);
@@ -42,8 +42,8 @@ TEST(LWWGraph, queryVertexTest) {
     res = data0.queryVertex(2);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 2);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 30);
+    EXPECT_FALSE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 30);
 }
 
 TEST(LWWGraph, addVertexTest) {
@@ -58,8 +58,8 @@ TEST(LWWGraph, addVertexTest) {
         auto res = data0.queryVertex(k);
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
-        EXPECT_FALSE(res->second._isRemoved);
-        EXPECT_EQ(res->second._timestamp, (10+k));
+        EXPECT_FALSE(res->second.isRemoved());
+        EXPECT_EQ(res->second.timestamp(), (10+k));
     }
 
     // Add duplicate (With various timestamps)
@@ -71,7 +71,7 @@ TEST(LWWGraph, addVertexTest) {
         auto res = data0.queryVertex(k);
         EXPECT_TRUE(res != data0.lend());
         EXPECT_EQ(res->first, k);
-        EXPECT_FALSE(res->second._isRemoved);
+        EXPECT_FALSE(res->second.isRemoved());
     }
 
     // Add duplicate, check timestamps is the last value.
@@ -83,8 +83,8 @@ TEST(LWWGraph, addVertexTest) {
     auto res = data0.queryVertex(4);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 4);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 39);
+    EXPECT_FALSE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 39);
 }
 
 TEST(LWWGraph, addVertexDuplicateCallsTest) {
@@ -99,8 +99,8 @@ TEST(LWWGraph, addVertexDuplicateCallsTest) {
     auto res = data0.queryVertex(1);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 1);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 19);
+    EXPECT_FALSE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 19);
 
     // Some more duplicate on another key
     data0.addVertex(42, 29);
@@ -111,8 +111,8 @@ TEST(LWWGraph, addVertexDuplicateCallsTest) {
     res = data0.queryVertex(42);
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, 42);
-    EXPECT_FALSE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 29);
+    EXPECT_FALSE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 29);
 }
 
 TEST(LWWGraph, removeVertexTest) {
@@ -124,8 +124,8 @@ TEST(LWWGraph, removeVertexTest) {
     auto res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 12);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 12);
 
     // Add a vertex with edges
     data0.addVertex("v1", 20);
@@ -142,13 +142,13 @@ TEST(LWWGraph, removeVertexTest) {
     res = data0.queryVertex("v2");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v2");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 29);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 29);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        auto& edges = it->second._content._edges;
+        auto& edges = it->second.value()._edges;
         auto edge_it = edges.query("v2");
-        bool isRemoved = edge_it->second._isRemoved;
-        int timestamp = edge_it->second._timestamp;
+        bool isRemoved = edge_it->second.isRemoved();
+        int timestamp = edge_it->second.timestamp();
 
         ASSERT_TRUE(edge_it != edges.lend()); // They all add edge with v2
         ASSERT_TRUE(isRemoved);
@@ -164,16 +164,16 @@ TEST(LWWGraph, removeVertexBeforeVertexCreatedTest) {
     auto res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 20);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 20);
 
     // Receive the add, but too late (Vertex is still the same)
     data0.addVertex("v1", 10);
     res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 20);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 20);
 }
 
 TEST(LWWGraph, removeVertexDuplicateCallsTest) {
@@ -185,8 +185,8 @@ TEST(LWWGraph, removeVertexDuplicateCallsTest) {
     auto res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 11);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 11);
 
     // Duplicate remove calls
     data0.removeVertex("v1", 22);
@@ -198,8 +198,8 @@ TEST(LWWGraph, removeVertexDuplicateCallsTest) {
     res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 29);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 29);
 }
 
 TEST(LWWGraph, removeVertexWithEdgesDuplicateCallsTest) {
@@ -228,13 +228,13 @@ TEST(LWWGraph, removeVertexWithEdgesDuplicateCallsTest) {
     auto res = data0.queryVertex("v1");
     EXPECT_TRUE(res != data0.lend());
     EXPECT_EQ(res->first, "v1");
-    EXPECT_TRUE(res->second._isRemoved);
-    EXPECT_EQ(res->second._timestamp, 30);
+    EXPECT_TRUE(res->second.isRemoved());
+    EXPECT_EQ(res->second.timestamp(), 30);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        auto& edges = it->second._content._edges;
+        auto& edges = it->second.value()._edges;
         auto edge_it = edges.query("v1");
-        bool isRemoved = edge_it->second._isRemoved;
-        int timestamp = edge_it->second._timestamp;
+        bool isRemoved = edge_it->second.isRemoved();
+        int timestamp = edge_it->second.timestamp();
 
         ASSERT_TRUE(edge_it != edges.lend()); // They all add edge with v1
         ASSERT_TRUE(isRemoved);
@@ -253,23 +253,23 @@ TEST(LWWGraph, addEdgeTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 13);
-    EXPECT_FALSE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 13);
+    EXPECT_FALSE(v1->second.isRemoved());
 
     // Vertex 2 is 're-added' by addEdge (So timestamps == addEdge timestamps)
     auto v2 = data0.queryVertex("v2");
     EXPECT_TRUE(v2 != data0.lend());
     EXPECT_EQ(v2->first, "v2");
-    EXPECT_EQ(v2->second._timestamp, 13);
-    EXPECT_FALSE(v2->second._isRemoved);
+    EXPECT_EQ(v2->second.timestamp(), 13);
+    EXPECT_FALSE(v2->second.isRemoved());
 
     // Edge v1 -> v2 should have been created
-    auto edges = v1->second._content._edges;
+    auto edges = v1->second.value()._edges;
     auto edge = edges.query("v2");
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
-    EXPECT_EQ(edge->second._timestamp, 13);
-    EXPECT_FALSE(edge->second._isRemoved);
+    EXPECT_EQ(edge->second.timestamp(), 13);
+    EXPECT_FALSE(edge->second.isRemoved());
 }
 
 TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
@@ -281,23 +281,23 @@ TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 10);
-    EXPECT_FALSE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 10);
+    EXPECT_FALSE(v1->second.isRemoved());
 
     // Vertex 2 should have been created
     auto v2 = data0.queryVertex("v2");
     EXPECT_TRUE(v2 != data0.lend());
     EXPECT_EQ(v2->first, "v2");
-    EXPECT_EQ(v2->second._timestamp, 10);
-    EXPECT_FALSE(v2->second._isRemoved);
+    EXPECT_EQ(v2->second.timestamp(), 10);
+    EXPECT_FALSE(v2->second.isRemoved());
 
     // Edge v1 -> v2 should have been created and marked as removed
-    auto edges = v1->second._content._edges;
+    auto edges = v1->second.value()._edges;
     auto edge = edges.query("v2"); // LWWSet. Returns const_load_iterator
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
-    EXPECT_EQ(edge->second._timestamp, 10);
-    EXPECT_FALSE(edge->second._isRemoved);
+    EXPECT_EQ(edge->second.timestamp(), 10);
+    EXPECT_FALSE(edge->second.isRemoved());
 
 
     // Now receive the actual 'addVertex'. (But addEdge created earlier stamp)
@@ -306,11 +306,11 @@ TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
 
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
-    edges = v1->second._content._edges;
+    edges = v1->second.value()._edges;
     edge = edges.query("v2");
-    EXPECT_EQ(v1->second._timestamp, 10);
-    EXPECT_EQ(v2->second._timestamp, 10);
-    EXPECT_EQ(edge->second._timestamp, 10);
+    EXPECT_EQ(v1->second.timestamp(), 10);
+    EXPECT_EQ(v2->second.timestamp(), 10);
+    EXPECT_EQ(edge->second.timestamp(), 10);
 }
 
 TEST(LWWGraph, addEdgeDuplicateCallsTest) {
@@ -329,23 +329,23 @@ TEST(LWWGraph, addEdgeDuplicateCallsTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 19);
-    EXPECT_FALSE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 19);
+    EXPECT_FALSE(v1->second.isRemoved());
 
     // Vertex 2
     auto v2 = data0.queryVertex("v2");
     EXPECT_TRUE(v2 != data0.lend());
     EXPECT_EQ(v2->first, "v2");
-    EXPECT_EQ(v2->second._timestamp, 19);
-    EXPECT_FALSE(v2->second._isRemoved);
+    EXPECT_EQ(v2->second.timestamp(), 19);
+    EXPECT_FALSE(v2->second.isRemoved());
 
     // Edge v1 -> v2
-    auto edges = v1->second._content._edges;
+    auto edges = v1->second.value()._edges;
     auto edge = edges.query("v2");
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
-    EXPECT_EQ(edge->second._timestamp, 19);
-    EXPECT_FALSE(edge->second._isRemoved);
+    EXPECT_EQ(edge->second.timestamp(), 19);
+    EXPECT_FALSE(edge->second.isRemoved());
 }
 
 TEST(LWWGraph, removeEdgeTest) {
@@ -360,23 +360,23 @@ TEST(LWWGraph, removeEdgeTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 11);
-    EXPECT_FALSE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 11);
+    EXPECT_FALSE(v1->second.isRemoved());
 
     // Vertex 2 stay the same
     auto v2 = data0.queryVertex("v2");
     EXPECT_TRUE(v2 != data0.lend());
     EXPECT_EQ(v2->first, "v2");
-    EXPECT_EQ(v2->second._timestamp, 12);
-    EXPECT_FALSE(v2->second._isRemoved);
+    EXPECT_EQ(v2->second.timestamp(), 12);
+    EXPECT_FALSE(v2->second.isRemoved());
 
     // Edge v1 -> v2 should have been removed
-    auto edges = v1->second._content._edges;
+    auto edges = v1->second.value()._edges;
     auto edge = edges.query("v2");
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
-    EXPECT_EQ(edge->second._timestamp, 13);
-    EXPECT_TRUE(edge->second._isRemoved);
+    EXPECT_EQ(edge->second.timestamp(), 13);
+    EXPECT_TRUE(edge->second.isRemoved());
 }
 
 TEST(LWWGraph, removeEdgeBeforeAddedTest) {
@@ -389,23 +389,23 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 0); // Created with smallest timestamp.
-    EXPECT_TRUE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 0); // Created with smallest timestamp.
+    EXPECT_TRUE(v1->second.isRemoved());
 
     // vertex 2 should have been created (with tmp timestamps)
     auto v2 = data0.queryVertex("v2");
     EXPECT_TRUE(v2 != data0.lend());
     EXPECT_EQ(v2->first, "v2");
-    EXPECT_EQ(v2->second._timestamp, 0); // Created with smallest timestamp.
-    EXPECT_TRUE(v2->second._isRemoved);
+    EXPECT_EQ(v2->second.timestamp(), 0); // Created with smallest timestamp.
+    EXPECT_TRUE(v2->second.isRemoved());
 
     // Edge v1 -> v2 should have been created and marked as removed
-    auto edges = v1->second._content._edges;
+    auto edges = v1->second.value()._edges;
     auto edge = edges.query("v2"); // LWWSet. Returns const_load_iterator
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
-    EXPECT_EQ(edge->second._timestamp, 10);
-    EXPECT_TRUE(edge->second._isRemoved);
+    EXPECT_EQ(edge->second.timestamp(), 10);
+    EXPECT_TRUE(edge->second.isRemoved());
 
 
     // Duplicate remove calls
@@ -415,11 +415,11 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
     data0.removeEdge("v1", "v2", 3);
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
-    edges = v1->second._content._edges;
+    edges = v1->second.value()._edges;
     edge = edges.query("v2");
-    EXPECT_EQ(v1->second._timestamp, 0);
-    EXPECT_EQ(v2->second._timestamp, 0);
-    EXPECT_EQ(edge->second._timestamp, 10);
+    EXPECT_EQ(v1->second.timestamp(), 0);
+    EXPECT_EQ(v2->second.timestamp(), 0);
+    EXPECT_EQ(edge->second.timestamp(), 10);
 
 
     // Duplicate remove calls with higher timestamps
@@ -430,11 +430,11 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
     data0.removeEdge("v1", "v2", 28);
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
-    edges = v1->second._content._edges;
+    edges = v1->second.value()._edges;
     edge = edges.query("v2");
-    EXPECT_EQ(v1->second._timestamp, 0);
-    EXPECT_EQ(v2->second._timestamp, 0);
-    EXPECT_EQ(edge->second._timestamp, 29);
+    EXPECT_EQ(v1->second.timestamp(), 0);
+    EXPECT_EQ(v2->second.timestamp(), 0);
+    EXPECT_EQ(edge->second.timestamp(), 29);
 }
 
 
@@ -536,13 +536,13 @@ TEST(LWWGraph, addEdgeRemoveVertexConcurrentTest) {
     auto v1 = data0.queryVertex("v1");
     EXPECT_TRUE(v1 != data0.lend());
     EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second._timestamp, 100);
-    EXPECT_TRUE(v1->second._isRemoved);
+    EXPECT_EQ(v1->second.timestamp(), 100);
+    EXPECT_TRUE(v1->second.isRemoved());
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        auto& edges = it->second._content._edges;
+        auto& edges = it->second.value()._edges;
         auto edge_it = edges.query("v1");
-        bool isRemoved = edge_it->second._isRemoved;
-        int timestamp = edge_it->second._timestamp;
+        bool isRemoved = edge_it->second.isRemoved();
+        int timestamp = edge_it->second.timestamp();
 
         ASSERT_TRUE(edge_it != edges.lend()); // They all add edge with v1
         ASSERT_TRUE(isRemoved);

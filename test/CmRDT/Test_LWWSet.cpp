@@ -3,11 +3,11 @@
 
 
 // Check the whole internal state of an element
-#define _ASSERT_ELT_EQ(elt_it, key, isRemoved, timestamp) \
+#define _ASSERT_ELT_EQ(elt_it, key, is_removed, stamp) \
     ASSERT_TRUE(elt_it != data0.lend()); \
     EXPECT_EQ(elt_it->first, key); \
-    EXPECT_EQ(elt_it->second._isRemoved, isRemoved); \
-    EXPECT_EQ(elt_it->second._timestamp, timestamp)
+    EXPECT_EQ(elt_it->second.isRemoved(), is_removed); \
+    EXPECT_EQ(elt_it->second.timestamp(), stamp)
 
 
 namespace CRDT {
@@ -523,8 +523,8 @@ TEST(LWWSet, loadIteratorAddRemoveTest) {
         // Dev note: I'm not sure order is predictable.
         // I use number of iterations instead.
         ++k;
-        EXPECT_FALSE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 10);
+        EXPECT_FALSE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 10);
     }
     EXPECT_EQ(k, 4);
 
@@ -571,8 +571,8 @@ TEST(LWWSet, loadIteratorRemovedTest) {
     int k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         ++k;
-        EXPECT_TRUE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 10);
+        EXPECT_TRUE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 10);
     }
     ASSERT_EQ(k, 5);
 
@@ -585,8 +585,8 @@ TEST(LWWSet, loadIteratorRemovedTest) {
     k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         ++k;
-        EXPECT_FALSE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 20);
+        EXPECT_FALSE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 20);
     }
     ASSERT_EQ(k, 5);
 
@@ -599,8 +599,8 @@ TEST(LWWSet, loadIteratorRemovedTest) {
     k = 0;
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
         ++k;
-        EXPECT_TRUE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 30);
+        EXPECT_TRUE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 30);
     }
     ASSERT_EQ(k, 5);
 }
@@ -611,12 +611,12 @@ TEST(LWWSet, loadIteratorReferenceTest) {
     // Simple test add then remove
     data0.add(1, 10);
     auto it = data0.lbegin();
-    EXPECT_FALSE(it->second._isRemoved);
-    EXPECT_EQ(it->second._timestamp, 10);
+    EXPECT_FALSE(it->second.isRemoved());
+    EXPECT_EQ(it->second.timestamp(), 10);
     it = data0.lbegin();
     data0.remove(1, 20);
-    EXPECT_TRUE(it->second._isRemoved);
-    EXPECT_EQ(it->second._timestamp, 20);
+    EXPECT_TRUE(it->second.isRemoved());
+    EXPECT_EQ(it->second.timestamp(), 20);
 
     // Add all
     data0.add(1, 30);
@@ -625,8 +625,8 @@ TEST(LWWSet, loadIteratorReferenceTest) {
     data0.add(4, 30);
     data0.add(5, 30);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        EXPECT_FALSE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 30);
+        EXPECT_FALSE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 30);
     }
 
     // Remove all
@@ -636,8 +636,8 @@ TEST(LWWSet, loadIteratorReferenceTest) {
     data0.remove(4, 40);
     data0.remove(5, 40);
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        EXPECT_TRUE(it->second._isRemoved);
-        EXPECT_EQ(it->second._timestamp, 40);
+        EXPECT_TRUE(it->second.isRemoved());
+        EXPECT_EQ(it->second.timestamp(), 40);
     }
 }
 
