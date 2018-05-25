@@ -507,10 +507,10 @@ TEST(LWWSet, iteratorReferenceTest) {
 
 
 // -----------------------------------------------------------------------------
-// Iterator Tests (Load iterator)
+// Iterator Tests (crdt iterator)
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, loadIteratorAddRemoveTest) {
+TEST(LWWSet, crdtIteratorAddRemoveTest) {
     LWWSet<int, int> data0;
 
     // Add some elements and test iteration
@@ -528,7 +528,7 @@ TEST(LWWSet, loadIteratorAddRemoveTest) {
     }
     EXPECT_EQ(k, 4);
 
-    // Remove elements, should not impact load iterator
+    // Remove elements, should not impact crdt iterator
     data0.remove(0, 20);
     data0.remove(1, 21);
     k = 0;
@@ -551,15 +551,15 @@ TEST(LWWSet, loadIteratorAddRemoveTest) {
     EXPECT_EQ(k, 8);
 }
 
-TEST(LWWSet, loadIteratorEmptyTest) {
+TEST(LWWSet, crdtIteratorEmptyTest) {
     LWWSet<int, int> data0;
 
     for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
-        ASSERT_TRUE(false) << "Load Iterator should be empty";;
+        ASSERT_TRUE(false) << "crdt Iterator should be empty";;
     }
 }
 
-TEST(LWWSet, loadIteratorRemovedTest) {
+TEST(LWWSet, crdtIteratorRemovedTest) {
     LWWSet<int, int> data0;
 
     // Fill set with removed elt (Yes, we don't even need add before).
@@ -605,7 +605,7 @@ TEST(LWWSet, loadIteratorRemovedTest) {
     ASSERT_EQ(k, 5);
 }
 
-TEST(LWWSet, loadIteratorReferenceTest) {
+TEST(LWWSet, crdtIteratorReferenceTest) {
     LWWSet<int, int> data0;
 
     // Simple test add then remove

@@ -59,7 +59,7 @@ class LWWSet {
         class Metadata;
 
         typedef typename std::unordered_map<Key, Metadata>::size_type size_type;
-        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_load_iterator;
+        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_crdt_iterator;
 
     private:
         std::unordered_map<Key, Metadata> _map;
@@ -123,7 +123,7 @@ class LWWSet {
          * \param key The key to find.
          * \return Iterator to the key with CRDT metadata or end() if not found.
          */
-        const_load_iterator query(const Key& key) const {
+        const_crdt_iterator query(const Key& key) const {
             return _map.find(key);
         }
 
@@ -264,20 +264,20 @@ class LWWSet {
         }
 
         /**
-         * Returns a constant load iterator to the beginning.
+         * Returns a constant crdt iterator to the beginning.
          *
-         * \see load_iterator
+         * \see crdt_iterator
          */
-        const_load_iterator lbegin() const noexcept {
+        const_crdt_iterator lbegin() const noexcept {
             return _map.begin();
         }
 
         /**
-         * Returns a constant load iterator to the end.
+         * Returns a constant crdt iterator to the end.
          *
-         * \see load_iterator
+         * \see crdt_iterator
          */
-        const_load_iterator lend() const noexcept {
+        const_crdt_iterator lend() const noexcept {
             return _map.end();
         }
 
@@ -394,7 +394,7 @@ class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_t
         friend LWWSet;
 
         const LWWSet&       _data;
-        const_load_iterator _it;
+        const_crdt_iterator _it;
 
 
     public:

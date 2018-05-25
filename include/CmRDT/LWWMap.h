@@ -16,32 +16,29 @@ namespace CmRDT {
  *
  * Associative container that contains key-value pairs with unique keys.
  * Timestamps is assigned to each add / remove operation to create total order
- * of operations. Internally, remove operation does not actually remove 
- * the key-value but only mark it as deleted.
+ * of operations. Internally, remove operation does not actually remove
+ * the key-value but only mark them as deleted.
  *
  * \note
- * CRDT Map only deals with concurrent add / remove of keys. The content for 
- * a key is not CRDT by itself. It is on your call to deal with the content.
- * You may for instance use a LWWRegister. (In such case, after any add,
- * call register.update function to also update, if necessary, the content).
- *
- * \note
- * All operations on this set are commutative! You may receive a remove operation
- * even before its create operation.
+ * All operations on this container are commutative! You may receive 'remove'
+ * operation even before 'create' operation.
  *
  * \note
  * Internally uses std::unordered_map (To store key and CRDT metadata).
  * Insertion, deletion and query follow at least std::unordered_map complexity.
- *
+ * \see http://en.cppreference.com/w/cpp/container/unordered_map
  *
  * \warning
- * T element must have a default constructor available.
+ * CRDT Map only deals with concurrent add / remove of keys. The key's content
+ * by itself is not CRDT. It is on your call to deal with the content.
+ * You may for instance use a LWWRegister. (In such case, after any add,
+ * call register update function to also update, if necessary, the content).
+ *
  *
  * \warning
  * Timestamps are strictly unique with total order.
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation).
- *
  *
  * \note
  * Quote from the CRDT article "A comprehensive study of CRDT":
@@ -58,7 +55,7 @@ namespace CmRDT {
  *
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
- * \tparam U    Type of timestamps (Implements operators > and <).
+ * \tparam U    Type of timestamps (Must implements operators > and <).
  *
  * \author  Constantin Masson
  * \date    May 2018
@@ -70,11 +67,11 @@ class LWWMap {
         class iterator;
         class const_iterator;
 
-        typedef typename std::unordered_map<Key, Element>::iterator load_iterator;
-        typedef typename std::unordered_map<Key, Element>::const_iterator const_load_iterator;
+        typedef typename std::unordered_map<Key, Element>::iterator crdt_iterator;
+        typedef typename std::unordered_map<Key, Element>::const_iterator const_crdt_iterator;
         typedef typename std::unordered_map<Key, Element>::size_type size_type;
 
-        // From outside, we see LWWMap as <Key, T> (Except load_iterator)
+        // From outside, we see LWWMap as <Key, T> (Except crdt_iterator)
         typedef typename std::unordered_map<Key, T>::key_type        key_type;
         typedef typename std::unordered_map<Key, T>::mapped_type     mapped_type;
         typedef typename std::unordered_map<Key, T>::value_type      value_type;
@@ -144,7 +141,7 @@ class LWWMap {
          * \param key The key to find.
          * \return Iterator to the key-element or past-the-end if not found.
          */
-        load_iterator query(const Key& key) {
+        crdt_iterator query(const Key& key) {
             return _map.find(key);
         }
 
@@ -327,16 +324,16 @@ class LWWMap {
         }
 
         /**
-         * Returns a load iterator to the beginning.
+         * Returns a crdt iterator to the beginning.
          */
-        load_iterator lbegin() noexcept {
+        crdt_iterator lbegin() noexcept {
             return _map.begin();
         }
 
         /**
-         * Returns a load iterator to the end.
+         * Returns a crdt iterator to the end.
          */
-        load_iterator lend() noexcept {
+        crdt_iterator lend() noexcept {
             return _map.end();
         }
 
@@ -470,7 +467,7 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
         friend LWWMap;
 
         LWWMap&       _data;
-        load_iterator _it;
+        crdt_iterator _it;
 
     public:
         iterator(LWWMap& map) : _data(map) {
@@ -520,7 +517,7 @@ class LWWMap<Key, T, U>::const_iterator : public std::iterator<std::input_iterat
         friend LWWMap;
 
         const LWWMap&       _data;
-        const_load_iterator _it;
+        const_crdt_iterator _it;
 
     public:
         const_iterator(const LWWMap& map) : _data(map) {

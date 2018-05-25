@@ -293,7 +293,7 @@ TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value()._edges;
-    auto edge = edges.query("v2"); // LWWSet. Returns const_load_iterator
+    auto edge = edges.query("v2"); // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);
@@ -401,7 +401,7 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value()._edges;
-    auto edge = edges.query("v2"); // LWWSet. Returns const_load_iterator
+    auto edge = edges.query("v2"); // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.lend());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);

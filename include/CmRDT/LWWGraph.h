@@ -57,7 +57,7 @@ class LWWGraph {
         class Vertex;
         LWWMap<Key, Vertex, U> _adj;
 
-        typedef typename LWWMap<Key,Vertex,U>::load_iterator load_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator crdt_iterator;
 
 
     // -------------------------------------------------------------------------
@@ -74,7 +74,7 @@ class LWWGraph {
          * \param key   Vertex's key to find.
          * \return      Iterator to the vertex or past-the-end if not found.
          */
-        load_iterator queryVertex(const Key& key) {
+        crdt_iterator queryVertex(const Key& key) {
             return _adj.query(key);
         }
 
@@ -186,16 +186,16 @@ class LWWGraph {
     public:
 
         /**
-         * Returns a load iterator to the beginning.
+         * Returns a crdt iterator to the beginning.
          */
-        load_iterator lbegin() {
+        crdt_iterator lbegin() {
             return _adj.lbegin();
         }
 
         /**
-         * Returns a load iterator to the end.
+         * Returns a crdt iterator to the end.
          */
-        load_iterator lend() {
+        crdt_iterator lend() {
             return _adj.lend();
         }
 
