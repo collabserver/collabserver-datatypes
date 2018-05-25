@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <utility> // std::pair
 #include <cassert>
 #include <ostream>
 
@@ -62,9 +63,15 @@ template<typename Key, typename T, typename U>
 class LWWMap {
     public:
         class Element;
+        class iterator;
 
         typedef typename std::unordered_map<Key, Element>::iterator load_iterator;
         typedef typename std::unordered_map<Key, Element>::size_type size_type;
+
+        // From outside, we see LWWMap as <Key, T> (Except load_iterator)
+        typedef typename std::unordered_map<Key, T>::value_type value_type;
+        typedef typename std::unordered_map<Key, T>::reference reference;
+        typedef typename std::unordered_map<Key, T>::const_reference const_reference;
 
     private:
         std::unordered_map<Key, Element> _map;
@@ -130,6 +137,35 @@ class LWWMap {
         load_iterator query(const Key& key) {
             return _map.find(key);
         }
+
+        /**
+         * Find a key-element in the container.
+         * This only lookup for key that are not internally deleted.
+         * (Like a normal map::find method).
+         * If element is internally removed (removed flag to true), find return
+         * past-the-end anyway (see end()).
+         *
+         * \param key Key value of the element to search for.
+         * \return Iterator to the element with key or past-the-end if not found.
+         */
+        iterator find(const Key& key) {
+            auto elt_iterator = _map.find(key);
+            if(elt_iterator != _map.end() && !elt_iterator->second._isRemoved) {
+                iterator it(*this);
+                it._it = elt_iterator;
+                return it;
+            }
+            else {
+                return this->end();
+            }
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers methods
+    // -------------------------------------------------------------------------
+
+    public:
 
         /**
          * Inserts new key in the container.
@@ -221,16 +257,32 @@ class LWWMap {
     public:
 
         /**
+         * Returns iterator to the beginning.
+         */
+        iterator begin() noexcept {
+            return iterator(*this);
+        }
+
+        /**
+         * Returns iterator to the end.
+         */
+        iterator end() noexcept {
+            iterator it(*this);
+            it._it = _map.end();
+            return it;
+        }
+
+        /**
          * Returns a load iterator to the beginning.
          */
-        load_iterator lbegin() {
+        load_iterator lbegin() noexcept {
             return _map.begin();
         }
 
         /**
          * Returns a load iterator to the end.
          */
-        load_iterator lend() {
+        load_iterator lend() noexcept {
             return _map.end();
         }
 
@@ -307,6 +359,51 @@ class LWWMap<Key, T, U>::Element {
         }
         friend bool operator!=(const Element& lhs, const Element& rhs) {
             return !(lhs == rhs);
+        }
+};
+
+
+/**
+ * Iterator.for LWWMap container.
+ * Iterate over all keys-elements that are in set and are NOT marked as removed.
+ */
+template<typename Key, typename T, typename U>
+class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag, T> {
+    private:
+        friend LWWMap;
+        LWWMap& _data;
+        load_iterator _it;
+
+    public:
+        iterator(LWWMap& map) : _data(map) {
+            _it = _data._map.begin();
+
+            // If first element is already removed, skip it
+            while(_it != _data._map.end() && _it->second._isRemoved) {
+                ++_it;
+            }
+        }
+
+        iterator& operator++() {
+            ++_it;
+
+            while(_it != _data._map.end() && _it->second._isRemoved) {
+                ++_it;
+            }
+            return *this;
+        }
+
+        bool operator==(const iterator& other) const {
+            return _it == other._it;
+        }
+
+        bool operator!=(const iterator& other) const {
+            return !(*this == other);
+        }
+
+        //reference operator*() {
+        std::pair<const Key&, T&> operator*() {
+            return {_it->first, _it->second._content};
         }
 };
 

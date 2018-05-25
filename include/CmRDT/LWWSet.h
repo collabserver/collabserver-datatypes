@@ -366,7 +366,7 @@ class LWWSet<Key,U>::Metadata {
 
 
 /**
- * Constant iterator for LWWSet.
+ * Constant iterator for LWWSet container.
  * Iterate over all keys that are in set and are NOT marked as removed.
  */
 template<typename Key, typename U>

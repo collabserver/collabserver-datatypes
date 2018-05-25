@@ -198,9 +198,8 @@ TEST(LWWMap, queryTest) {
 
 TEST(LWWMap, findTest) {
     ASSERT_TRUE(false) << "TODO: Not implemented yet";
-    /*
-     * TODO
-    LWWMap<std::string, int> data0;
+
+    LWWMap<std::string, int, int> data0;
 
     // Add all the crap there!
     data0.add("e1", 11);
@@ -211,9 +210,12 @@ TEST(LWWMap, findTest) {
     auto e1 = data0.find("e1");
     auto e2 = data0.find("e2");
     auto e3 = data0.find("e3");
-    EXPECT_EQ(*e1, "e1");
-    EXPECT_EQ(*e2, "e2");
-    EXPECT_EQ(*e3, "e3");
+    auto TMP = *e1;
+    /*
+     * TODO
+    EXPECT_EQ(e1->first, "e1");
+    EXPECT_EQ(e2->first, "e2");
+    EXPECT_EQ(e3->first, "e3");
     */
 }
 
