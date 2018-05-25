@@ -214,6 +214,9 @@ class LWWGraph {
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
+            if(lhs._adj.size() != rhs._adj.size()) {
+                return false;
+            }
             return (lhs._adj == rhs._adj);
         }
 
@@ -250,8 +253,13 @@ class LWWGraph<Key,T,U>::Vertex {
         LWWSet<Key,U>   _edges;
 
     public:
-        friend bool operator==(const Vertex& lhs,const Vertex& rhs) {
+
+        friend bool operator==(const Vertex& lhs, const Vertex& rhs) {
             return (lhs._edges == rhs._edges) && (lhs._content == rhs._content);
+        }
+
+        friend bool operator!=(const Vertex& lhs, const Vertex& rhs) {
+            return !(lhs == rhs);
         }
 };
 

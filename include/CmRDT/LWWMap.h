@@ -4,6 +4,7 @@
 #include <utility> // std::pair
 #include <cassert>
 #include <ostream>
+#include <iostream>
 
 namespace CRDT {
 namespace CmRDT {
@@ -67,14 +68,20 @@ class LWWMap {
     public:
         class Element;
         class iterator;
+        class const_iterator;
 
         typedef typename std::unordered_map<Key, Element>::iterator load_iterator;
+        typedef typename std::unordered_map<Key, Element>::const_iterator const_load_iterator;
         typedef typename std::unordered_map<Key, Element>::size_type size_type;
 
         // From outside, we see LWWMap as <Key, T> (Except load_iterator)
-        typedef typename std::unordered_map<Key, T>::mapped_type mapped_type;
-        typedef typename std::unordered_map<Key, T>::reference reference;
-        typedef typename std::unordered_map<Key, T>::pointer pointer;
+        typedef typename std::unordered_map<Key, T>::key_type        key_type;
+        typedef typename std::unordered_map<Key, T>::mapped_type     mapped_type;
+        typedef typename std::unordered_map<Key, T>::value_type      value_type;
+        typedef typename std::unordered_map<Key, T>::reference       reference;
+        typedef typename std::unordered_map<Key, T>::const_reference const_reference;
+        typedef typename std::unordered_map<Key, T>::pointer         pointer;
+        typedef typename std::unordered_map<Key, T>::const_pointer   const_pointer;
 
     private:
         std::unordered_map<Key, Element> _map;
@@ -155,6 +162,18 @@ class LWWMap {
             auto elt_iterator = _map.find(key);
             if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
                 iterator it(*this);
+                it._it = elt_iterator;
+                return it;
+            }
+            else {
+                return this->end();
+            }
+        }
+
+        const_iterator find(const Key& key) const {
+            auto elt_iterator = _map.find(key);
+            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
+                const_iterator it(*this);
                 it._it = elt_iterator;
                 return it;
             }
@@ -276,6 +295,38 @@ class LWWMap {
         }
 
         /**
+         * Returns constant iterator to the beginning.
+         */
+        const_iterator begin() const noexcept {
+            return const_iterator(*this);
+        }
+
+        /**
+         * Returns const iterator to the end.
+         */
+        const_iterator end() const noexcept {
+            const_iterator it(*this);
+            it._it = _map.end();
+            return it;
+        }
+
+        /**
+         * Returns constant iterator to the beginning.
+         */
+        const_iterator cbegin() const noexcept {
+            return const_iterator(*this);
+        }
+
+        /**
+         * Returns constant iterator to the end.
+         */
+        const_iterator cend() const noexcept {
+            const_iterator it(*this);
+            it._it = _map.end();
+            return it;
+        }
+
+        /**
          * Returns a load iterator to the beginning.
          */
         load_iterator lbegin() noexcept {
@@ -307,9 +358,27 @@ class LWWMap {
                 return false;
             }
 
-            // TODO: should only test for living elements.
-            // atm: doesn't do the job specified by the doc.
-            return lhs._map == rhs._map;
+            // Dev note: in the worst case, this is N2 complexity.
+            // See note in LWWSet
+            for(auto& elt : lhs) {
+                auto other = rhs.find(elt.first);;
+                if(other == rhs.cend()){
+                    return false;
+                }
+                if(elt.second != other->second) {
+                    return false;
+                }
+            }
+            for(auto& elt: rhs) {
+                auto other = lhs.find(elt.first);
+                if(other == lhs.cend()) {
+                    return false;
+                }
+                if(elt.second != other->second) {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /**
@@ -387,25 +456,15 @@ class LWWMap<Key, T, U>::Element {
         bool isRemoved() const {
             return _isRemoved;
         }
-
-    public:
-
-        friend bool operator==(const Element& lhs, const Element& rhs) {
-            return (lhs.value() == rhs.value()) && (lhs.isRemoved() == rhs.isRemoved());
-        }
-
-        friend bool operator!=(const Element& lhs, const Element& rhs) {
-            return !(lhs == rhs);
-        }
 };
 
 
 /**
- * Iterator.for LWWMap container.
+ * Iterator for LWWMap container.
  * Iterate over all keys-elements that are in set and are NOT marked as removed.
  */
 template<typename Key, typename T, typename U>
-class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag, T> {
+class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag, value_type> {
 
     private:
         friend LWWMap;
@@ -440,11 +499,61 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
             return !(*this == other);
         }
 
-        reference operator*() {
+        reference operator*() const {
             return _it->second._internalValue;
         }
 
-        pointer operator->() {
+        pointer operator->() const {
+            return &(_it->second._internalValue);
+        }
+};
+
+
+/**
+ * Constant iterator for LWWMap container.
+ * Iterate over all keys-elements that are in set and are NOT marked as removed.
+ */
+template<typename Key, typename T, typename U>
+class LWWMap<Key, T, U>::const_iterator : public std::iterator<std::input_iterator_tag, value_type> {
+
+    private:
+        friend LWWMap;
+
+        const LWWMap&       _data;
+        const_load_iterator _it;
+
+    public:
+        const_iterator(const LWWMap& map) : _data(map) {
+            _it = _data._map.begin();
+
+            // If first element is already removed, skip it
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
+                ++_it;
+            }
+        }
+
+        const_iterator& operator++() {
+            ++_it;
+
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
+                ++_it;
+            }
+            return *this;
+        }
+
+        bool operator==(const const_iterator& other) const {
+            return _it == other._it;
+        }
+
+        bool operator!=(const const_iterator& other) const {
+            return !(*this == other);
+        }
+
+        const_reference operator*() const {
+            return _it->second._internalValue;
+        }
+
+        const_pointer operator->() const {
             return &(_it->second._internalValue);
         }
 };

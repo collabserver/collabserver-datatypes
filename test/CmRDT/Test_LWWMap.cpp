@@ -459,6 +459,56 @@ TEST(LWWMap, iteratorEmptyMapTest) {
     LWWMap<int, int, int> data0;
 
     // Iterate empty set should be ok (No elt)
+    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
+        EXPECT_TRUE(false) << "Iterator should be empty but found ";
+    }
+
+    // Add / remove some elements and iterate
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+    data0.add(4, 14);
+    data0.remove(0, 20);
+    data0.remove(1, 21);
+    data0.remove(2, 22);
+    data0.remove(3, 23);
+    data0.remove(4, 24);
+    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
+        // data0 should be empty from iterator point of view
+        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
+    }
+
+    // Add more and remove
+    data0.add(5, 30);
+    data0.remove(5, 31);
+    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
+        // Should be Still empty
+        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
+    }
+
+    // Add / remove again
+    data0.add(6, 40);
+    data0.add(7, 41);
+    data0.add(8, 42);
+    data0.add(9, 43);
+    data0.remove(6, 44);
+    data0.remove(7, 45);
+    data0.remove(8, 46);
+    data0.remove(9, 47);
+    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
+        // Should be Still empty
+        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
+    }
+}
+
+TEST(LWWMap, iteratorReferenceTest) {
+    LWWMap<std::string, int, int> data0;
+
+    // Add all
+    data0.add("e1", 1);
+    auto it = data0.begin();
+    ASSERT_EQ(it->first, "e1");
 }
 
 
