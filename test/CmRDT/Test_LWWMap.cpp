@@ -197,8 +197,6 @@ TEST(LWWMap, queryTest) {
 // -----------------------------------------------------------------------------
 
 TEST(LWWMap, findTest) {
-    ASSERT_TRUE(false) << "TODO: Not implemented yet";
-
     LWWMap<std::string, int, int> data0;
 
     // Add all the crap there!
@@ -210,26 +208,20 @@ TEST(LWWMap, findTest) {
     auto e1 = data0.find("e1");
     auto e2 = data0.find("e2");
     auto e3 = data0.find("e3");
-    auto TMP = *e1;
-    /*
-     * TODO
+
     EXPECT_EQ(e1->first, "e1");
-    EXPECT_EQ(e2->first, "e2");
-    EXPECT_EQ(e3->first, "e3");
-    */
+    EXPECT_EQ((*e1).first, "e1");
+    EXPECT_EQ((*e2).first, "e2");
+    EXPECT_EQ((*e3).first, "e3");
 }
 
 TEST(LWWMap, findRemovedElementTest) {
-    ASSERT_TRUE(false) << "TODO: Not implemented yet";
-    /*
-     * TODO
-    LWWMap<std::string, int> data0;
+    LWWMap<std::string, int, int> data0;
 
     data0.add("e1", 10);
     data0.remove("e1", 20);
     auto e1 = data0.find("e1");
     EXPECT_EQ(e1, data0.end());
-    */
 }
 
 
@@ -419,6 +411,54 @@ TEST(LWWMap, reserveTest) {
     // Not sure how to test it at this exact terrible moment.
     // For now, just do a call to be sure it compiles.
     data0.reserve(10);
+}
+
+
+// -----------------------------------------------------------------------------
+// Iterator Tests (Normal iterator)
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, iteratorTest) {
+    LWWMap<int, int, int> data0;
+
+    // Add some elements and test iteration
+    data0.add(0, 10);
+    data0.add(1, 11);
+    data0.add(2, 12);
+    data0.add(3, 13);
+    int k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        // Dev note: I'm not sure order is predictable.
+        // I use number of iteration instead.
+        ++k;
+    }
+    EXPECT_EQ(k, 4);
+
+    // Remove elements, then iterator should not use them
+    data0.remove(0, 20);
+    data0.remove(1, 21);
+    k = 0;
+    for(auto& elt : data0) {
+        ++k;
+    }
+    EXPECT_EQ(k, 2);
+
+    // Add again some more and test
+    data0.add(4, 30);
+    data0.add(5, 31);
+    data0.add(6, 32);
+    data0.add(7, 33);
+    k = 0;
+    for(auto& elt : data0) {
+        ++k;
+    }
+    EXPECT_EQ(k, 6);
+}
+
+TEST(LWWMap, iteratorEmptyMapTest) {
+    LWWMap<int, int, int> data0;
+
+    // Iterate empty set should be ok (No elt)
 }
 
 

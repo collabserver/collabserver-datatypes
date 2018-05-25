@@ -34,6 +34,9 @@ namespace CmRDT {
  *
  *
  * \warning
+ * T element must have a default constructor available.
+ *
+ * \warning
  * Timestamps are strictly unique with total order.
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation).
@@ -69,9 +72,9 @@ class LWWMap {
         typedef typename std::unordered_map<Key, Element>::size_type size_type;
 
         // From outside, we see LWWMap as <Key, T> (Except load_iterator)
-        typedef typename std::unordered_map<Key, T>::value_type value_type;
+        typedef typename std::unordered_map<Key, T>::mapped_type mapped_type;
         typedef typename std::unordered_map<Key, T>::reference reference;
-        typedef typename std::unordered_map<Key, T>::const_reference const_reference;
+        typedef typename std::unordered_map<Key, T>::pointer pointer;
 
     private:
         std::unordered_map<Key, Element> _map;
@@ -178,7 +181,7 @@ class LWWMap {
          * \param stamp Timestamps of this operation.
          */
         void add(const Key& key, const U& stamp) {
-            Element elt; // Content is not set here
+            Element elt(key); // Content is not set here
             elt._timestamp  = stamp;
             elt._isRemoved  = false;
 
@@ -212,7 +215,7 @@ class LWWMap {
          * \param stamp Timestamps of this operation.
          */
         void remove(const Key& key, const U& stamp) {
-            Element elt; // Content is not set here
+            Element elt(key); // Content is not set here
             elt._timestamp  = stamp;
             elt._isRemoved  = true;
 
@@ -259,14 +262,14 @@ class LWWMap {
         /**
          * Returns iterator to the beginning.
          */
-        iterator begin() noexcept {
+        iterator begin() {
             return iterator(*this);
         }
 
         /**
          * Returns iterator to the end.
          */
-        iterator end() noexcept {
+        iterator end() {
             iterator it(*this);
             it._it = _map.end();
             return it;
@@ -300,6 +303,10 @@ class LWWMap {
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWMap& lhs, const LWWMap& rhs) {
+            if(lhs.size() != rhs.size()) {
+                return false;
+            }
+
             // TODO: should only test for living elements.
             // atm: doesn't do the job specified by the doc.
             return lhs._map == rhs._map;
@@ -353,13 +360,24 @@ class LWWMap<Key, T, U>::Element {
     private:
         friend LWWMap;
 
-        T       _value;
+        // I did this for the iterator* method
+        // This is possibly not the best solution
+        std::pair<const Key,T> _internalValue;
+
         U       _timestamp;
         bool    _isRemoved;
 
     public:
+        Element(const Key key) : _internalValue(std::make_pair(key, T{})) {
+        }
+
+    public:
         T& value() {
-            return _value;
+            return _internalValue.second;
+        }
+
+        const T& value() const {
+            return _internalValue.second;
         }
 
         const U& timestamp() const {
@@ -373,7 +391,7 @@ class LWWMap<Key, T, U>::Element {
     public:
 
         friend bool operator==(const Element& lhs, const Element& rhs) {
-            return (lhs._value == rhs._value) && (lhs._isRemoved == rhs._isRemoved);
+            return (lhs.value() == rhs.value()) && (lhs.isRemoved() == rhs.isRemoved());
         }
 
         friend bool operator!=(const Element& lhs, const Element& rhs) {
@@ -422,9 +440,12 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
             return !(*this == other);
         }
 
-        //reference operator*() {
-        std::pair<const Key&, T&> operator*() {
-            return {_it->first, _it->second.value()};
+        reference operator*() {
+            return _it->second._internalValue;
+        }
+
+        pointer operator->() {
+            return &(_it->second._internalValue);
         }
 };
 

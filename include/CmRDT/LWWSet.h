@@ -58,8 +58,8 @@ class LWWSet {
         class const_iterator;
         class Metadata;
 
-        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_load_iterator;
         typedef typename std::unordered_map<Key, Metadata>::size_type size_type;
+        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_load_iterator;
 
     private:
         std::unordered_map<Key, Metadata> _map;
