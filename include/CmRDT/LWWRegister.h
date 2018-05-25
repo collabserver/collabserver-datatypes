@@ -8,19 +8,16 @@ namespace CmRDT {
 
 
 /**
+ * \brief
  * Last-Writer-Wins Register (LWW Register).
  * CmRDT (Operation-based).
  *
+ * Register holds any kind of atomic data inside.
  * Timestamps is assigned to each update and creates a total order of updates.
+ * Whenever register is actually updated, the old value is totally lost and 
+ * changed by its new value and timestamp is updated.
  *
- * \warning
- * Timestamps are strictly unique with total order.
- * If (t1 == t2) is true, replicates may diverge.
- * (See quote and implementation).
- *
- *
- * \note
- * Quote from the CRDT article "A comprehensive study of CRDT":
+ * \par Quote from the article "A comprehensive study of CRDT"
  * "
  *  A Last-Writer-Wins Register (LWW-Register) creates a total order of
  *  assignments by associating a timestamp with each update.
@@ -31,9 +28,23 @@ namespace CmRDT {
  *  such as its MAC address.
  * "
  *
+ * \warning
+ * Timestamps are strictly unique with total order.
+ * If (t1 == t2) is true, replicates may diverge.
+ * (See quote and implementation for further informations).
+ *
+ * \bug
+ * T template parameter must have a default constructor.
+ * We may add a constructor that takes a T value to avoid this.
+ *
+ * \bug
+ * U timestamp is initialized with 0 (U time = 0).
+ * So your U type must accept operation "= 0"
+ * We may add a constructor that takes a U default time to avoid this.
+ *
  *
  * \tparam T    Type of element (Register content).
- * \tparam U    Type of timestamps (Implements operators > and <).
+ * \tparam U    Type of timestamps (Must implements operators > and <).
  *
  * \author  Constantin Masson
  * \date    May 2018
@@ -41,8 +52,8 @@ namespace CmRDT {
 template<typename T, typename U>
 class LWWRegister {
     private:
-        T   _reg;
-        U   _timestamp = 0;
+        T   _reg;           // TODO: We should create init constructor?
+        U   _timestamp = 0; // TODO: this may create some trouble. See bug
 
 
     // -------------------------------------------------------------------------
@@ -61,14 +72,11 @@ class LWWRegister {
         }
 
         /**
-         * Change the local register value. (Downstream update).
+         * Change the local register value.
          * Do nothing if given stamp is less to the current timestamps.
          *
-         * \warning
-         * timestamp must be strictly unique. Two equal timestamps is undefined.
-         *
-         * \param value New value for this register.
-         * \param stamp Associated timestamp
+         * \param value New value to place in this register.
+         * \param stamp Timestamp of this update.
          */
         void update(const T& value, const U& stamp) {
             assert(stamp != _timestamp);
@@ -80,9 +88,9 @@ class LWWRegister {
         }
 
         /**
-         * Get the internal current timestamps.
+         * Get the internal current timestamps associated with this register.
          *
-         * \return Current timestamps associated with this register.
+         * \return Current register's timestamps.
          */
         const U& timestamp() const {
             return _timestamp;
@@ -100,6 +108,8 @@ class LWWRegister {
          * Two registers are equal if their data are equal.
          * Timestamps is not used for equality.
          *
+         * \param lhs   Left hand side.
+         * \param rhs   Right hand side.
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWRegister& lhs, const LWWRegister& rhs) {
@@ -110,6 +120,10 @@ class LWWRegister {
          * Check if two registers are different.
          * See operator== for equality meaning.
          *
+         * \see LWWRegister::operator==
+         *
+         * \param lhs   Left hand side.
+         * \param rhs   Right hand side.
          * \return True if not equal, otherwise, return false.
          */
         friend bool operator!=(const LWWRegister& lhs, const LWWRegister& rhs) {

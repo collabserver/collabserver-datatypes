@@ -11,30 +11,39 @@ namespace CmRDT {
 
 
 /**
- * Last-Writer-Wins Graph (LWW Graph).
+ * \brief
+ * Last-Writer-Wins Directed Graph (LWW Graph).
  * CmRDT (Operation-based)
  *
- * This is a Directed Graph.
+ * This is a Directed Graph. Internally uses adjacency list of vertex (Using
+ * LWWMap). Each vertex has a set of edge destination (Using LWWSet).
+ * Vertex content is user defined (See warning below).
  *
- * \note
- * CRDT graph deals with concurrent add / remove of vertex and edges.
- * The content of vertex itself is not CRDT, it is on your call to deal with
- * concurrent modification. (The T parameter). You may use a CRDT type as the
- * T parameter. To have a fully CRDT update, you need to deal with dependency.
- * (Ex: receive update before the vertex is even created.). A solution is to
- * ad dependency metadata, another is to create temporary vertex (vertex created
- * with the minimal timestamp value).
+ * \par CRDT properties
+ * Timestamps is assigned to each add / remove operation to create total order
+ * of operations. Whenever add or remove operation is applied, timestamps are
+ * used to select the winning operation.
  *
- * \warning
- * Timestamps are strictly unique with total order.
- * If (t1 == t2) is true, replicates may diverge.
- * (See quote and implementation).
+ * \par
+ * Any added vertex is never removed but only marked as deleted instead.
+ * For that reason, this CRDT container may not fit all system due to memory use.
  *
+ * \par
+ * All operations on this container are commutative! You may receive a remove
+ * operation even before its create operation (ex: Network latency).
+ * To be fully CRDT without any synchronization mechanism, order of operations
+ * is not important.
+ * In several examples and implementations, a 'pre condition' is
+ * required in order to apply some operations. Whenever this pre condition is
+ * not validated, external synchronization mechanism is required. (Operation
+ * is delayed until possible). An example of implementation is to use
+ * dependency metadata. This may be important, for instance in order to have
+ * causality preservation. I decided to design all operation to be commutative
+ * so that no synchronization, delay or external mechanism are required.
  *
- * \note
- * Quote from the CRDT article "A comprehensive study of CRDT":
+ * \par Quote from the article "A comprehensive study of CRDT"
  * "
- *  A Last-Writer-Wins [...] creates a total order of
+ *  A Last-Writer-Wins Register (LWW-Register) creates a total order of
  *  assignments by associating a timestamp with each update.
  *  Timestamps are assumed unique, totally ordered, and consistent with causal
  *  order; i.e., if assignment 1 happened-before assignment 2,
@@ -43,10 +52,30 @@ namespace CmRDT {
  *  such as its MAC address.
  * "
  *
+ * \warning
+ * CRDT Graph only deals with concurrent add / remove of vertex and edges!!
+ * By default, vertex's content is NOT CRDT! This means, several user working
+ * concurrently eventually end up with the same graph but may have
+ * different vertex data. This is because we cannot deal with add / remove
+ * and vertex content update at the same place. For instance, you may have a
+ * 'graph of map of register' and this container don't know how to update its
+ * content.
+ * To have a graph of CRDT atomic content, you may use a graph of LWWRegister
+ * for instance. To update a vertex data, use query on this vertex and call the
+ * register update function.
+ *
+ * \warning
+ * Timestamps are strictly unique with total order.
+ * If (t1 == t2) is true, replicates may diverge.
+ * (See quote and implementation for further informations).
+ *
+ * \bug
+ * The value T must have a default constructor since add calls it.
+ *
  *
  * \tparam Key  Type of unique identifier for each graph vertex
  * \tparam T    Type of vertex content data.
- * \tparam U    Type of timestamps (Implements operators > and <).
+ * \tparam U    Type of timestamps (Must implements operators > and <).
  *
  * \author  Constantin Masson
  * \date    May 2018
@@ -68,11 +97,19 @@ class LWWGraph {
 
         /**
          * Query a vertex and its internal CRDT metadata.
-         * Query a removed vertex returns this vertex with removed flag true.
-         * This is meant to be used for CRDT uses such as update.
+         *
+         * If vertex with this key exists in the internal container, it is
+         * returned, regardless its 'removed' status.
+         * This may be useful for datatypes built on top of this set.
+         * To have CRDT updates, you must apply the update, regardless its
+         * internal status. This query will return the vertex in any case
+         * (If already added once in the container.)
+         *
+         * If this key has never been added, returns crdt past-the-end
+         * (See lend()) iterator.
          *
          * \param key   Vertex's key to find.
-         * \return      Iterator to the vertex or past-the-end if not found.
+         * \return      Iterator to the vertex or lend() if not found.
          */
         crdt_iterator queryVertex(const Key& key) {
             return _adj.query(key);
@@ -81,8 +118,19 @@ class LWWGraph {
         /**
          * Add a new vertex in the graph.
          *
-         * If vertex already exists, update timestamps if was smaller.
-         * This is required for CRDT properties and commutativity.
+         * If key already exists, use timestamps for concurrency control.
+         *
+         * \par Concurrent addVertex / addVertex
+         * Timestamp is updated with the higher value. Key is added in any case.
+         *
+         * \par Concurrent addVertex / removeVertex
+         * Uses the higher timestamp select the winning operation.
+         * If remove timestamp wins, this add operation does nothing.
+         *
+         * \note
+         * This only adds the key. A default vertex is created.
+         * To add key and set its content, call this add method and query the
+         * newly added vertex (Then update it with its default value).
          *
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
@@ -92,14 +140,20 @@ class LWWGraph {
         }
 
         /**
-         * Remove a vertex from the graph. (Using LWW rule).
-         * Remove all edges that implies this vertex. (Using LWW rule).
-         * If vertex doesn't exists, create it first with removed flag to true.
-         * (CRDT commutativity).
+         * Remove a vertex from the graph.
          *
-         * \note
-         * See addEdge documentation to understand concurrent operations
-         * addEdge | removeVertex.
+         * If key doesn't exists, internally add it first (with removed flag).
+         * This is because remove / add are commutative and remove may be
+         * received before add. (Note that receiving the actual add wont do
+         * anything since its timestamps will be smaller).
+         *
+         * After timestamp check, if vertex actually removed, also remove all
+         * edges that implies this vertex.
+         *
+         * \par Concurrent addEdge / removeVertex
+         * See documentation of LWWGraph::addEdge
+         *
+         * \see LWWGraph::addEdge
          *
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
@@ -117,10 +171,11 @@ class LWWGraph {
         /**
          * Add edge from a vertex to another.
          *
-         * \warning
          * This also performs a 'addVertex' for vertex 'from' and 'to'.
-         * All operations must be commutative and this ensure addEdge is
-         * commutative even if addEdge is received before the add operations.
+         * This ensure addEdge is commutative even if addEdge is received before
+         * the add operations.
+         *
+         * \par Concurrent addEdge / removeVertex
          * If after the 'addVertex' operation, any vertex is still marked as
          * removed. Meaning 'addEdge' was before 'removeVertex', this edge
          * is marked as removed (With the 'removeVertex' timestamp).
@@ -159,7 +214,7 @@ class LWWGraph {
         }
 
         /**
-         * Remove the specific edge between two vertex.
+         * Removes the specific edge between two vertex.
          *
          * If from and/or to doesn't exists, create one with minimum possible
          * timestamp. This create a temporary vertex. This is use in case of
@@ -186,14 +241,20 @@ class LWWGraph {
     public:
 
         /**
-         * Returns a crdt iterator to the beginning.
+         * Returns a constant crdt iterator to the beginning.
+         *
+         * \see crdt_iterator
+         * \return CRDT iterator to the first vertex.
          */
         crdt_iterator lbegin() {
             return _adj.lbegin();
         }
 
         /**
-         * Returns a crdt iterator to the end.
+         * Returns a constant crdt iterator to the end.
+         *
+         * \see crdt_iterator
+         * \return CRDT iterator to the last vertex.
          */
         crdt_iterator lend() {
             return _adj.lend();
@@ -211,6 +272,8 @@ class LWWGraph {
          * Two LWWGraphs are equal if their adjacency list of 'living' vertex
          * are equal.
          *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
          * \return True if equal, otherwise, return false.
          */
         friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
@@ -224,6 +287,10 @@ class LWWGraph {
          * Check if lhs and rhs are not equals.
          * See operator == for further information about equality meaning.
          *
+         * \see LWWGraph::operator==
+         *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
          * \return True if not equal, otherwise, return false.
          */
         friend bool operator!=(const LWWGraph& lhs, const LWWGraph& rhs) {
@@ -243,8 +310,23 @@ class LWWGraph {
 };
 
 
+// /////////////////////////////////////////////////////////////////////////////
+// *****************************************************************************
+// Nested classes
+// *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
+
 /**
- * TODO doc
+ * \brief
+ * Vertex data int the graph.
+ *
+ *
+ * \tparam Key  Type of key.
+ * \tparam T    Type of element.
+ * \tparam U    Type of timestamps.
+ *
+ * \author  Constantin Masson
+ * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWGraph<Key,T,U>::Vertex {
@@ -254,10 +336,29 @@ class LWWGraph<Key,T,U>::Vertex {
 
     public:
 
+        /**
+         * Check if lhs and rhs are equals.
+         * Two Vertex are equal if their set of edges are equal and their
+         * content are equal.
+         *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
+         * \return True if equal, otherwise, return false.
+         */
         friend bool operator==(const Vertex& lhs, const Vertex& rhs) {
             return (lhs._edges == rhs._edges) && (lhs._content == rhs._content);
         }
 
+        /**
+         * Check if lhs and rhs are not equals.
+         * See operator == for further information about equality meaning.
+         *
+         * \see LWWMap::Vertex::operator==
+         *
+         * \param lhs Left hand side
+         * \param rhs Right hand side
+         * \return True if not equal, otherwise, return false.
+         */
         friend bool operator!=(const Vertex& lhs, const Vertex& rhs) {
             return !(lhs == rhs);
         }

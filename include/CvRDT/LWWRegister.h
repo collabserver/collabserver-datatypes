@@ -8,6 +8,11 @@ namespace CvRDT {
 
 
 /**
+ * \deprecated
+ * I originally made this class as an example and is not fully tested.
+ * Several update / bug fixing may be required to use it in real world.
+ *
+ *
  * Last-Writer-Wins Register (LWW Register).
  * CvRDT (State-based).
  *
