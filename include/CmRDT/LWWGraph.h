@@ -106,10 +106,10 @@ class LWWGraph {
          * (If already added once in the container.)
          *
          * If this key has never been added, returns crdt past-the-end
-         * (See lend()) iterator.
+         * (See crdt_end()) iterator.
          *
          * \param key   Vertex's key to find.
-         * \return      Iterator to the vertex or lend() if not found.
+         * \return      Iterator to the vertex or crdt_end() if not found.
          */
         crdt_iterator queryVertex(const Key& key) {
             return _adj.query(key);
@@ -162,7 +162,7 @@ class LWWGraph {
             _adj.remove(key, stamp);
 
             // Remove all edge to this vertex (Even from 'removed' vertex)
-            for(auto it = _adj.lbegin(); it != _adj.lend(); ++it) {
+            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
                 auto& edges = it->second.value()._edges;
                 edges.remove(key, stamp);
             }
@@ -196,8 +196,8 @@ class LWWGraph {
             // This is really important for CRDT / Commutativity feature.
             auto vertex_it_from = _adj.query(from);
             auto vertex_it_to = _adj.query(to);
-            assert(vertex_it_from != _adj.lend());
-            assert(vertex_it_to != _adj.lend());
+            assert(vertex_it_from != _adj.crdt_end());
+            assert(vertex_it_to != _adj.crdt_end());
             const bool from_removed = vertex_it_from->second.isRemoved();
             const bool to_removed = vertex_it_to->second.isRemoved();
 
@@ -246,8 +246,8 @@ class LWWGraph {
          * \see crdt_iterator
          * \return CRDT iterator to the first vertex.
          */
-        crdt_iterator lbegin() {
-            return _adj.lbegin();
+        crdt_iterator crdt_begin() {
+            return _adj.crdt_begin();
         }
 
         /**
@@ -256,8 +256,8 @@ class LWWGraph {
          * \see crdt_iterator
          * \return CRDT iterator to the last vertex.
          */
-        crdt_iterator lend() {
-            return _adj.lend();
+        crdt_iterator crdt_end() {
+            return _adj.crdt_end();
         }
 
 

@@ -4,7 +4,7 @@
 
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it, key, is_removed, stamp) \
-    ASSERT_TRUE(elt_it != data0.lend()); \
+    ASSERT_TRUE(elt_it != data0.crdt_end()); \
     EXPECT_EQ(elt_it->first, key); \
     EXPECT_EQ(elt_it->second.isRemoved(), is_removed); \
     EXPECT_EQ(elt_it->second.timestamp(), stamp)
@@ -174,7 +174,7 @@ TEST(LWWMap, queryTest) {
 
     // Query before exists
     auto coco = data0.query("e1");
-    EXPECT_TRUE(coco == data0.lend());
+    EXPECT_TRUE(coco == data0.crdt_end());
 
     // Add element and query
     data0.add("e1", 10);
@@ -188,7 +188,7 @@ TEST(LWWMap, queryTest) {
 
     // Query invalid data
     coco = data0.query("xxx");
-    EXPECT_TRUE(coco == data0.lend());
+    EXPECT_TRUE(coco == data0.crdt_end());
 }
 
 

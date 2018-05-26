@@ -136,10 +136,10 @@ class LWWSet {
          * (If already added once in the container.)
          *
          * If this key has never been added in set, returns crdt past-the-end
-         * (See lend()) iterator.
+         * (See crdt_end()) iterator.
          *
          * \param key The key to query.
-         * \return Iterator to the key with CRDT metadata or lend() if not found.
+         * \return Iterator to the key with CRDT metadata or crdt_end() if not found.
          */
         const_crdt_iterator query(const Key& key) const {
             return _map.find(key);
@@ -297,7 +297,7 @@ class LWWSet {
          * \see crdt_iterator
          * \return CRDT iterator to the first element.
          */
-        const_crdt_iterator lbegin() const noexcept {
+        const_crdt_iterator crdt_begin() const noexcept {
             return _map.begin();
         }
 
@@ -307,7 +307,7 @@ class LWWSet {
          * \see crdt_iterator
          * \return CRDT iterator to the last element.
          */
-        const_crdt_iterator lend() const noexcept {
+        const_crdt_iterator crdt_end() const noexcept {
             return _map.end();
         }
 

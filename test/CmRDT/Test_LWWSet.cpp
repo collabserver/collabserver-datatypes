@@ -4,7 +4,7 @@
 
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it, key, is_removed, stamp) \
-    ASSERT_TRUE(elt_it != data0.lend()); \
+    ASSERT_TRUE(elt_it != data0.crdt_end()); \
     EXPECT_EQ(elt_it->first, key); \
     EXPECT_EQ(elt_it->second.isRemoved(), is_removed); \
     EXPECT_EQ(elt_it->second.timestamp(), stamp)
@@ -170,7 +170,7 @@ TEST(LWWSet, queryTest) {
 
     // Query before exists
     auto coco = data0.query("e1");
-    EXPECT_TRUE(coco == data0.lend());
+    EXPECT_TRUE(coco == data0.crdt_end());
 
     // Add element and query
     data0.add("e1", 10);
@@ -184,7 +184,7 @@ TEST(LWWSet, queryTest) {
 
     // Query invalid data
     coco = data0.query("xxx");
-    EXPECT_TRUE(coco == data0.lend());
+    EXPECT_TRUE(coco == data0.crdt_end());
 }
 
 
@@ -519,7 +519,7 @@ TEST(LWWSet, crdtIteratorAddRemoveTest) {
     data0.add(2, 10);
     data0.add(3, 10);
     int k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         // Dev note: I'm not sure order is predictable.
         // I use number of iterations instead.
         ++k;
@@ -532,7 +532,7 @@ TEST(LWWSet, crdtIteratorAddRemoveTest) {
     data0.remove(0, 20);
     data0.remove(1, 21);
     k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 4);
@@ -545,7 +545,7 @@ TEST(LWWSet, crdtIteratorAddRemoveTest) {
     data0.remove(4, 34);
     data0.remove(5, 35);
     k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 8);
@@ -554,7 +554,7 @@ TEST(LWWSet, crdtIteratorAddRemoveTest) {
 TEST(LWWSet, crdtIteratorEmptyTest) {
     LWWSet<int, int> data0;
 
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ASSERT_TRUE(false) << "crdt Iterator should be empty";;
     }
 }
@@ -569,7 +569,7 @@ TEST(LWWSet, crdtIteratorRemovedTest) {
     data0.remove(4, 10);
     data0.remove(5, 10);
     int k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 10);
@@ -583,7 +583,7 @@ TEST(LWWSet, crdtIteratorRemovedTest) {
     data0.add(4, 20);
     data0.add(5, 20);
     k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_FALSE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 20);
@@ -597,7 +597,7 @@ TEST(LWWSet, crdtIteratorRemovedTest) {
     data0.remove(4, 30);
     data0.remove(5, 30);
     k = 0;
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 30);
@@ -610,10 +610,10 @@ TEST(LWWSet, crdtIteratorReferenceTest) {
 
     // Simple test add then remove
     data0.add(1, 10);
-    auto it = data0.lbegin();
+    auto it = data0.crdt_begin();
     EXPECT_FALSE(it->second.isRemoved());
     EXPECT_EQ(it->second.timestamp(), 10);
-    it = data0.lbegin();
+    it = data0.crdt_begin();
     data0.remove(1, 20);
     EXPECT_TRUE(it->second.isRemoved());
     EXPECT_EQ(it->second.timestamp(), 20);
@@ -624,7 +624,7 @@ TEST(LWWSet, crdtIteratorReferenceTest) {
     data0.add(3, 30);
     data0.add(4, 30);
     data0.add(5, 30);
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         EXPECT_FALSE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 30);
     }
@@ -635,7 +635,7 @@ TEST(LWWSet, crdtIteratorReferenceTest) {
     data0.remove(3, 40);
     data0.remove(4, 40);
     data0.remove(5, 40);
-    for(auto it = data0.lbegin(); it != data0.lend(); ++it) {
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 40);
     }
