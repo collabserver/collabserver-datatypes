@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CvRDT/LWWRegister.h"
+#include "collab/CvRDT/LWWRegister.h"
 
 #include <stdio.h>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

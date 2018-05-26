@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CvRDT/PNCounter.h"
+#include "collab/CvRDT/PNCounter.h"
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

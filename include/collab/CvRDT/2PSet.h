@@ -4,7 +4,7 @@
 #include <iterator>
 #include <iostream>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

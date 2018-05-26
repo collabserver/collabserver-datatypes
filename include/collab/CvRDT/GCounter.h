@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cassert>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

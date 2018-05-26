@@ -1,8 +1,9 @@
-#include "CmRDT/LWWGraph.h"
+#include "collab/CmRDT/LWWGraph.h"
+
 #include <gtest/gtest.h>
 #include <string>
 
-namespace CRDT {
+namespace collab {
 namespace CmRDT {
 
 

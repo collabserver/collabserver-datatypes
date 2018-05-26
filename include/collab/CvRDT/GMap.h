@@ -4,7 +4,7 @@
 #include <algorithm> // std::max
 #include <utility> // std::pair
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

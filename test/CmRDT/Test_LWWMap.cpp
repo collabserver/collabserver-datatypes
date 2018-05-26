@@ -1,4 +1,4 @@
-#include "CmRDT/LWWMap.h"
+#include "collab/CmRDT/LWWMap.h"
 #include <gtest/gtest.h>
 
 
@@ -10,7 +10,7 @@
     EXPECT_EQ(elt_it->second.timestamp(), stamp)
 
 
-namespace CRDT {
+namespace collab {
 namespace CmRDT {
 
 

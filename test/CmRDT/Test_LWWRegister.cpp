@@ -1,7 +1,7 @@
-#include "CmRDT/LWWRegister.h"
+#include "collab/CmRDT/LWWRegister.h"
 #include <gtest/gtest.h>
 
-namespace CRDT {
+namespace collab {
 namespace CmRDT {
 
 

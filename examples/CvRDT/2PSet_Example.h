@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CvRDT/2PSet.h"
+#include "collab/CvRDT/2PSet.h"
 
 #include <iostream>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

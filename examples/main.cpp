@@ -6,7 +6,7 @@
 #include "CvRDT/GMap_Example.h"
 #include "CvRDT/GGraph_Example.h"
 
-using namespace CRDT;
+using namespace collab;
 
 
 int main(int argc, char** argv) {

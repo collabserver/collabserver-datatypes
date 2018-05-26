@@ -3,7 +3,7 @@
 #include <cassert>
 #include <ostream>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

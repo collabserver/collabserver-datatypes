@@ -1,10 +1,10 @@
 #pragma once
 
-#include "CvRDT/GMap.h"
+#include "collab/CvRDT/GMap.h"
 
 #include <string>
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

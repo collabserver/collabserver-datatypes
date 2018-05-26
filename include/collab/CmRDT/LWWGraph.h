@@ -6,7 +6,7 @@
 #include <ostream>
 #include <cassert>
 
-namespace CRDT {
+namespace collab {
 namespace CmRDT {
 
 

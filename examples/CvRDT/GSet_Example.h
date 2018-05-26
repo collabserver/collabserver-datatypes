@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CvRDT/GSet.h"
+#include "collab/CvRDT/GSet.h"
 
-namespace CRDT {
+namespace collab {
 namespace CvRDT {
 
 

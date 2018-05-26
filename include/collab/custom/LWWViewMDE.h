@@ -1,7 +1,8 @@
 #pragma once
 
-#include "CmRDT/LWWMap.h"
-#include "CmRDT/LWWGraph.h"
+#include "collab/CmRDT/LWWMap.h"
+#include "collab/CmRDT/LWWGraph.h"
+
 #include <string>
 #include <chrono>
 
@@ -17,10 +18,10 @@ class LWWViewMDE {
 
     private:
         typedef std::chrono::steady_clock::time_point Timestamp;
-        typedef CRDT::CmRDT::LWWMap<std::string, std::string, Timestamp> Attribute;
+        typedef CmRDT::LWWMap<std::string, std::string, Timestamp> Attribute;
 
     private:
-        CRDT::CmRDT::LWWGraph<UUID, Attribute, Timestamp> _modelMDE;
+        CmRDT::LWWGraph<UUID, Attribute, Timestamp> _modelMDE;
 
 
     public:
