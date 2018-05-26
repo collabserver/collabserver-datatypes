@@ -330,11 +330,31 @@ class LWWGraph {
  */
 template<typename Key, typename T, typename U>
 class LWWGraph<Key,T,U>::Vertex {
-    public:
+
+    private:
+        friend LWWGraph;
         T               _content;
         LWWSet<Key,U>   _edges;
 
     public:
+
+        /**
+         * Returns a reference to the vertex content data.
+         *
+         * \return Reference to the content.
+         */
+        T& content() {
+            return _content;
+        }
+
+        /**
+         * Returns a reference to the vertex's edges.
+         *
+         * \return Reference to the set of edges.
+         */
+        LWWSet<Key,U>& edges() {
+            return _edges;
+        }
 
         /**
          * Check if lhs and rhs are equals.
