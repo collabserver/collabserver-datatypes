@@ -1,6 +1,7 @@
 #pragma once
 
 #include "collab/CvRDT/GGraph.h"
+#include <iostream>
 
 #include <string>
 

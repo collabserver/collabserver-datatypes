@@ -1,10 +1,10 @@
-#include "CvRDT/GCounter_Example.h"
-#include "CvRDT/PNCounter_Example.h"
-#include "CvRDT/LWWRegister_Example.h"
-#include "CvRDT/GSet_Example.h"
-#include "CvRDT/2PSet_Example.h"
-#include "CvRDT/GMap_Example.h"
-#include "CvRDT/GGraph_Example.h"
+#include "Example_GCounter.h"
+#include "Example_PNCounter.h"
+#include "Example_LWWRegister.h"
+#include "Example_GSet.h"
+#include "Example_2PSet.h"
+#include "Example_GMap.h"
+#include "Example_GGraph.h"
 
 using namespace collab;
 
@@ -24,5 +24,6 @@ int main(int argc, char** argv) {
     CvRDT::GMap_example();
 
     CvRDT::GGraph_example();
+
     return 0;
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "collab/CvRDT/2PSet.h"
-
 #include <iostream>
 
 namespace collab {

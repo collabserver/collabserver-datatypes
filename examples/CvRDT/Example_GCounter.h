@@ -1,36 +1,31 @@
 #pragma once
 
-#include "collab/CvRDT/GSet.h"
+#include "collab/CvRDT/GCounter.h"
+#include <iostream>
 
 namespace collab {
 namespace CvRDT {
 
 
-void GSet_example() {
-    std::cout << "\n----- CvRDT GSet Example ----------\n";
+void GCounter_example() {
+    std::cout << "\n----- CvRDT GCounter Example ----------\n";
 
-    GSet<int> data0; // Data at replicate 0
-    GSet<int> data1; // Data at replicate 1
+    GCounter<int, std::string> data0("user1");
+    GCounter<int, std::string> data1("user2");
 
 
     // --- Replicate 0 (data0) ---
-    // data0 = [0,2,4]
-    data0.insert(0);
-    data0.insert(2);
-    data0.insert(4);
+    data0.increment();
+    data0.increment();
+    data0.increment();
 
 
     // --- Replicate 1 (data1) ---
-    // data1 = [1,2,3,4,5]
-    data1.insert(1);
-    data1.insert(2);
-    data1.insert(3);
-    data1.insert(4);
-    data1.insert(5);
+    data1.increment();
+    data1.increment();
 
 
     // --- Final ---
-    // Merge result = {0,1,2,3,4,5}
     std::cout << "data0 before merge: " << data0 << "\n";
     std::cout << "data1 before merge: " << data1 << "\n";
 
@@ -44,6 +39,5 @@ void GSet_example() {
     std::cout << " (true=" << true << ")\n";
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
-
 
 }} // End namespaces

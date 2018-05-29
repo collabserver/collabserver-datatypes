@@ -1,6 +1,7 @@
 #pragma once
 
 #include "collab/CvRDT/GMap.h"
+#include <iostream>
 
 #include <string>
 
