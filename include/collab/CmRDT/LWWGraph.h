@@ -5,6 +5,7 @@
 
 #include <ostream>
 #include <cassert>
+#include <type_traits>
 
 namespace collab {
 namespace CmRDT {
@@ -69,11 +70,9 @@ namespace CmRDT {
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation for further informations).
  *
- * \bug
- * The value T must have a default constructor since add calls it.
- *
- * \bug
- * Timestamp must have operator=
+ * \warning
+ * T template parameter must have a default constructor.
+ * U timestamp must accept "U t = 0" (This should set with minimal value).
  *
  *
  * \tparam Key  Type of unique identifier for each graph vertex

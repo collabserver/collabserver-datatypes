@@ -58,6 +58,9 @@ namespace CmRDT {
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation for further informations).
  *
+ * \warning
+ * U timestamp must accept "U t = 0" (This should set with minimal value).
+ *
  * \see http://en.cppreference.com/w/cpp/container/unordered_set
  * \see http://en.cppreference.com/w/cpp/container/unordered_map
  *
@@ -414,8 +417,8 @@ class LWWSet<Key,U>::Metadata {
     private:
         friend LWWSet;
 
-        U    _timestamp;
-        bool _isRemoved;
+        U    _timestamp = 0;
+        bool _isRemoved = false;
 
     public:
 

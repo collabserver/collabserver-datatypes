@@ -33,14 +33,9 @@ namespace CmRDT {
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation for further informations).
  *
- * \bug
+ * \warning
  * T template parameter must have a default constructor.
- * We may add a constructor that takes a T value to avoid this.
- *
- * \bug
- * U timestamp is initialized with 0 (U time = 0).
- * So your U type must accept operation "= 0"
- * We may add a constructor that takes a U default time to avoid this.
+ * U timestamp must accept "U t = 0" (This should set with minimal value).
  *
  *
  * \tparam T    Type of element (Register content).

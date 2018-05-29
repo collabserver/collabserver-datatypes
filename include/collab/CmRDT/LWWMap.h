@@ -71,8 +71,9 @@ namespace CmRDT {
  * If (t1 == t2) is true, replicates may diverge.
  * (See quote and implementation for further informations).
  *
- * \bug
- * The value T must have a default constructor since add calls it.
+ * \warning
+ * T template parameter must have a default constructor.
+ * U timestamp must accept "U t = 0" (This should set with minimal value).
  *
  * \see http://en.cppreference.com/w/cpp/container/unordered_map
  *
@@ -516,11 +517,11 @@ class LWWMap<Key, T, U>::Element {
         // Actual element value is in _internalValue.second (Burk! Ugly!)
         std::pair<const Key,T> _internalValue;
 
-        U       _timestamp;
-        bool    _isRemoved;
+        U       _timestamp = 0;
+        bool    _isRemoved = false;
 
     public:
-        Element(const Key key) : _internalValue(std::make_pair(key, T{})) {
+        Element(const Key& key) : _internalValue(std::make_pair(key, T{})) {
             // TODO: T must have default constructor.
             // This may be too restrictive for end-user.
             // I should think about another way.

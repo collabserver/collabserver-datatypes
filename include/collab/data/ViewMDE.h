@@ -1,13 +1,13 @@
 #pragma once
 
 #include "CollabData.h"
+#include "Timestamp.h"
 
 #include "collab/CmRDT/LWWMap.h"
 #include "collab/CmRDT/LWWGraph.h"
 #include "collab/CmRDT/LWWRegister.h"
 
 #include <string>
-#include <chrono>
 
 namespace collab {
 
@@ -27,7 +27,6 @@ class ViewMDE : public CollabData {
         typedef std::string UUID;
 
     private:
-        typedef std::chrono::steady_clock::time_point               Timestamp;
         typedef CmRDT::LWWRegister<std::string, Timestamp>          attribute;
         typedef CmRDT::LWWMap<std::string, attribute, Timestamp>    attributesMap;
 
@@ -42,7 +41,7 @@ class ViewMDE : public CollabData {
          * \param id The element's ID.
          */
         void addElement(const UUID& id) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             _modelMDE.addVertex(id, tnow);
         }
 
@@ -52,7 +51,7 @@ class ViewMDE : public CollabData {
          * \param id The element's ID.
          */
         void removeElement(const UUID& id) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             _modelMDE.removeVertex(id, tnow);
         }
 
@@ -66,7 +65,7 @@ class ViewMDE : public CollabData {
         void addAttribute(const UUID& eltID,
                           const std::string& name,
                           const std::string& value) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             auto v = _modelMDE.queryVertex(eltID);
             // TODO
         }
@@ -78,7 +77,7 @@ class ViewMDE : public CollabData {
          * \param name  Attribute's name.
          */
         void removeAttribute(const UUID& eltID, const std::string& name) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             // TODO
         }
 
@@ -92,7 +91,7 @@ class ViewMDE : public CollabData {
         void updateAttribute(const UUID& eltID,
                              const std::string& name,
                              const std::string& value) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             // TODO
         }
 
@@ -103,14 +102,13 @@ class ViewMDE : public CollabData {
          * \param to    ID of element link is going to.
          */
         void addLink(const UUID& from, const UUID& to) {
-            auto tnow = std::chrono::steady_clock::now();
+            auto tnow = Timestamp::now();
             _modelMDE.addEdge(from, to, tnow);
         }
 
         void removeLink(const UUID& from, const UUID& to) {
-            auto tnow = std::chrono::steady_clock::now();
-            //_modelMDE.removeEdge(from, to, tnow);
-            //TODO Fix issue with timestamp = 0
+            auto tnow = Timestamp::now();
+            _modelMDE.removeEdge(from, to, tnow);
         }
 };
 
