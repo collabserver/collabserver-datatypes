@@ -48,8 +48,8 @@ endif()
 include_directories("${CMAKE_SOURCE_DIR}/include/")
 file(GLOB_RECURSE srcFiles "${CMAKE_SOURCE_DIR}/test/*.cpp")
 
-add_executable(testAll ${srcFiles})
-target_link_libraries(testAll gtest)
-add_test(NAME runAllTests COMMAND testAll)
+add_executable(runtests ${srcFiles})
+target_link_libraries(runtests gtest)
+add_test(NAME runAllTests COMMAND runtests)
 
 

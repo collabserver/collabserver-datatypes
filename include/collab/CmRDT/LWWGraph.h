@@ -72,6 +72,9 @@ namespace CmRDT {
  * \bug
  * The value T must have a default constructor since add calls it.
  *
+ * \bug
+ * Timestamp must have operator=
+ *
  *
  * \tparam Key  Type of unique identifier for each graph vertex
  * \tparam T    Type of vertex content data.

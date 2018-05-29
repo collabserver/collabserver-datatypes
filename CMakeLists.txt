@@ -4,5 +4,5 @@ if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(FATAL_ERROR "in-source build not allowed. Use another directory.")
 endif()
 
-include ("CMake/AddCompilerFlags.cmake")
+include("CMake/AddCompilerFlags.cmake")
 include("CMake/AddTests.cmake")
