@@ -6,3 +6,4 @@ endif()
 
 include("CMake/AddCompilerFlags.cmake")
 include("CMake/AddTests.cmake")
+include("CMake/AddExamples.cmake")
