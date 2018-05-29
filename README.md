@@ -32,8 +32,8 @@ To learn more about CRDTs, checkout the links at the end of this readme.
     - GSet: Grow-only set
     - LWWRegister: Last-Write-Wins Register
     - PNCounter: Increment / Decrement counter
-- Custom (Custom data built in top of CRDTs)
-    - LWWViewMDE: custom data built for AToMPM software.
+- Data (Custom data built in top of CRDTs. For collab-server)
+    - LWWViewMDE: custom data built for collab-server and AToMPM software.
 
 > Warning: I wrote the CvRDTs as an example. They are not meant to be used.
 > (At least, some changes may be required).
@@ -58,8 +58,11 @@ make ./runtests
 
 
 # Integrate in your project
-Data Types are header only, you only need to include the right header.
-For instance, to use a CmRDT::LWWSet, `#include "collab/CmRDT/LWWSet.h"`
+Data Types are header only, you need to include the right header.
+Include the this project `include` folder in your project path, then include
+the data type your want to use.
+
+For instance, to use CmRDT::LWWSet: `#include "collab/CmRDT/LWWSet.h"`
 
 
 # CRDTs theoretical description
