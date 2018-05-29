@@ -2,10 +2,10 @@
 
 [![release-version](https://img.shields.io/badge/release-beta--version-red.svg)]()
 [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
-[![license](https://img.shields.io/badge/license-Apache2.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
+[![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
 
 
-| master | dev
+| master | dev |
 | :-----: | :----: |
 | [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts) | [![build-status-dev](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=dev)](https://travis-ci.org/CollabServer/collab-data-crdts) |
 
@@ -45,7 +45,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 - [GoogleTest](https://github.com/google/googletest) (For unit tests).
 
 
-# Build and run with CMake (Linux only)
+# Build and run tests with CMake (Linux only)
 > Requires C++11 and "pragma once" support.
 
 ```
@@ -53,17 +53,24 @@ mkdir build
 cd build
 cmake ..
 make -j4
-make ./testAll
+make ./runtests
 ```
 
 
-# CRDTs academic description
+# Integrate in your project
+Data Types are header only, you only need to include the right header.
+For instance, to use a CmRDT::LWWSet, `#include "collab/CmRDT/LWWSet.h"`
+
+
+# CRDTs theoretical description
 
 - State-based object (CvRDT)
 
-```
-Convergent Replicated Data Types (CvRDT)
+> CvRDT stands for Convergent Replicated Data Types.
+> Updates are applied locally, then the whole data state is sent to others.
+> A merge method integrate two states so that all replicates convergent.
 
+```
 State CvRDT is defined by (S s0 q u m)
     S   -> Global State
     s0  -> State at beginning
@@ -74,9 +81,11 @@ State CvRDT is defined by (S s0 q u m)
 
 - Operation-based object (CmRDT)
 
-```
-Commutative Replicated Data Types (CmRDT)
+> CmRDT stands for Commutative Replicated Data Types.
+> Only delta of change (Operation) are broadcasted and applied to others.
+> All operations are commutative.
 
+```
 Operation CmRDT is defined by (S s0 q t u P)
     S   -> Global State
     s0  -> State at beginning
