@@ -417,7 +417,7 @@ class LWWSet<Key,U>::Metadata {
     private:
         friend LWWSet;
 
-        U    _timestamp = 0;
+        U    _timestamp = {0};
         bool _isRemoved = false;
 
     public:

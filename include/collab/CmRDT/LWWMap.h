@@ -517,7 +517,7 @@ class LWWMap<Key, T, U>::Element {
         // Actual element value is in _internalValue.second (Burk! Ugly!)
         std::pair<const Key,T> _internalValue;
 
-        U       _timestamp = 0;
+        U       _timestamp = {0};
         bool    _isRemoved = false;
 
     public:
