@@ -29,7 +29,10 @@ class Timestamp {
             return t;
         }
 
-        Timestamp(int value) {
+        Timestamp(const int value) {
+            // Dev note:
+            // This may sounds weird, but this is because the only need of
+            // U time = x is to set the timestamp to its lower value.
             _uniqueID = 0;
             _time = std::chrono::time_point<std::chrono::steady_clock>::min();
         }
@@ -40,6 +43,13 @@ class Timestamp {
     // -------------------------------------------------------------------------
 
     public:
+
+        Timestamp& operator=(const int value) {
+            // Dev note: see constructor note
+            _uniqueID = 0;
+            _time = std::chrono::time_point<std::chrono::steady_clock>::min();
+            return *this;
+        }
 
         friend bool operator==(const Timestamp& rhs, const Timestamp& lhs) {
             return (rhs._time == lhs._time && rhs._uniqueID == lhs._uniqueID);
