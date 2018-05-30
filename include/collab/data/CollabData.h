@@ -1,6 +1,7 @@
 #pragma once
 
-#include "CollabInstance.h"
+
+class CollabInstance;
 
 namespace collab {
 
@@ -18,6 +19,9 @@ namespace collab {
  * \date    May 2018
  */
 class CollabData {
+    private:
+        CollabInstance* _collabInstance = nullptr;
+
     public:
         CollabData() = default;
         virtual ~CollabData() = default;

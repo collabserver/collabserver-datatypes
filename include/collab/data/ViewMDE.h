@@ -2,6 +2,7 @@
 
 #include "CollabData.h"
 #include "Timestamp.h"
+#include "ViewMDE_Operations.h"
 
 #include "collab/CmRDT/LWWMap.h"
 #include "collab/CmRDT/LWWGraph.h"
@@ -18,6 +19,9 @@ namespace collab {
  *
  * ViewMDE is built on top of collab CRDTs.
  *
+ * \todo
+ * TODO Documentation
+ *
  *
  * \author  Constantin Masson
  * \date    May 2018
@@ -27,8 +31,8 @@ class ViewMDE : public CollabData {
         typedef std::string UUID;
 
     private:
-        typedef CmRDT::LWWRegister<std::string, Timestamp>          attribute;
-        typedef CmRDT::LWWMap<std::string, attribute, Timestamp>    attributesMap;
+        typedef CmRDT::LWWRegister<std::string, Timestamp>        attribute;
+        typedef CmRDT::LWWMap<std::string, attribute, Timestamp>  attributesMap;
 
         CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _modelMDE;
 
@@ -42,7 +46,10 @@ class ViewMDE : public CollabData {
          */
         void addElement(const UUID& id) {
             auto tnow = Timestamp::now();
+            AddElementOperation op(id, tnow);
+            // TODO: post 'addElement' event to all observers
             _modelMDE.addVertex(id, tnow);
+            // Send Operation to back CollabInstance.
         }
 
         /**
