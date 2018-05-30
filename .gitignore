@@ -1,6 +1,5 @@
 # Custom ignore
 build/
-doc/
 .syntastic_cpp_config
 .ycm_extra_conf.py
 
