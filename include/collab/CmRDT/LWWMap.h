@@ -198,7 +198,7 @@ class LWWMap {
         }
 
         /**
-         * \copydoc LWWMap::find()
+         * \copydoc LWWMap::find
          */
         const_iterator find(const Key& key) const {
             auto elt_iterator = _map.find(key);
@@ -340,18 +340,14 @@ class LWWMap {
         }
 
         /**
-         * Returns a constant iterator to the beginning.
-         *
-         * \return Constant iterator to the first element.
+         * \copydoc LWWMap::begin
          */
         const_iterator begin() const noexcept {
             return const_iterator(*this);
         }
 
         /**
-         * Returns a constant iterator to the end.
-         *
-         * \return Constant iterator to the last element.
+         * \copydoc LWWMap::end
          */
         const_iterator end() const noexcept {
             const_iterator it(*this);
@@ -360,18 +356,14 @@ class LWWMap {
         }
 
         /**
-         * Returns a constant iterator to the beginning.
-         *
-         * \return Constant iterator to the first element.
+         * \copydoc LWWMap::begin
          */
         const_iterator cbegin() const noexcept {
             return const_iterator(*this);
         }
 
         /**
-         * Returns a constant iterator to the end.
-         *
-         * \return Constant iterator to the last element.
+         * \copydoc LWWMap::end
          */
         const_iterator cend() const noexcept {
             const_iterator it(*this);
@@ -380,7 +372,7 @@ class LWWMap {
         }
 
         /**
-         * Returns a constant crdt iterator to the beginning.
+         * Returns a crdt_iterator to the beginning.
          *
          * \see LWWMap::crdt_iterator
          * \return CRDT iterator to the first element.
@@ -390,13 +382,27 @@ class LWWMap {
         }
 
         /**
-         * Returns a constant crdt iterator to the end.
+         * Returns a crdt_iterator to the end.
          *
          * \see LWWMap::crdt_iterator
          * \return CRDT iterator to the last element.
          */
         crdt_iterator crdt_end() noexcept {
             return _map.end();
+        }
+
+        /**
+         * \copydoc LWWMap::crdt_begin
+         */
+        const_crdt_iterator crdt_begin() const noexcept {
+            return _map.cbegin();
+        }
+
+        /**
+         * \copydoc LWWMap::crdt_end
+         */
+        const_crdt_iterator crdt_end() const noexcept {
+            return _map.cend();
         }
 
 

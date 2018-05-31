@@ -86,9 +86,10 @@ template<typename Key, typename T, typename U>
 class LWWGraph {
     public:
         class Vertex;
-        typedef typename LWWMap<Key,Vertex,U>::iterator         iterator;
-        typedef typename LWWMap<Key,Vertex,U>::const_iterator   const_iterator;
-        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator    crdt_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::iterator             iterator;
+        typedef typename LWWMap<Key,Vertex,U>::const_iterator       const_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator        crdt_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::const_crdt_iterator  const_crdt_iterator;
 
     private:
         LWWMap<Key, Vertex, U> _adj;
@@ -246,7 +247,7 @@ class LWWGraph {
     public:
 
         /**
-         * Returns an iterator to the beginning.
+         * Returns iterator to the beginning.
          *
          * \return iterator to the first element.
          */
@@ -255,7 +256,7 @@ class LWWGraph {
         }
 
         /**
-         * Returns an iterator to the end.
+         * Returns iterator to the end.
          *
          * \return iterator to the last element.
          */
@@ -266,18 +267,14 @@ class LWWGraph {
         }
 
         /**
-         * Returns a constant iterator to the beginning.
-         *
-         * \return Constant iterator to the first element.
+         * \copydoc LWWGraph::begin
          */
         const_iterator begin() const noexcept {
             return const_iterator(_adj);
         }
 
         /**
-         * Returns a constant iterator to the end.
-         *
-         * \return Constant iterator to the last element.
+         * \copydoc LWWGraph::end
          */
         const_iterator end() const noexcept {
             const_iterator it(_adj);
@@ -286,18 +283,14 @@ class LWWGraph {
         }
 
         /**
-         * Returns a constant iterator to the beginning.
-         *
-         * \return Constant iterator to the first element.
+         * \copydoc LWWGraph::begin
          */
         const_iterator cbegin() const noexcept {
             return const_iterator(_adj);
         }
 
         /**
-         * Returns a constant iterator to the end.
-         *
-         * \return Constant iterator to the last element.
+         * \copydoc LWWGraph::end
          */
         const_iterator cend() const noexcept {
             const_iterator it(_adj);
@@ -306,7 +299,7 @@ class LWWGraph {
         }
 
         /**
-         * Returns a constant crdt iterator to the beginning.
+         * Returns crdt_iterator to the beginning.
          *
          * \see LWWGraph::crdt_iterator
          * \return CRDT iterator to the first vertex.
@@ -316,12 +309,26 @@ class LWWGraph {
         }
 
         /**
-         * Returns a constant crdt iterator to the end.
+         * Returns crdt_iterator to the end.
          *
          * \see LWWGraph::crdt_iterator
          * \return CRDT iterator to the last vertex.
          */
         crdt_iterator crdt_end() {
+            return _adj.crdt_end();
+        }
+
+        /**
+         * \copydoc LWWGraph::crdt_begin
+         */
+        const_crdt_iterator crdt_begin() const {
+            return _adj.crdt_begin();
+        }
+
+        /**
+         * \copydoc LWWGraph::crdt_end
+         */
+        const_crdt_iterator crdt_end() const {
             return _adj.crdt_end();
         }
 
@@ -368,9 +375,16 @@ class LWWGraph {
          */
         friend std::ostream& operator<<(std::ostream& out,
                                         const LWWGraph<Key,T,U>& o) {
-            out << "CmRDT::LWWGraph = Not Implemented Yet";
-            for(const auto& v : o._adj) {
-                // TODO To implements
+            out << "CmRDT::LWWGraph = ";
+            for(auto it = o.crdt_begin(); it != o.crdt_end(); ++it) {
+                out << "\n Vertex(" << it->first << "," << it->second.timestamp();
+                if(it->second.isRemoved()) {
+                    out << ",x)";
+                }
+                else {
+                    out << ",o)";
+                }
+                out << " -> " << it->second.value().edges();
             }
             return out;
         }
@@ -415,11 +429,25 @@ class LWWGraph<Key,T,U>::Vertex {
         }
 
         /**
+         * \copydoc Vertex::content
+         */
+        const T& content() const {
+            return _content;
+        }
+
+        /**
          * Returns a reference to the vertex's edges.
          *
          * \return Reference to the set of edges.
          */
         LWWSet<Key,U>& edges() {
+            return _edges;
+        }
+
+        /**
+         * \copydoc Vertex::edges
+         */
+        const LWWSet<Key,U>& edges() const {
             return _edges;
         }
 
