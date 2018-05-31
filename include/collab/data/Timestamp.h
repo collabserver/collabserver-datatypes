@@ -11,7 +11,12 @@ namespace collab {
  * Timestamps implementation for CollabServer.
  *
  * Timestamps should be strictly unique. This implementation mix time value
- * (chrono clock) with a unique integer. (ex: user counter).
+ * (chrono clock) with an integer value unique for each user.
+ *
+ * \todo
+ * The integer value should be unique for each user. Actual implementation is
+ * not finished and all this is hard coded.
+ *
  *
  * \author  Constantin Masson
  * \date    Nov 2018

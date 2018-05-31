@@ -117,6 +117,16 @@ class ViewMDE : public CollabData {
             auto tnow = Timestamp::now();
             _modelMDE.removeEdge(from, to, tnow);
         }
+
+
+    // -------------------------------------------------------------------------
+    // OperationObserver
+    // -------------------------------------------------------------------------
+
+    public:
+        void applyOperation(const Operation& op) {
+            // TODO
+        }
 };
 
 

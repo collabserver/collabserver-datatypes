@@ -5,7 +5,7 @@ namespace collab {
 
 /**
  * \brief
- * Represents any operations on CollabData.
+ * Interface that represents any operations on CollabData.
  *
  * \author  Constantin Masson
  * \date    May 2018
