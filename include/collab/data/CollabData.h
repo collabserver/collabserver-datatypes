@@ -64,8 +64,8 @@ class CollabData {
 
         /**
          * Registers a OperationObserver in this data.
-         * Does nothing if this observer is already registered and returns false.
-         * Does nothing if nullptr is given.
+         * Does nothing if this observer is already registered (Returns false).
+         * Does nothing if nullptr is given (Returns false).
          *
          * \param observer The observer to add.
          * \return True if added, otherwise, return false.
@@ -93,7 +93,7 @@ class CollabData {
         /**
          * Apply an external operation on this data.
          * Operation may be received from external components (Ex: network).
-         * The exact operation is received though. (already unserialized).
+         * The exact operation is received. (already unserialized).
          *
          * \param Constant reference to the operation to apply.
          */

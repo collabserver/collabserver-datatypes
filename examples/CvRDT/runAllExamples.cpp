@@ -9,9 +9,8 @@
 using namespace collab;
 
 
+// Start all CvRDT examples (State-based)
 int main(int argc, char** argv) {
-
-    // CvRDT (State-based)
 
     CvRDT::GCounter_example();
     CvRDT::PNCounter_example();

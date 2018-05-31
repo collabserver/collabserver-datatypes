@@ -84,11 +84,14 @@ namespace CmRDT {
  */
 template<typename Key, typename T, typename U>
 class LWWGraph {
-    private:
+    public:
         class Vertex;
-        LWWMap<Key, Vertex, U> _adj;
+        typedef typename LWWMap<Key,Vertex,U>::iterator         iterator;
+        typedef typename LWWMap<Key,Vertex,U>::const_iterator   const_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator    crdt_iterator;
 
-        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator crdt_iterator;
+    private:
+        LWWMap<Key, Vertex, U> _adj;
 
 
     // -------------------------------------------------------------------------
@@ -243,6 +246,66 @@ class LWWGraph {
     public:
 
         /**
+         * Returns an iterator to the beginning.
+         *
+         * \return iterator to the first element.
+         */
+        iterator begin() {
+            return iterator(_adj);
+        }
+
+        /**
+         * Returns an iterator to the end.
+         *
+         * \return iterator to the last element.
+         */
+        iterator end() {
+            iterator it(_adj);
+            it._it = _adj.end();
+            return it;
+        }
+
+        /**
+         * Returns a constant iterator to the beginning.
+         *
+         * \return Constant iterator to the first element.
+         */
+        const_iterator begin() const noexcept {
+            return const_iterator(_adj);
+        }
+
+        /**
+         * Returns a constant iterator to the end.
+         *
+         * \return Constant iterator to the last element.
+         */
+        const_iterator end() const noexcept {
+            const_iterator it(_adj);
+            it._it = _adj.end();
+            return it;
+        }
+
+        /**
+         * Returns a constant iterator to the beginning.
+         *
+         * \return Constant iterator to the first element.
+         */
+        const_iterator cbegin() const noexcept {
+            return const_iterator(_adj);
+        }
+
+        /**
+         * Returns a constant iterator to the end.
+         *
+         * \return Constant iterator to the last element.
+         */
+        const_iterator cend() const noexcept {
+            const_iterator it(_adj);
+            it._it = _adj.end();
+            return it;
+        }
+
+        /**
          * Returns a constant crdt iterator to the beginning.
          *
          * \see LWWGraph::crdt_iterator
@@ -306,7 +369,9 @@ class LWWGraph {
         friend std::ostream& operator<<(std::ostream& out,
                                         const LWWGraph<Key,T,U>& o) {
             out << "CmRDT::LWWGraph = Not Implemented Yet";
-            // TODO To implements
+            for(const auto& v : o._adj) {
+                // TODO To implements
+            }
             return out;
         }
 };

@@ -465,14 +465,14 @@ class LWWMap {
                                         const LWWMap<Key,T,U>& o) {
             out << "CmRDT::LWWMap = ";
             for(const auto& elt : o._map) {
-                out << "(K=" << elt.first
-                    << ",T=" << elt.second.value()
-                    << ",U=" << elt.second.timestamp();
+                out << "\n  (" << elt.first
+                    << ", " << elt.second.value()
+                    << ", " << elt.second.timestamp();
                 if(elt.second.isRemoved()) {
-                    out << ",removed) ";
+                        out << ", x)";
                 }
                 else {
-                    out << ",alive) ";
+                    out << ", o)";
                 }
             }
             return out;

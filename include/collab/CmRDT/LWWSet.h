@@ -324,6 +324,9 @@ class LWWSet {
          * Check if lhs and rhs are equals.
          * Two sets are equal if their 'living' set of keys are equal.
          *
+         * \warning
+         * Only keys are considered. Content of key may differs.
+         *
          * \param lhs Left hand side
          * \param rhs Right hand side
          * \return True if equal, otherwise, return false.
@@ -372,13 +375,13 @@ class LWWSet {
         friend std::ostream& operator<<(std::ostream& out, const LWWSet<Key,U>& o) {
             out << "CmRDT::LWWSet = ";
             for(const auto& elt : o._map) {
-                out << "(K=" << elt.first
-                    << ",U=" << elt.second.timestamp();
+                out << "(" << elt.first
+                    << "," << elt.second.timestamp();
                 if(elt.second.isRemoved()) {
-                    out << ",removed) ";
+                    out << ",x) ";
                 }
                 else {
-                    out << ",alive) ";
+                    out << ",o) ";
                 }
             }
             return out;
