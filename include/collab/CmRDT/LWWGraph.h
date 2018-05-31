@@ -245,7 +245,7 @@ class LWWGraph {
         /**
          * Returns a constant crdt iterator to the beginning.
          *
-         * \see crdt_iterator
+         * \see LWWGraph::crdt_iterator
          * \return CRDT iterator to the first vertex.
          */
         crdt_iterator crdt_begin() {
@@ -255,7 +255,7 @@ class LWWGraph {
         /**
          * Returns a constant crdt iterator to the end.
          *
-         * \see crdt_iterator
+         * \see LWWGraph::crdt_iterator
          * \return CRDT iterator to the last vertex.
          */
         crdt_iterator crdt_end() {

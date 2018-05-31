@@ -382,7 +382,7 @@ class LWWMap {
         /**
          * Returns a constant crdt iterator to the beginning.
          *
-         * \see crdt_iterator
+         * \see LWWMap::crdt_iterator
          * \return CRDT iterator to the first element.
          */
         crdt_iterator crdt_begin() noexcept {
@@ -392,7 +392,7 @@ class LWWMap {
         /**
          * Returns a constant crdt iterator to the end.
          *
-         * \see crdt_iterator
+         * \see LWWMap::crdt_iterator
          * \return CRDT iterator to the last element.
          */
         crdt_iterator crdt_end() noexcept {

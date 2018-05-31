@@ -296,7 +296,7 @@ class LWWSet {
         /**
          * Returns a constant crdt iterator to the beginning.
          *
-         * \see crdt_iterator
+         * \see LWWSet::crdt_iterator
          * \return CRDT iterator to the first element.
          */
         const_crdt_iterator crdt_begin() const noexcept {
@@ -306,7 +306,7 @@ class LWWSet {
         /**
          * Returns a constant crdt iterator to the end.
          *
-         * \see crdt_iterator
+         * \see LWWSet::crdt_iterator
          * \return CRDT iterator to the last element.
          */
         const_crdt_iterator crdt_end() const noexcept {

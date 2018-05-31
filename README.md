@@ -65,6 +65,12 @@ the data type your want to use.
 For instance, to use CmRDT::LWWSet: `#include "collab/CmRDT/LWWSet.h"`
 
 
+# Generate doxygen documentation
+Code documentation uses [Doxygen](https://www.stack.nl/~dimitri/doxygen/).
+To generate the documentation: `doxygen Doxyfile`.
+Generated files are places in `doc` folder.
+
+
 # CRDTs theoretical description
 
 - State-based object (CvRDT)
