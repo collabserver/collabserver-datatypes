@@ -13,9 +13,9 @@ namespace collab {
  * Timestamps should be strictly unique. This implementation mix time value
  * (chrono clock) with an integer value unique for each user.
  *
- * \todo
- * The integer value should be unique for each user. Actual implementation is
- * not finished and all this is hard coded.
+ * \bug
+ * Unique ID is hard coded for now.
+ * Should be unique per user. For instance hash of MAC address.
  *
  *
  * \author  Constantin Masson
@@ -25,21 +25,41 @@ class Timestamp {
     private:
         std::chrono::steady_clock::time_point _time;
         int _uniqueID = 0;
+        static const int _localUniqueID = 0; // TODO Unique per user.
+
+
+    // -------------------------------------------------------------------------
+    // Intitialization
+    // -------------------------------------------------------------------------
 
     public:
-        static Timestamp now() {
-            Timestamp t = 0;
-            t._uniqueID = 0; // TODO (ex: get hash of MAC addr)
-            t._time = std::chrono::steady_clock::now();
-            return t;
+
+        /**
+         * Create a timestamp with the minimal possible value.
+         *
+         * \note
+         * The parameters is only used to allow "Timestamp t = 0".
+         * This may be weird, but this is required by CRDTs.
+         * (See implementation). Note that, I had an issue with gcc 4.6.4 and
+         * "Timestamp t = 0" was not compiling. Use "Timestamp t = {0}" instead.
+         *
+         * \param value Dummy value (See note)
+         */
+        Timestamp(const int value) {
+            _uniqueID = Timestamp::_localUniqueID;
+            _time = std::chrono::time_point<std::chrono::steady_clock>::min();
         }
 
-        Timestamp(const int value) {
-            // Dev note:
-            // This may sounds weird, but this is because the only need of
-            // U time = x is to set the timestamp to its lower value.
-            _uniqueID = 0;
-            _time = std::chrono::time_point<std::chrono::steady_clock>::min();
+        /**
+         * Returns a timestamps that correspond to current time.
+         * This is the most common way to use timestamp class.
+         * Only call "Timestamp t = Timestamp::now();" whenever you need it.
+         */
+        static Timestamp now() {
+            Timestamp t     = {0}; // See constructor doc to understand {0}
+            t._uniqueID     = Timestamp::_localUniqueID;
+            t._time         = std::chrono::steady_clock::now();
+            return t;
         }
 
 
@@ -51,7 +71,7 @@ class Timestamp {
 
         Timestamp& operator=(const int value) {
             // Dev note: see constructor note
-            _uniqueID = 0;
+            _uniqueID = Timestamp::_localUniqueID;
             _time = std::chrono::time_point<std::chrono::steady_clock>::min();
             return *this;
         }

@@ -2,6 +2,7 @@
 
 #include "Timestamp.h"
 #include "Operation.h"
+
 #include <string>
 
 class ViewMDE;
@@ -19,6 +20,14 @@ class AddElementOperation : public Operation {
         AddElementOperation(const std::string& id, const Timestamp& time)
             : _elementID(id), _timestamp(time) {
         }
+
+    public:
+        bool serialize(std::stringstream& buffer) const {
+            return false;
+        }
+        bool unserialize(std::stringstream& buffer) {
+            return false;
+        }
 };
 
 class AddAttributeOperation : public Operation {
@@ -31,6 +40,14 @@ class AddAttributeOperation : public Operation {
         Timestamp       _timestampPrevious;
         std::string     _namePrevious;
         std::string     _valuePrevious;
+
+    public:
+        bool serialize(std::stringstream& buffer) const {
+            return false;
+        }
+        bool unserialize(std::stringstream& buffer) {
+            return false;
+        }
 };
 
 

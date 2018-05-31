@@ -6,7 +6,6 @@
 namespace collab {
 
 
-
 TEST(ViewMDE, constructorTest) {
     ViewMDE v;
 }

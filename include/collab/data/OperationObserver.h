@@ -24,9 +24,14 @@ class OperationObserver {
         /**
          * Receive an operation from a CollabData.
          *
-         * \param op Copy of the operation received.
+         * \warning
+         * If you need to keep track of this operation (ex: vector of operations)
+         * do a copy of this operation since the reference is local to the caller
+         * method and is deleted soon.
+         *
+         * \param op Reference the operation received.
          */
-        void receiveOperation(Operation op);
+        void receiveOperation(const Operation& op);
 };
 
 

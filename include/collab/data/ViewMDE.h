@@ -127,6 +127,12 @@ class ViewMDE : public CollabData {
         void applyOperation(const Operation& op) {
             // TODO
         }
+
+        void applyOperation(const int type, std::stringstream& buffer) {
+            // TODO Get operation by type
+            // Unserialize
+            // Call applyOperation
+        }
 };
 
 
