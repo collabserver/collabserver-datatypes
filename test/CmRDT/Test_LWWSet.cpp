@@ -3,11 +3,11 @@
 
 
 // Check the whole internal state of an element
-#define _ASSERT_ELT_EQ(elt_it, key, is_removed, stamp) \
-    ASSERT_TRUE(elt_it != data0.crdt_end()); \
-    EXPECT_EQ(elt_it->first, key); \
-    EXPECT_EQ(elt_it->second.isRemoved(), is_removed); \
-    EXPECT_EQ(elt_it->second.timestamp(), stamp)
+#define _ASSERT_ELT_EQ(elt_it_, key_, is_removed_, stamp_, data_) \
+    ASSERT_TRUE(elt_it_ != data_.crdt_end()); \
+    EXPECT_EQ(elt_it_->first, key_); \
+    EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_); \
+    EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
 
 
 namespace collab {
@@ -175,12 +175,12 @@ TEST(LWWSet, queryTest) {
     // Add element and query
     data0.add("e1", 10);
     coco = data0.query("e1");
-    _ASSERT_ELT_EQ(coco, "e1", false, 10);
+    _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 
     // Remove this element and query
     data0.remove("e1", 20);
     coco = data0.query("e1");
-    _ASSERT_ELT_EQ(coco, "e1", true, 20);
+    _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 
     // Query invalid data
     coco = data0.query("xxx");
@@ -233,7 +233,7 @@ TEST(LWWSet, addTest) {
     data0.add(3, 10);
     for(int k = 0; k < 4; ++k) {
         auto coco = data0.query(k);
-        _ASSERT_ELT_EQ(coco, k, false, 10);
+        _ASSERT_ELT_EQ(coco, k, false, 10, data0);
     }
 
     // More add later
@@ -243,7 +243,7 @@ TEST(LWWSet, addTest) {
     data0.add(3, 20);
     for(int k = 0; k < 4; ++k) {
         auto coco = data0.query(k);
-        _ASSERT_ELT_EQ(coco, k, false, 20);
+        _ASSERT_ELT_EQ(coco, k, false, 20, data0);
     }
 }
 
@@ -258,7 +258,7 @@ TEST(LWWSet, addDuplicateCallsTest) {
     data0.add(42, 17);
     data0.add(42, 10);
     auto carrot = data0.query(42);
-    _ASSERT_ELT_EQ(carrot, 42, false, 19);
+    _ASSERT_ELT_EQ(carrot, 42, false, 19, data0);
 
     // Test duplicate add, keep max timestamps 
     data0.add(64, 28);
@@ -268,7 +268,7 @@ TEST(LWWSet, addDuplicateCallsTest) {
     data0.add(64, 27);
     data0.add(64, 25);
     carrot = data0.query(64);
-    _ASSERT_ELT_EQ(carrot, 64, false, 29);
+    _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
 
@@ -290,7 +290,7 @@ TEST(LWWSet, removeTest) {
     data0.remove(3, 20);
     for(int k = 0; k < 4; ++k) {
         auto res = data0.query(k);
-        _ASSERT_ELT_EQ(res, k, true, 20);
+        _ASSERT_ELT_EQ(res, k, true, 20, data0);
     }
 }
 
@@ -306,7 +306,7 @@ TEST(LWWSet, removeDuplicateCallsTest) {
     data0.remove(42, 29);
     data0.remove(42, 21);
     auto res = data0.query(42);
-    _ASSERT_ELT_EQ(res, 42, true, 29);
+    _ASSERT_ELT_EQ(res, 42, true, 29, data0);
 }
 
 TEST(LWWSet, removeCalledBeforeAddCallTest) {
@@ -315,12 +315,12 @@ TEST(LWWSet, removeCalledBeforeAddCallTest) {
     // Remove before even added works
     data0.remove(42, 10);
     auto res = data0.query(42);
-    _ASSERT_ELT_EQ(res, 42, true, 10);
+    _ASSERT_ELT_EQ(res, 42, true, 10, data0);
 
     // Re-removed later, change timestamps anyway
     data0.remove(42, 20);
     res = data0.query(42);
-    _ASSERT_ELT_EQ(res, 42, true, 20);
+    _ASSERT_ELT_EQ(res, 42, true, 20, data0);
 }
 
 
@@ -334,22 +334,22 @@ TEST(LWWSet, addRemoveTest) {
     // Add element
     data0.add("v1", 10);
     auto res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", false, 10);
+    _ASSERT_ELT_EQ(res, "v1", false, 10, data0);
 
     // Remove this element
     data0.remove("v1", 20);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", true, 20);
+    _ASSERT_ELT_EQ(res, "v1", true, 20, data0);
 
     // Re-add
     data0.add("v1", 30);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", false, 30);
+    _ASSERT_ELT_EQ(res, "v1", false, 30, data0);
 
     // Re-remove
     data0.remove("v1", 40);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", true, 40);
+    _ASSERT_ELT_EQ(res, "v1", true, 40, data0);
 }
 
 TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
@@ -358,22 +358,22 @@ TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
     // Remove elt before even added. (Is technically removed)
     data0.remove("v1", 1000);
     auto res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", true, 1000);
+    _ASSERT_ELT_EQ(res, "v1", true, 1000, data0);
 
     // Add this element, but remove was done later (Still removed)
     data0.add("v1", 10);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", true, 1000);
+    _ASSERT_ELT_EQ(res, "v1", true, 1000, data0);
 
     // Re-add this element after the remove
     data0.add("v1", 1001);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", false, 1001);
+    _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 
     // Remove this element before the last add: do nothing (Still added)
     data0.remove("v1", 20);
     res = data0.query("v1");
-    _ASSERT_ELT_EQ(res, "v1", false, 1001);
+    _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 }
 
 TEST(LWWSet, addRemoveUseCaseTest) {
