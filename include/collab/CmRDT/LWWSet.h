@@ -27,7 +27,8 @@ namespace CmRDT {
  *
  * \par
  * Any added key is never removed but only marked as deleted instead.
- * For that reason, this CRDT container may not fit all system due to memory use.
+ * For that reason, this CRDT container may not fit all systems
+ * due to the used memory space.
  *
  * \par
  * All operations on this container are commutative! You may receive a remove
@@ -59,7 +60,8 @@ namespace CmRDT {
  * (See quote and implementation for further informations).
  *
  * \warning
- * U timestamp must accept "U t = 0" (This should set with minimal value).
+ * U timestamp must accept "U t = {0}".
+ * This must set with minimal value.
  *
  * \see http://en.cppreference.com/w/cpp/container/unordered_set
  * \see http://en.cppreference.com/w/cpp/container/unordered_map
@@ -78,7 +80,8 @@ class LWWSet {
         class Metadata;
 
         typedef typename std::unordered_map<Key, Metadata>::size_type size_type;
-        typedef typename std::unordered_map<Key, Metadata>::const_iterator const_crdt_iterator;
+        typedef typename std::unordered_map<Key, Metadata>::const_iterator
+            const_crdt_iterator;
 
     private:
         std::unordered_map<Key, Metadata> _map;
@@ -141,7 +144,7 @@ class LWWSet {
          * (See crdt_end()) iterator.
          *
          * \param key The key to query.
-         * \return Iterator to the key with CRDT metadata or crdt_end() if not found.
+         * \return Iterator CRDT to the key or crdt_end() if not found.
          */
         const_crdt_iterator query(const Key& key) const {
             return _map.find(key);
@@ -159,15 +162,26 @@ class LWWSet {
          * \return Iterator to the element with key or past-the-end if not found.
          */
         const_iterator find(const Key& key) const {
-            auto elt_iterator = _map.find(key);
-            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
+            auto elt_it = _map.find(key);
+            if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
                 const_iterator it(*this);
-                it._it = elt_iterator;
+                it._it = elt_it;
                 return it;
             }
             else {
                 return this->end();
             }
+        }
+
+        /**
+         * Count the number of element with this key.
+         * Since no duplicate are allowed, return 0 or 1.
+         *
+         * \param key Key value of the element to count.
+         * \return Number of elements with this key, either 0 or 1.
+         */
+        size_type count(const Key& key) const {
+            return (this->find(key) != this->end()) ? 1 : 0;
         }
 
 
@@ -268,6 +282,35 @@ class LWWSet {
 
 
     // -------------------------------------------------------------------------
+    // CRDT Specific
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Get the actual internal size of the container.
+         * This also count elements with removed flag.
+         * crdt_size() >= size()
+         *
+         * \return Internal size of the container.
+         */
+        float crdt_size() const {
+            return _map.size();
+        }
+
+        /**
+         * Check if tow containers have the exact same internal data.
+         * Element with removed flag are used for this comparison.
+         *
+         * \param other Container to compare with.
+         * \return True if equals, otherwise, return false.
+         */
+        bool crdt_equal(const LWWSet& other) const {
+            return (_map == other._map);
+        }
+
+
+    // -------------------------------------------------------------------------
     // Iterators
     // -------------------------------------------------------------------------
 
@@ -340,12 +383,12 @@ class LWWSet {
             // Better solution? Maybe. For now I don't have time to think about.
             // Equality should not be called that often anyway (Since in
             // collab environment, the local user has one replicate).
-            for(auto& elt : lhs) {
+            for(const auto& elt : lhs) {
                 if(rhs.find(elt) == rhs.end()){
                     return false;
                 }
             }
-            for(auto& elt: rhs) {
+            for(const auto& elt: rhs) {
                 if(lhs.find(elt) == lhs.end()) {
                     return false;
                 }
@@ -372,7 +415,8 @@ class LWWSet {
          * Display the internal content.
          * This is mainly for debug print purpose.
          */
-        friend std::ostream& operator<<(std::ostream& out, const LWWSet<Key,U>& o) {
+        friend std::ostream& operator<<(std::ostream& out,
+                                        const LWWSet<Key,U>& o) {
             out << "CmRDT::LWWSet = ";
             for(const auto& elt : o._map) {
                 out << "(" << elt.first
@@ -405,7 +449,8 @@ class LWWSet {
  *
  * \par
  * Keys are never removed, only marked as removed with a timestamps.
- * For further information, read about CRDTs (I put some resources in the README)
+ * For further information, read about CRDTs (I put some resources in the
+ * README)
  *
  *
  * \tparam Key  Type of set elements.
@@ -416,7 +461,6 @@ class LWWSet {
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::Metadata {
-
     private:
         friend LWWSet;
 
@@ -442,6 +486,17 @@ class LWWSet<Key,U>::Metadata {
         bool isRemoved() const {
             return _isRemoved;
         }
+
+    public:
+
+        friend bool operator==(const Metadata& rhs, const Metadata& lhs) {
+            return (rhs._timestamp == lhs._timestamp)
+                && (rhs._isRemoved == lhs._isRemoved);
+        }
+
+        friend bool operator!=(const Metadata& rhs, const Metadata& lhs) {
+            return !(rhs == lhs);
+        }
 };
 
 
@@ -460,8 +515,8 @@ class LWWSet<Key,U>::Metadata {
  * \date    May 2018
  */
 template<typename Key, typename U>
-class LWWSet<Key,U>::const_iterator : public std::iterator<std::input_iterator_tag, Key> {
-
+class LWWSet<Key,U>::const_iterator
+: public std::iterator<std::input_iterator_tag, Key> {
     private:
         friend LWWSet;
 

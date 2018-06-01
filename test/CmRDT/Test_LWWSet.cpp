@@ -148,6 +148,38 @@ TEST(LWWSet, sizeWithOlderRemoveAfterAddTest) {
 
 
 // -----------------------------------------------------------------------------
+// count()
+// -----------------------------------------------------------------------------
+TEST(LWWSet, countTest) {
+    LWWSet<int, int> data0;
+
+    ASSERT_EQ(data0.count(32), 0);
+    ASSERT_EQ(data0.count(10), 0);
+    ASSERT_EQ(data0.count(42), 0);
+
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+
+    ASSERT_EQ(data0.count(1), 1);
+    ASSERT_EQ(data0.count(2), 1);
+    ASSERT_EQ(data0.count(3), 1);
+    ASSERT_EQ(data0.count(32), 0);
+    ASSERT_EQ(data0.count(10), 0);
+    ASSERT_EQ(data0.count(42), 0);
+}
+
+TEST(LWWset, countAfterRemoveTest) {
+    LWWSet<int, int> data0;
+
+    ASSERT_EQ(data0.count(42), 0);
+    data0.add(42, 10);
+    data0.remove(42, 20);
+    ASSERT_EQ(data0.count(42), 0);
+}
+
+
+// -----------------------------------------------------------------------------
 // max_size()
 // -----------------------------------------------------------------------------
 
@@ -385,13 +417,15 @@ TEST(LWWSet, addRemoveUseCaseTest) {
     data0.add("v2", 3);
     data0.remove("v1", 4);
 
-    // User1 flow (Remove before add)
+    // User1 flow (receive remove before add)
     data1.remove("v1", 4);
     data1.add("v2", 3);
     data1.add("v1", 1);
 
+    // They are same (User point of view and internally as well)
     EXPECT_TRUE(data0 == data1);
     EXPECT_FALSE(data0 != data1);
+    EXPECT_TRUE(data0.crdt_equal(data1));
 }
 
 
@@ -405,6 +439,57 @@ TEST(LWWSet, reserveTest) {
     // Not sure how to test it at this exact terrible moment.
     // For now, just do a call to be sure it compiles.
     data0.reserve(10);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_size()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, crdt_sizeTest) {
+    LWWSet<int, int> data0;
+
+    // Add element and test
+    ASSERT_EQ(data0.crdt_size(), 0);
+    data0.add(1, 10);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    data0.add(2, 20);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    data0.add(3, 30);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    // Remove element, size won't change.
+    data0.remove(1, 100);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(2, 200);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(3, 300);
+    ASSERT_EQ(data0.crdt_size(), 3);
+}
+
+TEST(LWWSet, crdt_equal) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+    // Add some element in data1, data1 != data2 then
+    data0.add("e1", 10);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+    data0.add("e2", 20);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast to data1, they are same again! (Yeah! So beautiful!)
+    data1.add("e1", 10);
+    data1.add("e2", 20);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+
+    // Just little test, but yeah, data0 is equal to himself (and so data1)
+    ASSERT_TRUE(data0.crdt_equal(data0));
+    ASSERT_TRUE(data1.crdt_equal(data1));
 }
 
 
