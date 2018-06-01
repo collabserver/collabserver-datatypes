@@ -1,11 +1,11 @@
 #pragma once
 
-#include "LWWMap.h"
-#include "LWWSet.h"
-
 #include <ostream>
 #include <cassert>
 #include <type_traits>
+
+#include "LWWMap.h"
+#include "LWWSet.h"
 
 namespace collab {
 namespace CmRDT {
@@ -26,8 +26,9 @@ namespace CmRDT {
  * used to select the winning operation.
  *
  * \par
- * Any added vertex is never removed but only marked as deleted instead.
- * For that reason, this CRDT container may not fit all system due to memory use.
+ * Any added key is never removed but only marked as deleted instead.
+ * For that reason, this CRDT container may not fit all systems
+ * due to the used memory space.
  *
  * \par
  * All operations on this container are commutative! You may receive a remove
@@ -71,8 +72,8 @@ namespace CmRDT {
  * (See quote and implementation for further informations).
  *
  * \warning
- * T template parameter must have a default constructor.
- * U timestamp must accept "U t = 0" (This should set with minimal value).
+ * T type must have a default constructor.
+ * U timestamp must accept "U t = {0}" (This should set with minimal value).
  *
  *
  * \tparam Key  Type of unique identifier for each graph vertex
@@ -86,17 +87,47 @@ template<typename Key, typename T, typename U>
 class LWWGraph {
     public:
         class Vertex;
-        typedef typename LWWMap<Key,Vertex,U>::iterator             iterator;
-        typedef typename LWWMap<Key,Vertex,U>::const_iterator       const_iterator;
-        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator        crdt_iterator;
-        typedef typename LWWMap<Key,Vertex,U>::const_crdt_iterator  const_crdt_iterator;
+
+        typedef typename LWWMap<Key,Vertex,U>::size_type        size_type;
+        typedef typename LWWMap<Key,Vertex,U>::iterator         iterator;
+        typedef typename LWWMap<Key,Vertex,U>::const_iterator   const_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator    crdt_iterator;
+        typedef typename LWWMap<Key,Vertex,U>::const_crdt_iterator
+            const_crdt_iterator;
 
     private:
         LWWMap<Key, Vertex, U> _adj;
 
 
     // -------------------------------------------------------------------------
-    // CRDT methods
+    // Capacity methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Checks if the graph has no vertex.
+         * Only elements that are not marked as 'removed' count.
+         *
+         * \return True if the container is empty, false otherwise.
+         */
+        bool empty() const noexcept {
+            return _adj.empty();
+        }
+
+        /**
+         * Returns the number of vertex in this graph.
+         * Only elements that are not marked as 'removed' count.
+         *
+         * \return Number of elements in the container.
+         */
+        size_type size() const noexcept {
+            return _adj.size();
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Lookup methods
     // -------------------------------------------------------------------------
 
     public:
@@ -120,6 +151,32 @@ class LWWGraph {
         crdt_iterator queryVertex(const Key& key) {
             return _adj.query(key);
         }
+
+        /**
+         * \copydoc LWWGraph::queryVertex
+         */
+        const_crdt_iterator queryVertex(const Key& key) const {
+            return _adj.query(key);
+        }
+
+        /**
+         * TODO
+         */
+        iterator findVertex(const Key& key) {
+            return _adj.find(key);
+        }
+
+        /**
+         * \copydoc LWWGraph::findVertex
+         */
+        const_iterator findVertex(const Key& key) const {
+            return _adj.find(key);
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers methods
+    // -------------------------------------------------------------------------
 
         /**
          * Add a new vertex in the graph.
@@ -237,6 +294,56 @@ class LWWGraph {
             auto res = _adj.query(from);
             Vertex &v = res->second.value();
             v._edges.remove(to, stamp);
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Hash policy methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Change capacity of the vertex container.
+         * This reserve capacity for the internal adjacency list.
+         * (Edge list for each vertex is not reserved, only vertex list).
+         *
+         * \see http://en.cppreference.com/w/cpp/container/unordered_map/reserve
+         *
+         * \param count New capacity of the container.
+         */
+        void reserve(size_type count) {
+            _adj.reserve(count);
+        }
+
+
+    // -------------------------------------------------------------------------
+    // CRDT Specific
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Get the actual internal size of the container.
+         * This also count elements with removed flag.
+         * crdt_size() >= size()
+         * Only count number of vertex. (Not number of edges).
+         *
+         * \return Internal size of the container.
+         */
+        float crdt_size() const {
+            return _adj.crdt_size();
+        }
+
+        /**
+         * Check if tow containers have the exact same internal data.
+         * Element with removed flag are used for this comparison.
+         *
+         * \param other Container to compare with.
+         * \return True if equals, otherwise, return false.
+         */
+        bool crdt_equal(const LWWGraph& other) const {
+            return (_adj == other._adj);
         }
 
 
@@ -377,7 +484,9 @@ class LWWGraph {
                                         const LWWGraph<Key,T,U>& o) {
             out << "CmRDT::LWWGraph = ";
             for(auto it = o.crdt_begin(); it != o.crdt_end(); ++it) {
-                out << "\n Vertex(" << it->first << "," << it->second.timestamp();
+                out << "\n Vertex("
+                    << it->first << ","
+                    << it->second.timestamp();
                 if(it->second.isRemoved()) {
                     out << ",x)";
                 }
@@ -411,7 +520,6 @@ class LWWGraph {
  */
 template<typename Key, typename T, typename U>
 class LWWGraph<Key,T,U>::Vertex {
-
     private:
         friend LWWGraph;
         T               _content;
@@ -450,6 +558,13 @@ class LWWGraph<Key,T,U>::Vertex {
         const LWWSet<Key,U>& edges() const {
             return _edges;
         }
+
+
+    // -------------------------------------------------------------------------
+    // Operators overload
+    // -------------------------------------------------------------------------
+
+    public:
 
         /**
          * Check if lhs and rhs are equals.

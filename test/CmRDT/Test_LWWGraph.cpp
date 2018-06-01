@@ -16,6 +16,28 @@ namespace CmRDT {
 
 
 // -----------------------------------------------------------------------------
+// empty()
+// -----------------------------------------------------------------------------
+TEST(LWWGraph, emptyTest) {
+    LWWGraph<std::string, int, int> data0;
+    ASSERT_TRUE(data0.empty());
+
+    data0.addVertex("v1", 10);
+    ASSERT_FALSE(data0.empty());
+
+    data0.removeVertex("v1", 20);
+    ASSERT_TRUE(data0.empty());
+
+    // Try to add but smaller timestamp: still emtpy
+    data0.addVertex("v1", 11);
+    data0.addVertex("v1", 12);
+    ASSERT_TRUE(data0.empty());
+
+    data0.addVertex("v2", 30);
+    ASSERT_FALSE(data0.empty());
+}
+
+// -----------------------------------------------------------------------------
 // query()
 // -----------------------------------------------------------------------------
 

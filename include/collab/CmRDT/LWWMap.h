@@ -178,6 +178,13 @@ class LWWMap {
         }
 
         /**
+         * \copydoc LWWMap::query
+         */
+        const_crdt_iterator query(const Key& key) const {
+            return _map.find(key);
+        }
+
+        /**
          * Find a key-element in the container.
          *
          * This only lookup for key that are not internally deleted.
