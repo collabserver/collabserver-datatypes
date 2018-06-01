@@ -306,7 +306,7 @@ class LWWSet {
          * \return True if equals, otherwise, return false.
          */
         bool crdt_equal(const LWWSet& other) const {
-            return (_map == other._map);
+            return _map == other._map;
         }
 
 

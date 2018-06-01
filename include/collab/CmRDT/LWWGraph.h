@@ -343,7 +343,7 @@ class LWWGraph {
          * \return True if equals, otherwise, return false.
          */
         bool crdt_equal(const LWWGraph& other) const {
-            return (_adj == other._adj);
+            return _adj.crdt_equal(other._adj);
         }
 
 

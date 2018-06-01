@@ -169,7 +169,7 @@ TEST(LWWSet, countTest) {
     ASSERT_EQ(data0.count(42), 0);
 }
 
-TEST(LWWset, countAfterRemoveTest) {
+TEST(LWWSet, countAfterRemoveTest) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.count(42), 0);
@@ -507,18 +507,65 @@ TEST(LWWSet, crdt_equalWithAddRemoveTest) {
     data0.add("e3", 10);
     data0.remove("e2", 20);
     data0.remove("e3", 20);
-    data0.add("e4", 20);
 
     // Operations on data1
-    data0.add("e1", 11);
-    data0.add("e6", 11);
-    data0.add("e7", 11);
-    data0.remove("e6", 21);
-    data0.add("e8", 21);
+    data1.add("e1", 11);
+    data1.add("e6", 11);
+    data1.add("e7", 11);
+    data1.remove("e6", 21);
 
     // atm, not equals
     ASSERT_FALSE(data0.crdt_equal(data1));
     ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast changes from data0 to data1
+    data1.add("e1", 10);
+    data1.add("e2", 10);
+    data1.add("e3", 10);
+    data1.remove("e2", 20);
+    data1.remove("e3", 20);
+
+    // Broadcast changes from data1 to data0
+    data0.add("e1", 11);
+    data0.add("e6", 11);
+    data0.add("e7", 11);
+    data0.remove("e6", 21);
+
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+}
+
+TEST(LWWSet, crdt_equalAddRemoveUsercaseTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // Operations on data0
+    data0.add("v1", 11);
+    data0.add("v2", 12);
+    data0.add("v3", 13);
+
+    // Operations on data1
+    data1.add("v1", 21);
+    data1.add("v2", 22);
+    data1.remove("v3", 23);
+
+    // At this point, they are different
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast data0 to data1
+    data1.add("v1", 11);
+    data1.add("v2", 12);
+    data1.add("v3", 13);
+
+    // Broadcast data1 to data0
+    data0.add("v1", 21);
+    data0.add("v2", 22);
+    data0.remove("v3", 23);
+
+    // Shoudl be same
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
 TEST(LWWSet, crdt_equalSameValueButDifferentTimestampTest) {
@@ -530,6 +577,14 @@ TEST(LWWSet, crdt_equalSameValueButDifferentTimestampTest) {
 
     ASSERT_FALSE(data0.crdt_equal(data1));
     ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast
+    data1.add("e1", 10);
+    data0.add("e2", 20);
+
+    // Now are same
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
 TEST(LWWSet, crdt_equalWithUsersameButInternalNotSameTest) {
@@ -542,12 +597,50 @@ TEST(LWWSet, crdt_equalWithUsersameButInternalNotSameTest) {
     data0.add("e3", 10);
     data0.remove("e3", 20);
 
-    // data1 (Same for user point of view, but not same internally)
-    data1.add("e1", 10);
-    data1.add("e2", 10);
+    // data1
+    data1.add("e1", 30);
+    data1.add("e2", 30);
 
+    // They are different
+    // (Same for user point of view, but not same internally)
     ASSERT_FALSE(data0.crdt_equal(data1));
     ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast data0 to data1
+    data1.add("e1", 10);
+    data1.add("e2", 10);
+    data1.add("e3", 10);
+    data1.remove("e3", 20);
+
+    // Broadcast data1 to data0
+    data0.add("e1", 30);
+    data0.add("e2", 30);
+
+    // Now are same
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+}
+
+TEST(LWWSet, crdt_equalEmptyVsAddTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+
+    // Add only in data0
+    data0.add("e1", 10);
+    data0.add("e2", 20);
+    data0.add("e3", 30);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast in data1
+    data1.add("e1", 10);
+    data1.add("e2", 20);
+    data1.add("e3", 30);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
 

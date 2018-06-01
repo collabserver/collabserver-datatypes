@@ -359,7 +359,7 @@ class LWWMap {
          * \return True if equals, otherwise, return false.
          */
         bool crdt_equal(const LWWMap& other) const {
-            return (_map == other._map);
+            return _map == other._map;
         }
 
 
@@ -478,7 +478,7 @@ class LWWMap {
             // Dev note: in the worst case, this is N2 complexity.
             // See note in LWWSet::operator==
             for(const auto& elt : lhs) {
-                const auto other = rhs.find(elt.first);;
+                const_iterator other = rhs.find(elt.first);;
                 if(other == rhs.cend()){
                     return false;
                 }
@@ -552,7 +552,8 @@ class LWWMap {
  *
  * \par
  * Keys are never removed, only marked as removed with a timestamps.
- * For further information, read about CRDTs (I put some resources in the README)
+ * For further information, read about CRDTs
+ * (I put some resources in the README)
  *
  *
  * \tparam Key  Type of key.
@@ -638,12 +639,15 @@ class LWWMap<Key, T, U>::Element {
 
     public:
 
+        /**
+         * Check whether two Element are internally the same.
+         * This eq is mean for internal use (crdt_equal).
+         */
         friend bool operator==(const Element& rhs, const Element& lhs) {
             return (rhs._internalValue == lhs._internalValue)
                 && (rhs._isRemoved == lhs._isRemoved)
                 && (rhs._timestamp == lhs._timestamp);
         }
-
 };
 
 
@@ -662,7 +666,8 @@ class LWWMap<Key, T, U>::Element {
  * \date    May 2018
  */
 template<typename Key, typename T, typename U>
-class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag, value_type> {
+class LWWMap<Key, T, U>::iterator
+: public std::iterator<std::input_iterator_tag, value_type> {
 
     private:
         friend LWWMap;
@@ -722,7 +727,8 @@ class LWWMap<Key, T, U>::iterator : public std::iterator<std::input_iterator_tag
  * \date    May 2018
  */
 template<typename Key, typename T, typename U>
-class LWWMap<Key, T, U>::const_iterator : public std::iterator<std::input_iterator_tag, value_type> {
+class LWWMap<Key, T, U>::const_iterator
+: public std::iterator<std::input_iterator_tag, value_type> {
 
     private:
         friend LWWMap;
