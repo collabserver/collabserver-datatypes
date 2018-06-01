@@ -159,10 +159,10 @@ class LWWSet {
          * past-the-end anyway (see end()).
          *
          * \param key Key value of the element to search for.
-         * \return Iterator to the element with key or past-the-end if not found.
+         * \return Iterator to the element with key or end() if not found.
          */
         const_iterator find(const Key& key) const {
-            auto elt_it = _map.find(key);
+            const auto elt_it = _map.find(key);
             if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
                 const_iterator it(*this);
                 it._it = elt_it;

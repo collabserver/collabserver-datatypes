@@ -166,6 +166,38 @@ TEST(LWWMap, max_sizeTest) {
 
 
 // -----------------------------------------------------------------------------
+// count()
+// -----------------------------------------------------------------------------
+TEST(LWWMap, countTest) {
+    LWWMap<std::string, int, int> data0;
+
+    ASSERT_EQ(data0.count("x1"), 0);
+    ASSERT_EQ(data0.count("x2"), 0);
+    ASSERT_EQ(data0.count("x3"), 0);
+
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    ASSERT_EQ(data0.count("e1"), 1);
+    ASSERT_EQ(data0.count("e2"), 1);
+    ASSERT_EQ(data0.count("e3"), 1);
+    ASSERT_EQ(data0.count("x1"), 0);
+    ASSERT_EQ(data0.count("x2"), 0);
+    ASSERT_EQ(data0.count("x3"), 0);
+}
+
+TEST(LWWMap, countAfterRemoveTest) {
+    LWWMap<int, int, int> data0;
+
+    ASSERT_EQ(data0.count(42), 0);
+    data0.add(42, 10);
+    data0.remove(42, 20);
+    ASSERT_EQ(data0.count(42), 0);
+}
+
+
+// -----------------------------------------------------------------------------
 // query()
 // -----------------------------------------------------------------------------
 
@@ -189,6 +221,28 @@ TEST(LWWMap, queryTest) {
     // Query invalid data
     coco = data0.query("xxx");
     EXPECT_TRUE(coco == data0.crdt_end());
+}
+
+TEST(LWWMap, queryAndChangeValueTests) {
+    LWWMap<std::string, int, int> data0;
+
+    // Setup data
+    data0.add("e1", 1);
+    data0.add("e2", 2);
+    data0.remove("e1", 3);
+    data0.remove("e2", 3);
+
+    // Change values of container
+    auto it_e1 = data0.query("e1");
+    it_e1->second.value() = 42;
+    auto it_e2 = data0.query("e2");
+    it_e2->second.value() = 1024;
+
+    // Check if container value are well changed
+    auto e1 = data0.query("e1");
+    auto e2 = data0.query("e2");
+    EXPECT_EQ(e1->second.value(), 42);
+    EXPECT_EQ(e2->second.value(), 1024);
 }
 
 
@@ -222,6 +276,26 @@ TEST(LWWMap, findRemovedElementTest) {
     data0.remove("e1", 20);
     auto e1 = data0.find("e1");
     EXPECT_EQ(e1, data0.end());
+}
+
+TEST(LWWMap, findAndChangeValueTests) {
+    LWWMap<std::string, int, int> data0;
+
+    // Setup data
+    data0.add("e1", 1); // v1 == default set value
+    data0.add("e2", 2); // v2 == default set value
+
+    // Change values of container
+    auto it_e1 = data0.find("e1");
+    it_e1->second = 42;
+    auto it_e2 = data0.find("e2");
+    it_e2->second = 1024;
+
+    // Check if container value are well changed
+    auto e1 = data0.find("e1");
+    auto e2 = data0.find("e2");
+    EXPECT_EQ(e1->second, 42);
+    EXPECT_EQ(e2->second, 1024);
 }
 
 
@@ -415,6 +489,115 @@ TEST(LWWMap, reserveTest) {
 
 
 // -----------------------------------------------------------------------------
+// crdt_size()
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdt_sizeTest) {
+    LWWMap<int, int, int> data0;
+
+    // Add element and test
+    ASSERT_EQ(data0.crdt_size(), 0);
+    data0.add(1, 10);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    data0.add(2, 20);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    data0.add(3, 30);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    // Remove element, size won't change.
+    data0.remove(1, 100);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(2, 200);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(3, 300);
+    ASSERT_EQ(data0.crdt_size(), 3);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_equal()
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdt_equalWithOnlyAddTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+    // Add some element in data1, data1 != data2 then
+    data0.add("e1", 10);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+    data0.add("e2", 20);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast to data1, they are same again! (Yeah! So beautiful!)
+    data1.add("e1", 10);
+    data1.add("e2", 20);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+
+    // Just little test, but yeah, data0 is equal to himself (and so data1)
+    ASSERT_TRUE(data0.crdt_equal(data0));
+    ASSERT_TRUE(data1.crdt_equal(data1));
+}
+
+TEST(LWWMap, crdt_equalWithAddRemoveTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    // Operations on data0
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    data0.remove("e2", 20);
+    data0.remove("e3", 20);
+    data0.add("e4", 20);
+
+    // Operations on data1
+    data0.add("e1", 11);
+    data0.add("e6", 11);
+    data0.add("e7", 11);
+    data0.remove("e6", 21);
+    data0.add("e8", 21);
+
+    // atm, not equals
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+}
+
+TEST(LWWMap, crdt_equalSameValueButDifferentTimestampTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    data0.add("e1", 10);
+    data1.add("e2", 20);
+
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+}
+
+TEST(LWWMap, crdt_equalWithUsersameButInternalNotSameTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    // data0
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    data0.remove("e3", 20);
+
+    // data1 (Same for user point of view, but not same internally)
+    data1.add("e1", 10);
+    data1.add("e2", 10);
+
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+}
+
+
+// -----------------------------------------------------------------------------
 // Iterator Tests (Normal iterator)
 // -----------------------------------------------------------------------------
 
@@ -513,7 +696,7 @@ TEST(LWWMap, iteratorReferenceTest) {
 
 
 // -----------------------------------------------------------------------------
-// Operator Tests
+// Operator==
 // -----------------------------------------------------------------------------
 
 TEST(LWWMap, operatorEQTest) {
@@ -547,6 +730,40 @@ TEST(LWWMap, operatorEQTest) {
 
     // Now are equal
     data1.add("v5", 9);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
+}
+
+TEST(LWWMap, operatorEQWithDifferentTimestampTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    // Timestamp doesn't count from end user point of view
+    data0.add("v1", 1);
+    data1.add("v1", 2);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
+}
+
+TEST(LWWMap, operatorEQWithDifferentValueTest) {
+    LWWMap<std::string, int, int> data0;
+    LWWMap<std::string, int, int> data1;
+
+    // Setup data
+    data0.add("v1", 1); // v1 == default set value
+    data1.add("v1", 1); // v2 == default set value
+
+    // Change value
+    LWWMap<std::string, int, int>::iterator it0 = data0.find("v1");
+    it0->second = 42; // v1 == 42
+
+    // Timestamp doesn't count from end user point of view
+    ASSERT_TRUE(data0 != data1);
+    ASSERT_FALSE(data0 == data1);
+
+    // Restore to same value
+    auto it_1 = data1.find("v1");
+    it_1->second = 42; // v1 == 42
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
 }

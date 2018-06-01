@@ -467,7 +467,12 @@ TEST(LWWSet, crdt_sizeTest) {
     ASSERT_EQ(data0.crdt_size(), 3);
 }
 
-TEST(LWWSet, crdt_equal) {
+
+// -----------------------------------------------------------------------------
+// crdt_equal()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, crdt_equalWithOnlyAddTest) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -490,6 +495,59 @@ TEST(LWWSet, crdt_equal) {
     // Just little test, but yeah, data0 is equal to himself (and so data1)
     ASSERT_TRUE(data0.crdt_equal(data0));
     ASSERT_TRUE(data1.crdt_equal(data1));
+}
+
+TEST(LWWSet, crdt_equalWithAddRemoveTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // Operations on data0
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    data0.remove("e2", 20);
+    data0.remove("e3", 20);
+    data0.add("e4", 20);
+
+    // Operations on data1
+    data0.add("e1", 11);
+    data0.add("e6", 11);
+    data0.add("e7", 11);
+    data0.remove("e6", 21);
+    data0.add("e8", 21);
+
+    // atm, not equals
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+}
+
+TEST(LWWSet, crdt_equalSameValueButDifferentTimestampTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    data0.add("e1", 10);
+    data1.add("e2", 20);
+
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+}
+
+TEST(LWWSet, crdt_equalWithUsersameButInternalNotSameTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // data0
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    data0.remove("e3", 20);
+
+    // data1 (Same for user point of view, but not same internally)
+    data1.add("e1", 10);
+    data1.add("e2", 10);
+
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
 }
 
 
@@ -728,7 +786,7 @@ TEST(LWWSet, crdtIteratorReferenceTest) {
 
 
 // -----------------------------------------------------------------------------
-// Operator Tests
+// Operator==
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, operatorEQTest) {
@@ -762,6 +820,17 @@ TEST(LWWSet, operatorEQTest) {
 
     // Now are equal
     data1.add("v5", 9);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
+}
+
+TEST(LWWSet, operatorEQDifferentTimestampTest) {
+    LWWSet<std::string, int> data0;
+    LWWSet<std::string, int> data1;
+
+    // Timestamp doesn't count from end user point of view
+    data0.add("v1", 1);
+    data1.add("v1", 2);
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
 }

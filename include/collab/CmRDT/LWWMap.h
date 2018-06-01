@@ -4,7 +4,6 @@
 #include <utility> // std::pair
 #include <cassert>
 #include <ostream>
-#include <iostream>
 
 namespace collab {
 namespace CmRDT {
@@ -28,7 +27,8 @@ namespace CmRDT {
  *
  * \par
  * Any added key is never removed but only marked as deleted instead.
- * For that reason, this CRDT container may not fit all system due to memory use.
+ * For that reason, this CRDT container may not fit all systems
+ * due to the used memory space.
  *
  * \par
  * All operations on this container are commutative! You may receive a remove
@@ -72,8 +72,9 @@ namespace CmRDT {
  * (See quote and implementation for further informations).
  *
  * \warning
- * T template parameter must have a default constructor.
- * U timestamp must accept "U t = 0" (This should set with minimal value).
+ * T type must have a default constructor.
+ * U timestamp must accept "U t = {0}".
+ * This should set with minimal value.
  *
  * \see http://en.cppreference.com/w/cpp/container/unordered_map
  *
@@ -99,13 +100,15 @@ class LWWMap {
             const_crdt_iterator;
 
         // From outside, we see LWWMap as <Key, T> (Except crdt_iterator)
-        typedef typename std::unordered_map<Key, T>::key_type        key_type;
-        typedef typename std::unordered_map<Key, T>::mapped_type     mapped_type;
-        typedef typename std::unordered_map<Key, T>::value_type      value_type;
-        typedef typename std::unordered_map<Key, T>::reference       reference;
-        typedef typename std::unordered_map<Key, T>::const_reference const_reference;
-        typedef typename std::unordered_map<Key, T>::pointer         pointer;
-        typedef typename std::unordered_map<Key, T>::const_pointer   const_pointer;
+        typedef typename std::unordered_map<Key, T>::key_type key_type;
+        typedef typename std::unordered_map<Key, T>::mapped_type mapped_type;
+        typedef typename std::unordered_map<Key, T>::value_type value_type;
+        typedef typename std::unordered_map<Key, T>::reference reference;
+        typedef typename std::unordered_map<Key, T>::const_reference
+            const_reference;
+        typedef typename std::unordered_map<Key, T>::pointer pointer;
+        typedef typename std::unordered_map<Key, T>::const_pointer
+            const_pointer;
 
     private:
         std::unordered_map<Key, Element> _map;
@@ -168,7 +171,7 @@ class LWWMap {
          * (See crdt_end()) iterator.
          *
          * \param key The key to query.
-         * \return Iterator to the key with CRDT metadata or crdt_end() if not found.
+         * \return Iterator CRDT to the key or crdt_end() if not found.
          */
         crdt_iterator query(const Key& key) {
             return _map.find(key);
@@ -183,13 +186,13 @@ class LWWMap {
          * past-the-end anyway (see end()).
          *
          * \param key Key value of the element to search for.
-         * \return Iterator to the element with key or past-the-end if not found.
+         * \return Iterator to the element with key or end() if not found.
          */
         iterator find(const Key& key) {
-            auto elt_iterator = _map.find(key);
-            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
+            const auto elt_it = _map.find(key);
+            if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
                 iterator it(*this);
-                it._it = elt_iterator;
+                it._it = elt_it;
                 return it;
             }
             else {
@@ -201,15 +204,26 @@ class LWWMap {
          * \copydoc LWWMap::find
          */
         const_iterator find(const Key& key) const {
-            auto elt_iterator = _map.find(key);
-            if(elt_iterator != _map.end() && !elt_iterator->second.isRemoved()) {
+            const auto elt_it = _map.find(key);
+            if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
                 const_iterator it(*this);
-                it._it = elt_iterator;
+                it._it = elt_it;
                 return it;
             }
             else {
                 return this->end();
             }
+        }
+
+        /**
+         * Count the number of element with this key.
+         * Since no duplicate are allowed, return 0 or 1.
+         *
+         * \param key Key value of the element to count.
+         * \return Number of elements with this key, either 0 or 1.
+         */
+        size_type count(const Key& key) const {
+            return (this->find(key) != this->end()) ? 1 : 0;
         }
 
 
@@ -310,6 +324,35 @@ class LWWMap {
          */
         void reserve(size_type count) {
             _map.reserve(count);
+        }
+
+
+    // -------------------------------------------------------------------------
+    // CRDT Specific
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Get the actual internal size of the container.
+         * This also count elements with removed flag.
+         * crdt_size() >= size()
+         *
+         * \return Internal size of the container.
+         */
+        float crdt_size() const {
+            return _map.size();
+        }
+
+        /**
+         * Check if tow containers have the exact same internal data.
+         * Element with removed flag are used for this comparison.
+         *
+         * \param other Container to compare with.
+         * \return True if equals, otherwise, return false.
+         */
+        bool crdt_equal(const LWWMap& other) const {
+            return (_map == other._map);
         }
 
 
@@ -427,8 +470,8 @@ class LWWMap {
 
             // Dev note: in the worst case, this is N2 complexity.
             // See note in LWWSet::operator==
-            for(auto& elt : lhs) {
-                auto other = rhs.find(elt.first);;
+            for(const auto& elt : lhs) {
+                const auto other = rhs.find(elt.first);;
                 if(other == rhs.cend()){
                     return false;
                 }
@@ -436,8 +479,8 @@ class LWWMap {
                     return false;
                 }
             }
-            for(auto& elt: rhs) {
-                auto other = lhs.find(elt.first);
+            for(const auto& elt: rhs) {
+                const auto other = lhs.find(elt.first);
                 if(other == lhs.cend()) {
                     return false;
                 }
@@ -514,7 +557,6 @@ class LWWMap {
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::Element {
-
     private:
         friend LWWMap;
 
@@ -526,12 +568,23 @@ class LWWMap<Key, T, U>::Element {
         U       _timestamp = {0};
         bool    _isRemoved = false;
 
+
+    // -------------------------------------------------------------------------
+    // Initialization
+    // -------------------------------------------------------------------------
+
     public:
+
         Element(const Key& key) : _internalValue(std::make_pair(key, T{})) {
             // TODO: T must have default constructor.
             // This may be too restrictive for end-user.
             // I should think about another way.
         }
+
+
+    // -------------------------------------------------------------------------
+    // Methods
+    // -------------------------------------------------------------------------
 
     public:
 
@@ -570,6 +623,20 @@ class LWWMap<Key, T, U>::Element {
         bool isRemoved() const {
             return _isRemoved;
         }
+
+
+    // -------------------------------------------------------------------------
+    // Operator overload
+    // -------------------------------------------------------------------------
+
+    public:
+
+        friend bool operator==(const Element& rhs, const Element& lhs) {
+            return (rhs._internalValue == lhs._internalValue)
+                && (rhs._isRemoved == lhs._isRemoved)
+                && (rhs._timestamp == lhs._timestamp);
+        }
+
 };
 
 
