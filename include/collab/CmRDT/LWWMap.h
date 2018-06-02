@@ -73,8 +73,7 @@ namespace CmRDT {
  *
  * \warning
  * T type must have a default constructor.
- * U timestamp must accept "U t = {0}".
- * This should set with minimal value.
+ * U timestamp must accept "U t = {0}". (This should set the minimal value.)
  *
  * \see http://en.cppreference.com/w/cpp/container/unordered_map
  *
@@ -189,7 +188,7 @@ class LWWMap {
          *
          * This only lookup for key that are not internally deleted.
          * (Like a normal map::find method).
-         * If element is internally removed (removed flag to true), find return
+         * If element is internally removed (removed flag is true), find returns
          * past-the-end anyway (see end()).
          *
          * \param key Key value of the element to search for.
@@ -354,6 +353,12 @@ class LWWMap {
         /**
          * Check if tow containers have the exact same internal data.
          * Element with removed flag are used for this comparison.
+         *
+         * \bug
+         * crdt_equal is not called recursively if the map content itself is
+         * a crdt data. The normal operator== is called in this case.
+         * This is because at this point, map can't know if its content data is
+         * made from a CRDT type or a normal cpp type (such as int, float etc).
          *
          * \param other Container to compare with.
          * \return True if equals, otherwise, return false.
@@ -641,9 +646,15 @@ class LWWMap<Key, T, U>::Element {
 
         /**
          * Check whether two Element are internally the same.
-         * This eq is mean for internal use (crdt_equal).
+         *
+         * \warning
+         * Though it is the normal operator==, it is meant to be used as
+         * crdt_equal (For internal uses).
          */
         friend bool operator==(const Element& rhs, const Element& lhs) {
+            // TODO Can we find a way to call crdt_equal on internalValue?
+            // See the crdt_equal 'bug' note. But anyway, it is maybe better
+            // like this.
             return (rhs._internalValue == lhs._internalValue)
                 && (rhs._isRemoved == lhs._isRemoved)
                 && (rhs._timestamp == lhs._timestamp);

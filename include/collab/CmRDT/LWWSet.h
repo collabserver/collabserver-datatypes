@@ -61,7 +61,7 @@ namespace CmRDT {
  *
  * \warning
  * U timestamp must accept "U t = {0}".
- * This must set with minimal value.
+ * This must set timestamp with the minimal value.
  *
  * \see http://en.cppreference.com/w/cpp/container/unordered_set
  * \see http://en.cppreference.com/w/cpp/container/unordered_map

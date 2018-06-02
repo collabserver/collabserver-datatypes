@@ -146,7 +146,7 @@ class LWWGraph {
          * (See crdt_end()) iterator.
          *
          * \param key   Vertex's key to find.
-         * \return      Iterator to the vertex or crdt_end() if not found.
+         * \return      CRDT iterator to the vertex or crdt_end() if not found.
          */
         crdt_iterator queryVertex(const Key& key) {
             return _adj.query(key);
@@ -160,7 +160,14 @@ class LWWGraph {
         }
 
         /**
-         * TODO
+         * Find a vertex in the graph.
+         *
+         * This only lookup for vertex that are not internally deleted.
+         * If element is internally removed (removed flag is true), find returns
+         * past-the-end anyway (see end()).
+         *
+         * \param key   Vertex's key to find.
+         * \return      Iterator to the vertex or end() if not found.
          */
         iterator findVertex(const Key& key) {
             return _adj.find(key);
@@ -177,6 +184,8 @@ class LWWGraph {
     // -------------------------------------------------------------------------
     // Modifiers methods
     // -------------------------------------------------------------------------
+
+    public:
 
         /**
          * Add a new vertex in the graph.
@@ -251,28 +260,31 @@ class LWWGraph {
             _adj.add(from, stamp);
             _adj.add(to, stamp);
 
-            auto res = _adj.query(from);
-            Vertex &v = res->second.value();
+            auto from_it = _adj.query(from);
+            Vertex &v = from_it->second.value();
             v._edges.add(to, stamp);
 
-            // If on vertex is removed, also remove this edge with highest U.
-            // This is really important for CRDT / Commutativity feature.
-            auto vertex_it_from = _adj.query(from);
-            auto vertex_it_to = _adj.query(to);
-            assert(vertex_it_from != _adj.crdt_end());
-            assert(vertex_it_to != _adj.crdt_end());
-            const bool from_removed = vertex_it_from->second.isRemoved();
-            const bool to_removed = vertex_it_to->second.isRemoved();
+            // If edge added, check whether vertex from or to are not removed.
+            // If one of them is removed, this newly created edge must be
+            // removed now. (important for CRDT commutativity)
 
-            if(from_removed || to_removed) {
-                U from_time = vertex_it_from->second.timestamp();
-                U to_time   = vertex_it_to->second.timestamp();
-                assert(to_time != from_time);
-                U new_time  = (from_time > to_time) ? from_time : to_time;
+            auto from_edge_it = v.edges().query(to);
+            if(!from_edge_it->second.isRemoved()) {
+                auto vertex_it_from = _adj.query(from);
+                auto vertex_it_to = _adj.query(to);
+                assert(vertex_it_from != _adj.crdt_end());
+                assert(vertex_it_to != _adj.crdt_end());
+                const bool from_removed = vertex_it_from->second.isRemoved();
+                const bool to_removed = vertex_it_to->second.isRemoved();
 
-                auto res = _adj.query(from);
-                Vertex &v = res->second.value();
-                v._edges.remove(to, new_time);
+                if(from_removed || to_removed) {
+                    U from_time = vertex_it_from->second.timestamp();
+                    U to_time   = vertex_it_to->second.timestamp();
+                    assert(to_time != from_time);
+                    U high_time  = (from_time > to_time) ? from_time : to_time;
+
+                    v._edges.remove(to, high_time);
+                }
             }
         }
 
@@ -343,7 +355,23 @@ class LWWGraph {
          * \return True if equals, otherwise, return false.
          */
         bool crdt_equal(const LWWGraph& other) const {
-            return _adj.crdt_equal(other._adj);
+            if(_adj.crdt_equal(other._adj) == false) {
+                return false;
+            }
+
+            // At this point only edges not marked as deleted are checked.
+            // This is because crdt_equal calls == on each vertex, so edges==
+            // is called instead of edges.crdt_equal()
+
+            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+                const auto edges = it->second.value().edges();
+                const auto other_it = other._adj.query(it->first);
+                const auto other_edges = other_it->second.value().edges();
+                if(!edges.crdt_equal(other_edges)) {
+                    return false;
+                }
+            }
+            return true;
         }
 
 

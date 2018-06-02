@@ -600,41 +600,167 @@ TEST(LWWGraph, crdt_sizeWithAddEdgeRemoveVertex) {
     ASSERT_EQ(data0.crdt_size(), data1.crdt_size());
 }
 
-TEST(LWWGraph, crdt_equalWithAddEdgeRemoveVertex) {
+
+// -----------------------------------------------------------------------------
+// crdt_equal()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_equalWithOnlyAddVertexTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    // Replicate data0
+    data0.addVertex("v1", 11);
+    data0.addVertex("v2", 12);
+    data0.addVertex("v3", 13);
+    data0.addVertex("v4", 14);
+    data0.addVertex("v5", 15);
+
+    // Replicate data1
+    data1.addVertex("v6", 21);
+    data1.addVertex("v7", 22);
+    data1.addVertex("v8", 23);
+    data1.addVertex("v9", 24);
+
+    // At this point, data0 != data1
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast data0 to data1
+    data1.addVertex("v1", 11);
+    data1.addVertex("v2", 12);
+    data1.addVertex("v3", 13);
+    data1.addVertex("v4", 14);
+    data1.addVertex("v5", 15);
+
+    // Broadcast data1 to data0
+    data0.addVertex("v6", 21);
+    data0.addVertex("v7", 22);
+    data0.addVertex("v8", 23);
+    data0.addVertex("v9", 24);
+
+    // Now, data0 == data1
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+}
+
+TEST(LWWGraph, crdt_equalWithAddVertexRemoveVertexTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    // Replicate data0
+    data0.addVertex("v1", 110);
+    data0.addVertex("v2", 120);
+    data0.addVertex("v3", 130);
+    data0.removeVertex("v1", 140);
+    data0.removeVertex("v3", 150);
+    data0.addVertex("v1", 150);
+
+    // Replicate data1
+    data1.addVertex("v5", 101);
+    data1.removeVertex("v5", 111);
+    data1.addVertex("v2", 111);
+    data1.addVertex("v1", 111);
+    data1.addVertex("v5", 121);
+    data1.addVertex("v6", 131);
+    data1.removeVertex("v1", 201);
+
+    // Atm, data0 != data1
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+
+    // Broadcast data0 to data1
+    data1.addVertex("v1", 110);
+    data1.addVertex("v2", 120);
+    data1.addVertex("v3", 130);
+    data1.removeVertex("v1", 140);
+    data1.removeVertex("v3", 150);
+    data1.addVertex("v1", 150);
+
+    // Broadcast data1 to data0
+    data0.addVertex("v5", 101);
+    data0.removeVertex("v5", 111);
+    data0.addVertex("v2", 111);
+    data0.addVertex("v1", 111);
+    data0.addVertex("v5", 121);
+    data0.addVertex("v6", 131);
+    data0.removeVertex("v1", 201);
+
+    // Now, data0 == data1
+    ASSERT_TRUE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data1.crdt_equal(data0));
+}
+
+TEST(LWWGraph, crdt_equalWithAddEdgeRemoveVertexTest) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
     // This illustrate the scenario of concurrent addEdge || removeVertex
 
-    // init data0
+    // Replicate data0
     data0.addVertex("v1", 110);
     data0.addVertex("v2", 120);
     data0.addEdge("v1", "v2", 130);
+    data0.addEdge("v1", "v3", 200);
+    data0.addEdge("v2", "v1", 210);
 
-    // init data1
+    // Replicate data1
+    data1.addVertex("v1", 111);
+    data1.addVertex("v2", 121);
+    data1.addEdge("v1", "v2", 131);
+    data1.removeVertex("v1", 301);
+
+
+    // data0 != data1
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
+
+    // Broadcast data0 to data1
     data1.addVertex("v1", 110);
     data1.addVertex("v2", 120);
     data1.addEdge("v1", "v2", 130);
+    data1.addEdge("v1", "v3", 200);
+    data1.addEdge("v2", "v1", 210);
 
-    // data0 apply addEdge first
-    data0.addEdge("v2", "v3", 140);
-    data0.removeVertex("v1", 150);
+    // Broadcast data1 to data0
+    data0.addVertex("v1", 111);
+    data0.addVertex("v2", 121);
+    data0.addEdge("v1", "v2", 131);
+    data0.removeVertex("v1", 301);
 
-    // data1 apply removeVertex first
-    data1.removeVertex("v1", 150);
-    data1.addEdge("v2", "v3", 140);
 
-    // TODO TODO --- TMP TO REMOVE (Just for debug) --- TODO TODO
-    std::cout << "data0 (at the end): " << data0 << "\n";
-    std::cout << "data1 (at the end): " << data1 << "\n";
-
-    // data0 should be equal to data1 (internally)
+    // data0 == data1
     ASSERT_TRUE(data0.crdt_equal(data1));
     ASSERT_TRUE(data1.crdt_equal(data0));
 
     // Just to test, data0 equal data0
     ASSERT_TRUE(data0.crdt_equal(data0));
     ASSERT_TRUE(data1.crdt_equal(data1));
+}
+
+TEST(LWWGraph, crdt_equalOnEmptyGraphTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    ASSERT_TRUE(data0.crdt_equal(data0));
+    ASSERT_TRUE(data1.crdt_equal(data1));
+}
+
+TEST(LWWGraph, crdt_equalEmptyVsAddVertexTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    ASSERT_TRUE(data0.crdt_equal(data0));
+    ASSERT_TRUE(data1.crdt_equal(data1));
+
+    // Add crap in data0
+    data0.addVertex("v1", 10);
+    data0.addVertex("v2", 10);
+    data0.addVertex("v3", 10);
+
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_FALSE(data1.crdt_equal(data0));
 }
 
 
