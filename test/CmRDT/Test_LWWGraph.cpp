@@ -141,7 +141,7 @@ TEST(LWWGraph, sizeWithAddEdgeRemoveVertex) {
 
 
 // -----------------------------------------------------------------------------
-// query()
+// queryVertex()
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, queryVertexTest) {
@@ -263,7 +263,7 @@ TEST(LWWGraph, removeVertexTest) {
     // All edges with v2 (to and from) should be removed.
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
-        auto edge_it = edges.query("v2");
+        auto edge_it = edges.crdt_find("v2");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 
@@ -341,7 +341,7 @@ TEST(LWWGraph, removeVertexWithEdgesDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, "v1", true, 30, data0);
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
-        auto edge_it = edges.query("v1");
+        auto edge_it = edges.crdt_find("v1");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 
@@ -373,7 +373,7 @@ TEST(LWWGraph, addEdgeTest) {
 
     // Edge v1 -> v2 should have been created
     auto edges = v1->second.value().edges();
-    auto edge = edges.query("v2");
+    auto edge = edges.crdt_find("v2");
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 13);
@@ -395,7 +395,7 @@ TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value().edges();
-    auto edge = edges.query("v2"); // LWWSet. Returns const_crdt_iterator
+    auto edge = edges.crdt_find("v2"); // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);
@@ -409,7 +409,7 @@ TEST(LWWGraph, addEdgeBeforeVertexCreatedTest) {
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
     edges = v1->second.value().edges();
-    edge = edges.query("v2");
+    edge = edges.crdt_find("v2");
     EXPECT_EQ(v1->second.timestamp(), 10);
     EXPECT_EQ(v2->second.timestamp(), 10);
     EXPECT_EQ(edge->second.timestamp(), 10);
@@ -437,7 +437,7 @@ TEST(LWWGraph, addEdgeDuplicateCallsTest) {
 
     // Edge v1 -> v2
     auto edges = v1->second.value().edges();
-    auto edge = edges.query("v2");
+    auto edge = edges.crdt_find("v2");
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 19);
@@ -453,7 +453,7 @@ TEST(LWWGraph, addEdgeWithFromToEqualTest) {
     data0.addEdge("v1", "v1", 13);
 
     auto v1_it = data0.queryVertex("v1");
-    auto v1_edge = v1_it->second.value().edges().query("v1");
+    auto v1_edge = v1_it->second.value().edges().crdt_find("v1");
     EXPECT_TRUE(v1_edge != v1_it->second.value().edges().crdt_end());
     EXPECT_EQ(v1_edge->first, "v1");
     EXPECT_EQ(v1_edge->second.timestamp(), 29);
@@ -483,7 +483,7 @@ TEST(LWWGraph, removeEdgeTest) {
 
     // Edge v1 -> v2 should have been removed
     auto edges = v1->second.value().edges();
-    auto edge = edges.query("v2");
+    auto edge = edges.crdt_find("v2");
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 13);
@@ -506,7 +506,7 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value().edges();
-    auto edge = edges.query("v2"); // LWWSet. Returns const_crdt_iterator
+    auto edge = edges.crdt_find("v2"); // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);
@@ -521,7 +521,7 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
     edges = v1->second.value().edges();
-    edge = edges.query("v2");
+    edge = edges.crdt_find("v2");
     EXPECT_EQ(v1->second.timestamp(), 0);
     EXPECT_EQ(v2->second.timestamp(), 0);
     EXPECT_EQ(edge->second.timestamp(), 10);
@@ -536,7 +536,7 @@ TEST(LWWGraph, removeEdgeBeforeAddedTest) {
     v1 = data0.queryVertex("v1");
     v2 = data0.queryVertex("v2");
     edges = v1->second.value().edges();
-    edge = edges.query("v2");
+    edge = edges.crdt_find("v2");
     EXPECT_EQ(v1->second.timestamp(), 0);
     EXPECT_EQ(v2->second.timestamp(), 0);
     EXPECT_EQ(edge->second.timestamp(), 29);
@@ -575,7 +575,7 @@ TEST(LWWGraph, addEdgeRemoveVertexConcurrentTest) {
     EXPECT_TRUE(v1_it->second.isRemoved());
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
-        auto edge_it = edges.query("v1");
+        auto edge_it = edges.crdt_find("v1");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 

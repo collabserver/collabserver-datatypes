@@ -141,6 +141,17 @@ class LWWMap {
         }
 
         /**
+         * Get the actual internal size of the container.
+         * This also count elements with removed flag.
+         * crdt_size() >= size()
+         *
+         * \return Internal size of the container.
+         */
+        float crdt_size() const {
+            return _map.size();
+        }
+
+        /**
          * \see http://en.cppreference.com/w/cpp/container/unordered_map/max_size
          *
          * \return Maximum number of elements.
@@ -155,33 +166,6 @@ class LWWMap {
     // -------------------------------------------------------------------------
 
     public:
-
-        /**
-         * Query a key-element and its internal CRDT metadata.
-         *
-         * If element with this key exists in the internal container, it is
-         * returned, regardless its 'removed' status.
-         * This may be useful for datatypes built on top of this set.
-         * To have CRDT updates, you must apply the update, regardless its
-         * internal status. This query will return the element in any case
-         * (If already added once in the container.)
-         *
-         * If this key has never been added, returns crdt past-the-end
-         * (See crdt_end()) iterator.
-         *
-         * \param key The key to query.
-         * \return Iterator CRDT to the key or crdt_end() if not found.
-         */
-        crdt_iterator query(const Key& key) {
-            return _map.find(key);
-        }
-
-        /**
-         * \copydoc LWWMap::query
-         */
-        const_crdt_iterator query(const Key& key) const {
-            return _map.find(key);
-        }
 
         /**
          * Find a key-element in the container.
@@ -219,6 +203,33 @@ class LWWMap {
             else {
                 return this->end();
             }
+        }
+
+        /**
+         * Query a key-element and its internal CRDT metadata.
+         *
+         * If element with this key exists in the internal container, it is
+         * returned, regardless its 'removed' status.
+         * This may be useful for datatypes built on top of this set.
+         * To have CRDT updates, you must apply the update, regardless its
+         * internal status. This query will return the element in any case
+         * (If already added once in the container.)
+         *
+         * If this key has never been added, returns crdt past-the-end
+         * (See crdt_end()) iterator.
+         *
+         * \param key The key to query.
+         * \return Iterator CRDT to the key or crdt_end() if not found.
+         */
+        crdt_iterator crdt_find(const Key& key) {
+            return _map.find(key);
+        }
+
+        /**
+         * \copydoc LWWMap::crdt_find
+         */
+        const_crdt_iterator crdt_find(const Key& key) const {
+            return _map.find(key);
         }
 
         /**
@@ -339,17 +350,6 @@ class LWWMap {
     // -------------------------------------------------------------------------
 
     public:
-
-        /**
-         * Get the actual internal size of the container.
-         * This also count elements with removed flag.
-         * crdt_size() >= size()
-         *
-         * \return Internal size of the container.
-         */
-        float crdt_size() const {
-            return _map.size();
-        }
 
         /**
          * Check if tow containers have the exact same internal data.

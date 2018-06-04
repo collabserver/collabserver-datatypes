@@ -198,28 +198,28 @@ TEST(LWWMap, countAfterRemoveTest) {
 
 
 // -----------------------------------------------------------------------------
-// query()
+// crdt_find()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, queryTest) {
+TEST(LWWMap, crdt_findTest) {
     LWWMap<std::string, int, int> data0;
 
     // Query before exists
-    auto coco = data0.query("e1");
+    auto coco = data0.crdt_find("e1");
     EXPECT_TRUE(coco == data0.crdt_end());
 
     // Add element and query
     data0.add("e1", 10);
-    coco = data0.query("e1");
+    coco = data0.crdt_find("e1");
     _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 
     // Remove this element and query
     data0.remove("e1", 20);
-    coco = data0.query("e1");
+    coco = data0.crdt_find("e1");
     _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 
     // Query invalid data
-    coco = data0.query("xxx");
+    coco = data0.crdt_find("xxx");
     EXPECT_TRUE(coco == data0.crdt_end());
 }
 
@@ -233,14 +233,14 @@ TEST(LWWMap, queryAndChangeValueTests) {
     data0.remove("e2", 3);
 
     // Change values of container
-    auto it_e1 = data0.query("e1");
+    auto it_e1 = data0.crdt_find("e1");
     it_e1->second.value() = 42;
-    auto it_e2 = data0.query("e2");
+    auto it_e2 = data0.crdt_find("e2");
     it_e2->second.value() = 1024;
 
     // Check if container value are well changed
-    auto e1 = data0.query("e1");
-    auto e2 = data0.query("e2");
+    auto e1 = data0.crdt_find("e1");
+    auto e2 = data0.crdt_find("e2");
     EXPECT_EQ(e1->second.value(), 42);
     EXPECT_EQ(e2->second.value(), 1024);
 }
@@ -312,7 +312,7 @@ TEST(LWWMap, addTest) {
     data0.add(2, 10);
     data0.add(3, 10);
     for(int k = 0; k < 4; ++k) {
-        auto coco = data0.query(k);
+        auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 10, data0);
     }
 
@@ -322,7 +322,7 @@ TEST(LWWMap, addTest) {
     data0.add(2, 20);
     data0.add(3, 20);
     for(int k = 0; k < 4; ++k) {
-        auto coco = data0.query(k);
+        auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 20, data0);
     }
 }
@@ -337,7 +337,7 @@ TEST(LWWMap, addDuplicateCallsTest) {
     data0.add(42, 19);
     data0.add(42, 17);
     data0.add(42, 10);
-    auto carrot = data0.query(42);
+    auto carrot = data0.crdt_find(42);
     _ASSERT_ELT_EQ(carrot, 42, false, 19, data0);
 
     // Test duplicate add, keep max timestamps 
@@ -347,7 +347,7 @@ TEST(LWWMap, addDuplicateCallsTest) {
     data0.add(64, 22);
     data0.add(64, 27);
     data0.add(64, 25);
-    carrot = data0.query(64);
+    carrot = data0.crdt_find(64);
     _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
@@ -369,7 +369,7 @@ TEST(LWWMap, removeTest) {
     data0.remove(2, 20);
     data0.remove(3, 20);
     for(int k = 0; k < 4; ++k) {
-        auto res = data0.query(k);
+        auto res = data0.crdt_find(k);
         _ASSERT_ELT_EQ(res, k, true, 20, data0);
     }
 }
@@ -385,7 +385,7 @@ TEST(LWWMap, removeDuplicateCallsTest) {
     data0.remove(42, 22);
     data0.remove(42, 29);
     data0.remove(42, 21);
-    auto res = data0.query(42);
+    auto res = data0.crdt_find(42);
     _ASSERT_ELT_EQ(res, 42, true, 29, data0);
 }
 
@@ -394,12 +394,12 @@ TEST(LWWMap, removeCalledBeforeAddCallTest) {
 
     // Remove before even added works
     data0.remove(42, 10);
-    auto res = data0.query(42);
+    auto res = data0.crdt_find(42);
     _ASSERT_ELT_EQ(res, 42, true, 10, data0);
 
     // Re-removed later, change timestamps anyway
     data0.remove(42, 20);
-    res = data0.query(42);
+    res = data0.crdt_find(42);
     _ASSERT_ELT_EQ(res, 42, true, 20, data0);
 }
 
@@ -413,22 +413,22 @@ TEST(LWWMap, addRemoveTest) {
 
     // Add element
     data0.add("v1", 10);
-    auto res = data0.query("v1");
+    auto res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", false, 10, data0);
 
     // Remove this element
     data0.remove("v1", 20);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", true, 20, data0);
 
     // Re-add
     data0.add("v1", 30);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", false, 30, data0);
 
     // Re-remove
     data0.remove("v1", 40);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", true, 40, data0);
 }
 
@@ -437,22 +437,22 @@ TEST(LWWMap, addRemoveWithRemoveCalledFirstTest) {
 
     // Remove elt before even added. (Is technically removed)
     data0.remove("v1", 1000);
-    auto res = data0.query("v1");
+    auto res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", true, 1000, data0);
 
     // Add this element, but remove was done later (Still removed)
     data0.add("v1", 10);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", true, 1000, data0);
 
     // Re-add this element after the remove
     data0.add("v1", 1001);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 
     // Remove this element before the last add: do nothing (Still added)
     data0.remove("v1", 20);
-    res = data0.query("v1");
+    res = data0.crdt_find("v1");
     _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 }
 

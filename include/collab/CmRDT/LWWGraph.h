@@ -149,14 +149,14 @@ class LWWGraph {
          * \return      CRDT iterator to the vertex or crdt_end() if not found.
          */
         crdt_iterator queryVertex(const Key& key) {
-            return _adj.query(key);
+            return _adj.crdt_find(key);
         }
 
         /**
          * \copydoc LWWGraph::queryVertex
          */
         const_crdt_iterator queryVertex(const Key& key) const {
-            return _adj.query(key);
+            return _adj.crdt_find(key);
         }
 
         /**
@@ -234,7 +234,7 @@ class LWWGraph {
             _adj.remove(key, stamp);
 
             // Remove all vertex's edges
-            auto from_it = _adj.query(key);
+            auto from_it = _adj.crdt_find(key);
             auto& edges = from_it->second.value()._edges;
             for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
                 edges.remove(it->first, stamp);
@@ -271,7 +271,7 @@ class LWWGraph {
                 _adj.add(to, stamp);
             }
 
-            auto from_it = _adj.query(from);
+            auto from_it = _adj.crdt_find(from);
             Vertex &v = from_it->second.value();
             v._edges.add(to, stamp);
 
@@ -279,10 +279,10 @@ class LWWGraph {
             // If one of them is removed, this newly created edge must be
             // removed now. (important for CRDT commutativity)
 
-            auto from_edge_it = v.edges().query(to);
+            auto from_edge_it = v.edges().crdt_find(to);
             if(!from_edge_it->second.isRemoved()) {
-                auto vertex_it_from = _adj.query(from);
-                auto vertex_it_to = _adj.query(to);
+                auto vertex_it_from = _adj.crdt_find(from);
+                auto vertex_it_to = _adj.crdt_find(to);
                 assert(vertex_it_from != _adj.crdt_end());
                 assert(vertex_it_to != _adj.crdt_end());
                 const bool from_removed = vertex_it_from->second.isRemoved();
@@ -315,7 +315,7 @@ class LWWGraph {
                 _adj.remove(to, 0);
             }
 
-            auto res = _adj.query(from);
+            auto res = _adj.crdt_find(from);
             Vertex &v = res->second.value();
             v._edges.remove(to, stamp);
         }
@@ -377,7 +377,7 @@ class LWWGraph {
 
             for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
                 const auto& edges = it->second.value().edges();
-                const auto other_it = other._adj.query(it->first);
+                const auto other_it = other._adj.crdt_find(it->first);
                 const auto& other_edges = other_it->second.value().edges();
                 if(!edges.crdt_equal(other_edges)) {
                     return false;
