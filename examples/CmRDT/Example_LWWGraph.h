@@ -17,44 +17,44 @@ void LWWGraph_example() {
 
 
     // User 0 creates 2 vertex and link v2 -> v1
-    data0.addVertex("v1", 110);
-    data0.addVertex("v2", 120);
-    data0.addEdge("v1", "v2", 130);
+    data0.add_vertex("v1", 110);
+    data0.add_vertex("v2", 120);
+    data0.add_edge("v1", "v2", 130);
 
     // User 1 creates 2 vertex and link v2 -> v1
-    data1.addVertex("v1", 111);
-    data1.addVertex("v2", 121);
-    data1.addEdge("v1", "v2", 131);
+    data1.add_vertex("v1", 111);
+    data1.add_vertex("v2", 121);
+    data1.add_edge("v1", "v2", 131);
 
 
     // Broadcast changes from 0 to 1
-    data1.addVertex("v1", 110);
-    data1.addVertex("v2", 120);
-    data1.addEdge("v1", "v2", 130);
+    data1.add_vertex("v1", 110);
+    data1.add_vertex("v2", 120);
+    data1.add_edge("v1", "v2", 130);
 
     // Broadcast changes from 1 to 0
-    data0.addVertex("v1", 111);
-    data0.addVertex("v2", 121);
-    data0.addEdge("v1", "v2", 131);
+    data0.add_vertex("v1", 111);
+    data0.add_vertex("v2", 121);
+    data0.add_edge("v1", "v2", 131);
 
 
     // At this point, user0 and user1 have actually the same graph.
 
 
     // User0 add vertex v3 + edge v1 -> v3
-    data0.addEdge("v1", "v3", 140);
+    data0.add_edge("v1", "v3", 140);
 
     // User1 remove vertex v1
-    data1.removeVertex("v1", 151);
+    data1.remove_vertex("v1", 151);
 
 
     // Broadcast changes
-    data1.addEdge("v1", "v3", 140);
-    data0.removeVertex("v1", 151);
+    data1.add_edge("v1", "v3", 140);
+    data0.remove_vertex("v1", 151);
 
 
     // At this point, user0 and user1 have the same graph.
-    // RemoveVertex was later, so all edges with v2 are removed.
+    // remove_vertex was later, so all edges with v2 are removed.
 
 
     // Final state

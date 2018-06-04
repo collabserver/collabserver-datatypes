@@ -148,14 +148,14 @@ class LWWGraph {
          * \param key   Vertex's key to find.
          * \return      CRDT iterator to the vertex or crdt_end() if not found.
          */
-        crdt_iterator queryVertex(const Key& key) {
+        crdt_iterator crdt_find_vertex(const Key& key) {
             return _adj.crdt_find(key);
         }
 
         /**
-         * \copydoc LWWGraph::queryVertex
+         * \copydoc LWWGraph::crdt_find_vertex
          */
-        const_crdt_iterator queryVertex(const Key& key) const {
+        const_crdt_iterator crdt_find_vertex(const Key& key) const {
             return _adj.crdt_find(key);
         }
 
@@ -169,14 +169,14 @@ class LWWGraph {
          * \param key   Vertex's key to find.
          * \return      Iterator to the vertex or end() if not found.
          */
-        iterator findVertex(const Key& key) {
+        iterator find_vertex(const Key& key) {
             return _adj.find(key);
         }
 
         /**
-         * \copydoc LWWGraph::findVertex
+         * \copydoc LWWGraph::find_vertex
          */
-        const_iterator findVertex(const Key& key) const {
+        const_iterator find_vertex(const Key& key) const {
             return _adj.find(key);
         }
 
@@ -192,10 +192,10 @@ class LWWGraph {
          *
          * If key already exists, use timestamps for concurrency control.
          *
-         * \par Concurrent addVertex / addVertex
+         * \par Concurrent add_vertex / add_vertex
          * Timestamp is updated with the higher value. Key is added in any case.
          *
-         * \par Concurrent addVertex / removeVertex
+         * \par Concurrent add_vertex / remove_vertex
          * Uses the higher timestamp select the winning operation.
          * If remove timestamp wins, this add operation does nothing.
          *
@@ -207,7 +207,7 @@ class LWWGraph {
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
          */
-        void addVertex(const Key& key, const U& stamp) {
+        void add_vertex(const Key& key, const U& stamp) {
             _adj.add(key, stamp);
         }
 
@@ -222,15 +222,15 @@ class LWWGraph {
          * After timestamp check, if vertex actually removed, also remove all
          * edges that implies this vertex.
          *
-         * \par Concurrent addEdge / removeVertex
-         * See documentation of LWWGraph::addEdge
+         * \par Concurrent add_edge / remove_vertex
+         * See documentation of LWWGraph::add_edge
          *
-         * \see LWWGraph::addEdge
+         * \see LWWGraph::add_edge
          *
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
          */
-        void removeVertex(const Key& key, const U& stamp) {
+        void remove_vertex(const Key& key, const U& stamp) {
             _adj.remove(key, stamp);
 
             // Remove all vertex's edges
@@ -252,20 +252,20 @@ class LWWGraph {
         /**
          * Add edge from a vertex to another.
          *
-         * This also performs a 'addVertex' for vertex 'from' and 'to'.
-         * This ensure addEdge is commutative even if addEdge is received before
+         * This also performs a 'add_vertex' for vertex 'from' and 'to'.
+         * This ensure add_edge is commutative even if add_edge is received before
          * the add operations.
          *
-         * \par Concurrent addEdge / removeVertex
-         * If after the 'addVertex' operation, any vertex is still marked as
-         * removed. Meaning 'addEdge' was before 'removeVertex', this edge
-         * is marked as removed (With the 'removeVertex' timestamp).
-         * This resolve the concurrent 'addEdge' | 'removeVertex'
+         * \par Concurrent add_edge / remove_vertex
+         * If after the 'add_vertex' operation, any vertex is still marked as
+         * removed. Meaning 'add_edge' was before 'remove_vertex', this edge
+         * is marked as removed (With the 'remove_vertex' timestamp).
+         * This resolve the concurrent 'add_edge' | 'remove_vertex'
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
          */
-        void addEdge(const Key& from, const Key& to, const U& stamp) {
+        void add_edge(const Key& from, const Key& to, const U& stamp) {
             _adj.add(from, stamp);
             if(from != to) {
                 _adj.add(to, stamp);
@@ -303,13 +303,13 @@ class LWWGraph {
          *
          * If from and/or to doesn't exists, create one with minimum possible
          * timestamp. This create a temporary vertex. This is use in case of
-         * removeEdge is applied before 'addEdge'. (Required for CRDT
+         * remove_edge is applied before 'add_edge'. (Required for CRDT
          * commutativity).
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
          */
-        void removeEdge(const Key& from, const Key& to, const U& stamp) {
+        void remove_edge(const Key& from, const Key& to, const U& stamp) {
             _adj.remove(from, 0);
             if(from != to) {
                 _adj.remove(to, 0);

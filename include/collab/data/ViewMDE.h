@@ -48,7 +48,7 @@ class ViewMDE : public CollabData {
             auto tnow = Timestamp::now();
             AddElementOperation op(id, tnow);
             // TODO: post 'addElement' event to all observers
-            _modelMDE.addVertex(id, tnow);
+            _modelMDE.add_vertex(id, tnow);
             // Send Operation to back CollabInstance.
         }
 
@@ -59,7 +59,7 @@ class ViewMDE : public CollabData {
          */
         void removeElement(const UUID& id) {
             auto tnow = Timestamp::now();
-            _modelMDE.removeVertex(id, tnow);
+            _modelMDE.remove_vertex(id, tnow);
         }
 
         /**
@@ -73,7 +73,7 @@ class ViewMDE : public CollabData {
                           const std::string& name,
                           const std::string& value) {
             auto tnow = Timestamp::now();
-            auto v = _modelMDE.queryVertex(eltID);
+            auto v = _modelMDE.crdt_find_vertex(eltID);
             // TODO
         }
 
@@ -110,12 +110,12 @@ class ViewMDE : public CollabData {
          */
         void addLink(const UUID& from, const UUID& to) {
             auto tnow = Timestamp::now();
-            _modelMDE.addEdge(from, to, tnow);
+            _modelMDE.add_edge(from, to, tnow);
         }
 
         void removeLink(const UUID& from, const UUID& to) {
             auto tnow = Timestamp::now();
-            _modelMDE.removeEdge(from, to, tnow);
+            _modelMDE.remove_edge(from, to, tnow);
         }
 
 
