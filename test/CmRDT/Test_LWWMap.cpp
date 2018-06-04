@@ -39,6 +39,27 @@ TEST(LWWMap, emptyTest) {
 
 
 // -----------------------------------------------------------------------------
+// crdt_empty()
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdt_emptyTest) {
+    LWWMap<int, int, int> data0;
+    ASSERT_TRUE(data0.crdt_empty());
+
+    data0.add(1, 10);
+    ASSERT_FALSE(data0.crdt_empty());
+    data0.remove(1, 20);
+    ASSERT_FALSE(data0.crdt_empty());
+    data0.add(1, 15);
+    data0.add(1, 17);
+    data0.add(1, 16);
+    ASSERT_FALSE(data0.crdt_empty());
+    data0.add(2, 30);
+    ASSERT_FALSE(data0.crdt_empty());
+}
+
+
+// -----------------------------------------------------------------------------
 // size()
 // -----------------------------------------------------------------------------
 
@@ -194,6 +215,41 @@ TEST(LWWMap, countAfterRemoveTest) {
     data0.add(42, 10);
     data0.remove(42, 20);
     ASSERT_EQ(data0.count(42), 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_count()
+// -----------------------------------------------------------------------------
+TEST(LWWMap, crdt_countTest) {
+    LWWMap<int, int, int> data0;
+
+    ASSERT_EQ(data0.crdt_count(1), 0);
+    ASSERT_EQ(data0.crdt_count(2), 0);
+    ASSERT_EQ(data0.crdt_count(3), 0);
+
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+    data0.remove(1, 20);
+    data0.remove(2, 20);
+    data0.remove(3, 20);
+
+    ASSERT_EQ(data0.crdt_count(1), 1);
+    ASSERT_EQ(data0.crdt_count(2), 1);
+    ASSERT_EQ(data0.crdt_count(3), 1);
+    ASSERT_EQ(data0.crdt_count(32), 0);
+    ASSERT_EQ(data0.crdt_count(10), 0);
+    ASSERT_EQ(data0.crdt_count(42), 0);
+}
+
+TEST(LWWMap, crdt_countAfterRemoveTest) {
+    LWWMap<int, int, int> data0;
+
+    ASSERT_EQ(data0.crdt_count(42), 0);
+    data0.add(42, 10);
+    data0.remove(42, 20);
+    ASSERT_EQ(data0.crdt_count(42), 1);
 }
 
 

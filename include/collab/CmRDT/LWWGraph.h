@@ -116,6 +116,16 @@ class LWWGraph {
         }
 
         /**
+         * Checks if the graph has no vertex.
+         * Also check for elements marked as 'removed'.
+         *
+         * \return True if the container is empty, false otherwise.
+         */
+        bool crdt_empty() const noexcept {
+            return _adj.crdt_empty();
+        }
+
+        /**
          * Returns the number of vertex in this graph.
          * Only elements that are not marked as 'removed' count.
          *
@@ -125,12 +135,43 @@ class LWWGraph {
             return _adj.size();
         }
 
+        /**
+         * Returns the number of vertex in this graph.
+         * Also check for elements marked as 'removed'.
+         *
+         * \return Number of elements in the container.
+         */
+        size_type crdt_size() const noexcept {
+            return _adj.crdt_size();
+        }
+
 
     // -------------------------------------------------------------------------
-    // Lookup methods
+    // Lookup methods (Vertex)
     // -------------------------------------------------------------------------
 
     public:
+
+        /**
+         * Find a vertex in the graph.
+         *
+         * This only lookup for vertex that are not internally deleted.
+         * If element is internally removed (removed flag is true), find returns
+         * past-the-end anyway (see end()).
+         *
+         * \param key   Vertex's key to find.
+         * \return      Iterator to the vertex or end() if not found.
+         */
+        iterator find_vertex(const Key& key) {
+            return _adj.find(key);
+        }
+
+        /**
+         * \copydoc LWWGraph::find_vertex
+         */
+        const_iterator find_vertex(const Key& key) const {
+            return _adj.find(key);
+        }
 
         /**
          * Query a vertex and its internal CRDT metadata.
@@ -160,24 +201,67 @@ class LWWGraph {
         }
 
         /**
-         * Find a vertex in the graph.
+         * Count the number of vertex with this key.
+         * Since no duplicate are allowed, return 0 or 1.
          *
-         * This only lookup for vertex that are not internally deleted.
-         * If element is internally removed (removed flag is true), find returns
-         * past-the-end anyway (see end()).
-         *
-         * \param key   Vertex's key to find.
-         * \return      Iterator to the vertex or end() if not found.
+         * \param key Key value of the element to count.
+         * \return Number of elements with this key, either 0 or 1.
          */
-        iterator find_vertex(const Key& key) {
-            return _adj.find(key);
+        size_type count_vertex(const Key& key) const {
+            return _adj.count(key);
         }
 
         /**
-         * \copydoc LWWGraph::find_vertex
+         * Count the number of vertex with this key.
+         * Since no duplicate are allowed, return 0 or 1.
+         * Also lookup for element internally marked as 'removed'.
+         *
+         * \param key Key value of the element to count.
+         * \return Number of elements with this key, either 0 or 1.
          */
-        const_iterator find_vertex(const Key& key) const {
-            return _adj.find(key);
+        size_type crdt_count_vertex(const Key& key) const {
+            return _adj.crdt_count(key);
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Lookup methods (Edges)
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Count the number of edge from given vertex to another.
+         * Since no duplicate are allowed, return 0 or 1.
+         * Only elements that are not marked as 'removed' count.
+         *
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
+         * \return Number of edges with this characteristic, either 0 or 1.
+         */
+        size_type count_edge(const Key& from, const Key& to) const {
+            auto vertex_it = _adj.find(from);
+            if(vertex_it != _adj.end()) {
+                return vertex_it->second.edges().count(to);
+            }
+            return 0;
+        }
+
+        /**
+         * Count the number of edge from given vertex to another.
+         * Since no duplicate are allowed, return 0 or 1.
+         * Also check for elements marked as 'removed'. (Internal CRDT data).
+         *
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
+         * \return Number of edges with this characteristic, either 0 or 1.
+         */
+        size_type crdt_count_edge(const Key& from, const Key& to) const {
+            auto vertex_it = _adj.crdt_find(from);
+            if(vertex_it != _adj.crdt_end()) {
+                return vertex_it->second.value().edges().crdt_count(to);
+            }
+            return 0;
         }
 
 
@@ -253,8 +337,8 @@ class LWWGraph {
          * Add edge from a vertex to another.
          *
          * This also performs a 'add_vertex' for vertex 'from' and 'to'.
-         * This ensure add_edge is commutative even if add_edge is received before
-         * the add operations.
+         * This ensure add_edge is commutative even if add_edge is received
+         * before the add operations.
          *
          * \par Concurrent add_edge / remove_vertex
          * If after the 'add_vertex' operation, any vertex is still marked as
@@ -346,18 +430,6 @@ class LWWGraph {
     // -------------------------------------------------------------------------
 
     public:
-
-        /**
-         * Get the actual internal size of the container.
-         * This also count elements with removed flag.
-         * crdt_size() >= size()
-         * Only count number of vertex. (Not number of edges).
-         *
-         * \return Internal size of the container.
-         */
-        float crdt_size() const {
-            return _adj.crdt_size();
-        }
 
         /**
          * Check if tow containers have the exact same internal data.

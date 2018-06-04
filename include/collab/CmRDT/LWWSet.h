@@ -105,6 +105,17 @@ class LWWSet {
         }
 
         /**
+         * Check if the container has no elements.
+         * This also takes into account 'removed' elements.
+         * (Internal CRDT data).
+         *
+         * \return True if the container is empty, false otherwise.
+         */
+        bool crdt_empty() const noexcept {
+            return _map.empty();
+        }
+
+        /**
          * Returns the number of elements in the container.
          * Only elements that are not marked as 'removed' count.
          *
@@ -193,6 +204,17 @@ class LWWSet {
          */
         size_type count(const Key& key) const {
             return (this->find(key) != this->end()) ? 1 : 0;
+        }
+
+        /**
+         * Count the number of element with this key.
+         * Also lookup for 'removed' element (Internal CRDT data).
+         *
+         * \param key Key value of the element to count.
+         * \return Number of elements with this key, either 0 or 1.
+         */
+        size_type crdt_count(const Key& key) const {
+            return _map.count(key);
         }
 
 

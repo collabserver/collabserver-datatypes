@@ -41,6 +41,30 @@ TEST(LWWGraph, emptyTest) {
 
 
 // -----------------------------------------------------------------------------
+// crdt_empty()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_emptyTest) {
+    LWWGraph<std::string, int, int> data0;
+    ASSERT_TRUE(data0.crdt_empty());
+
+    data0.add_vertex("v1", 10);
+    ASSERT_FALSE(data0.crdt_empty());
+
+    data0.remove_vertex("v1", 20);
+    ASSERT_FALSE(data0.crdt_empty());
+
+    // Try to add but smaller timestamp: still emtpy
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v1", 12);
+    ASSERT_FALSE(data0.crdt_empty());
+
+    data0.add_vertex("v2", 30);
+    ASSERT_FALSE(data0.crdt_empty());
+}
+
+
+// -----------------------------------------------------------------------------
 // size()
 // -----------------------------------------------------------------------------
 
@@ -141,6 +165,36 @@ TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
 
 
 // -----------------------------------------------------------------------------
+// crdt_size()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_sizeTest) {
+    LWWGraph<std::string, int, int> data0;
+    ASSERT_EQ(data0.crdt_size(), 0);
+
+    // Add vertex
+    data0.add_vertex("v1", 10);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    data0.add_vertex("v2", 20);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    data0.add_vertex("v3", 30);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.add_vertex("v4", 40);
+    ASSERT_EQ(data0.crdt_size(), 4);
+
+    // Remove vertex
+    data0.remove_vertex("v1", 50);
+    ASSERT_EQ(data0.crdt_size(), 4);
+    data0.remove_vertex("v2", 60);
+    ASSERT_EQ(data0.crdt_size(), 4);
+    data0.remove_vertex("v3", 70);
+    ASSERT_EQ(data0.crdt_size(), 4);
+    data0.remove_vertex("v4", 80);
+    ASSERT_EQ(data0.crdt_size(), 4);
+}
+
+
+// -----------------------------------------------------------------------------
 // crdt_find_vertex()
 // -----------------------------------------------------------------------------
 
@@ -169,6 +223,178 @@ TEST(LWWGraph, crdt_find_vertexTest) {
     data0.add_vertex(2, 30);
     res = data0.crdt_find_vertex(2);
     _ASSERT_VERTEX_EQ(res, 2, false, 30, data0);
+}
+
+
+// -----------------------------------------------------------------------------
+// count_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, count_vertexTest) {
+    LWWGraph<int, int, int> data0;
+
+    // Query before exists
+    int res = data0.count_vertex(1);
+    EXPECT_EQ(res, 0);
+
+    // Add vertex
+    data0.add_vertex(1, 10);
+    data0.add_vertex(2, 10);
+    data0.add_vertex(3, 10);
+    data0.add_vertex(4, 10);
+    data0.add_vertex(5, 10);
+    data0.remove_vertex(1, 20);
+    data0.remove_vertex(2, 20);
+    data0.remove_vertex(3, 20);
+
+    res = data0.count_vertex(1);
+    EXPECT_EQ(res, 0);
+    res = data0.count_vertex(2);
+    EXPECT_EQ(res, 0);
+    res = data0.count_vertex(3);
+    EXPECT_EQ(res, 0);
+    res = data0.count_vertex(4);
+    EXPECT_EQ(res, 1);
+    res = data0.count_vertex(5);
+    EXPECT_EQ(res, 1);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_count_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_count_vertexTest) {
+    LWWGraph<int, int, int> data0;
+
+    // Query before exists
+    int res = data0.crdt_count_vertex(1);
+    EXPECT_EQ(res, 0);
+
+    // Add vertex
+    data0.add_vertex(1, 10);
+    data0.add_vertex(2, 10);
+    data0.add_vertex(3, 10);
+    data0.add_vertex(4, 10);
+    data0.add_vertex(5, 10);
+    data0.remove_vertex(1, 20);
+    data0.remove_vertex(2, 20);
+    data0.remove_vertex(3, 20);
+
+    res = data0.crdt_count_vertex(1);
+    EXPECT_EQ(res, 1);
+    res = data0.crdt_count_vertex(2);
+    EXPECT_EQ(res, 1);
+    res = data0.crdt_count_vertex(3);
+    EXPECT_EQ(res, 1);
+    res = data0.crdt_count_vertex(4);
+    EXPECT_EQ(res, 1);
+    res = data0.crdt_count_vertex(5);
+    EXPECT_EQ(res, 1);
+}
+
+
+// -----------------------------------------------------------------------------
+// count_edge()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, count_edgeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    int res = data0.count_edge("v1", "v2");
+    ASSERT_EQ(res, 0);
+
+    // Init data
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.add_edge("v1", "v1", 21);
+    data0.add_edge("v1", "v2", 22);
+    data0.remove_edge("v1", "v2", 31);
+
+    data0.add_edge("v2", "v1", 24);
+    data0.add_edge("v2", "v2", 25);
+    data0.add_edge("v2", "v3", 26);
+    data0.remove_edge("v2", "v2", 32);
+
+    data0.add_edge("v3", "v2", 27);
+    data0.remove_edge("v3", "v2", 33);
+
+
+    // Check
+    int v1v1 = data0.count_edge("v1", "v1");
+    int v1v2 = data0.count_edge("v1", "v2");
+    int v1v3 = data0.count_edge("v1", "v3");
+    ASSERT_EQ(v1v1, 1);
+    ASSERT_EQ(v1v2, 0);
+    ASSERT_EQ(v1v3, 0);
+
+    int v2v1 = data0.count_edge("v2", "v1");
+    int v2v2 = data0.count_edge("v2", "v2");
+    int v2v3 = data0.count_edge("v2", "v3");
+    ASSERT_EQ(v2v1, 1);
+    ASSERT_EQ(v2v2, 0);
+    ASSERT_EQ(v2v3, 1);
+
+    int v3v1 = data0.count_edge("v3", "v1");
+    int v3v2 = data0.count_edge("v3", "v2");
+    int v3v3 = data0.count_edge("v3", "v3");
+    ASSERT_EQ(v3v1, 0);
+    ASSERT_EQ(v3v2, 0);
+    ASSERT_EQ(v3v3, 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_count_edge()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_count_edgeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    int res = data0.crdt_count_edge("v1", "v2");
+    ASSERT_EQ(res, 0);
+
+    // Init data
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.add_edge("v1", "v1", 21);
+    data0.add_edge("v1", "v2", 22);
+    data0.remove_edge("v1", "v2", 31);
+
+    data0.add_edge("v2", "v1", 24);
+    data0.add_edge("v2", "v2", 25);
+    data0.add_edge("v2", "v3", 26);
+    data0.remove_edge("v2", "v2", 32);
+
+    data0.add_edge("v3", "v2", 27);
+    data0.remove_edge("v3", "v2", 33);
+
+
+    // Check
+    int v1v1 = data0.crdt_count_edge("v1", "v1");
+    int v1v2 = data0.crdt_count_edge("v1", "v2");
+    int v1v3 = data0.crdt_count_edge("v1", "v3");
+    ASSERT_EQ(v1v1, 1);
+    ASSERT_EQ(v1v2, 1);
+    ASSERT_EQ(v1v3, 0);
+
+    int v2v1 = data0.crdt_count_edge("v2", "v1");
+    int v2v2 = data0.crdt_count_edge("v2", "v2");
+    int v2v3 = data0.crdt_count_edge("v2", "v3");
+    ASSERT_EQ(v2v1, 1);
+    ASSERT_EQ(v2v2, 1);
+    ASSERT_EQ(v2v3, 1);
+
+    int v3v1 = data0.crdt_count_edge("v3", "v1");
+    int v3v2 = data0.crdt_count_edge("v3", "v2");
+    int v3v3 = data0.crdt_count_edge("v3", "v3");
+    ASSERT_EQ(v3v1, 0);
+    ASSERT_EQ(v3v2, 1);
+    ASSERT_EQ(v3v3, 0);
 }
 
 
