@@ -233,10 +233,19 @@ class LWWGraph {
         void removeVertex(const Key& key, const U& stamp) {
             _adj.remove(key, stamp);
 
-            // Remove all edge to this vertex (Even from 'removed' vertex)
+            // Remove all vertex's edges
+            auto from_it = _adj.query(key);
+            auto& edges = from_it->second.value()._edges;
+            for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
+                edges.remove(it->first, stamp);
+            }
+
+            // Remove all edge to this vertex (On others vertex)
             for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
                 auto& edges = it->second.value()._edges;
-                edges.remove(key, stamp);
+                if(it->first != key && edges.count(key) == 1) {
+                    edges.remove(key, stamp);
+                }
             }
         }
 
@@ -258,7 +267,9 @@ class LWWGraph {
          */
         void addEdge(const Key& from, const Key& to, const U& stamp) {
             _adj.add(from, stamp);
-            _adj.add(to, stamp);
+            if(from != to) {
+                _adj.add(to, stamp);
+            }
 
             auto from_it = _adj.query(from);
             Vertex &v = from_it->second.value();
@@ -280,7 +291,6 @@ class LWWGraph {
                 if(from_removed || to_removed) {
                     U from_time = vertex_it_from->second.timestamp();
                     U to_time   = vertex_it_to->second.timestamp();
-                    assert(to_time != from_time);
                     U high_time  = (from_time > to_time) ? from_time : to_time;
 
                     v._edges.remove(to, high_time);
@@ -301,7 +311,9 @@ class LWWGraph {
          */
         void removeEdge(const Key& from, const Key& to, const U& stamp) {
             _adj.remove(from, 0);
-            _adj.remove(to, 0);
+            if(from != to) {
+                _adj.remove(to, 0);
+            }
 
             auto res = _adj.query(from);
             Vertex &v = res->second.value();
@@ -364,9 +376,9 @@ class LWWGraph {
             // is called instead of edges.crdt_equal()
 
             for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                const auto edges = it->second.value().edges();
+                const auto& edges = it->second.value().edges();
                 const auto other_it = other._adj.query(it->first);
-                const auto other_edges = other_it->second.value().edges();
+                const auto& other_edges = other_it->second.value().edges();
                 if(!edges.crdt_equal(other_edges)) {
                     return false;
                 }

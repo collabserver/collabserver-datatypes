@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <string>
+#include <iostream>
 
 
 // Check the whole internal data of a vertex
@@ -308,7 +309,7 @@ TEST(LWWGraph, removeVertexDuplicateCallsTest) {
 
 
 // -----------------------------------------------------------------------------
-// removeVertex() || addEdge()
+// addEdge() || removeVertex()
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, removeVertexWithEdgesDuplicateCallsTest) {
@@ -330,6 +331,8 @@ TEST(LWWGraph, removeVertexWithEdgesDuplicateCallsTest) {
 
     data0.addEdge("v3", "v4", 27);
     data0.addEdge("v3", "v1", 28);
+
+    data0.addEdge("v4", "v1", 29);
 
     data0.removeVertex("v1", 30);
 
@@ -441,6 +444,22 @@ TEST(LWWGraph, addEdgeDuplicateCallsTest) {
     EXPECT_FALSE(edge->second.isRemoved());
 }
 
+TEST(LWWGraph, addEdgeWithFromToEqualTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.addVertex("v1", 11);
+    data0.addEdge("v1", "v1", 21);
+    data0.addEdge("v1", "v1", 29);
+    data0.addEdge("v1", "v1", 13);
+
+    auto v1_it = data0.queryVertex("v1");
+    auto v1_edge = v1_it->second.value().edges().query("v1");
+    EXPECT_TRUE(v1_edge != v1_it->second.value().edges().crdt_end());
+    EXPECT_EQ(v1_edge->first, "v1");
+    EXPECT_EQ(v1_edge->second.timestamp(), 29);
+    EXPECT_FALSE(v1_edge->second.isRemoved());
+}
+
 
 // -----------------------------------------------------------------------------
 // removeEdge()
@@ -542,18 +561,18 @@ TEST(LWWGraph, addEdgeRemoveVertexConcurrentTest) {
     data0.addEdge("v1", "v2", 21);
     data0.addEdge("v1", "v3", 22);
     data0.addEdge("v2", "v1", 23);
-    data0.addEdge("v2", "v3", 24);
+    data0.addEdge("v1", "v1", 24);
     data0.addEdge("v3", "v1", 25);
 
     // Remove timestamp is last, addEdge must remove edges linked with v1
     // Even if addEdge is called after remove (ex: network latency)
 
     // V1 is deleted as well as all its edges
-    auto v1 = data0.queryVertex("v1");
-    EXPECT_TRUE(v1 != data0.crdt_end());
-    EXPECT_EQ(v1->first, "v1");
-    EXPECT_EQ(v1->second.timestamp(), 100);
-    EXPECT_TRUE(v1->second.isRemoved());
+    auto v1_it = data0.queryVertex("v1");
+    EXPECT_TRUE(v1_it != data0.crdt_end());
+    EXPECT_EQ(v1_it->first, "v1");
+    EXPECT_EQ(v1_it->second.timestamp(), 100);
+    EXPECT_TRUE(v1_it->second.isRemoved());
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
         auto edge_it = edges.query("v1");

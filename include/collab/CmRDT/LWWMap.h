@@ -269,6 +269,7 @@ class LWWMap {
             U keyStamp      = keyElt.timestamp();
 
             if(!keyAdded) {
+                assert(keyStamp != stamp);
                 if(keyStamp < stamp) {
                     if(keyElt._isRemoved == true) {
                         ++_sizeAlive;

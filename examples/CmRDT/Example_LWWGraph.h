@@ -41,15 +41,15 @@ void LWWGraph_example() {
     // At this point, user0 and user1 have actually the same graph.
 
 
-    // User0 add vertex v3 + edge v2 -> v3
-    data0.addEdge("v2", "v3", 140);
+    // User0 add vertex v3 + edge v1 -> v3
+    data0.addEdge("v1", "v3", 140);
 
     // User1 remove vertex v1
     data1.removeVertex("v1", 151);
 
 
     // Broadcast changes
-    data1.addEdge("v2", "v3", 140);
+    data1.addEdge("v1", "v3", 140);
     data0.removeVertex("v1", 151);
 
 
