@@ -1,14 +1,13 @@
 #pragma once
 
+#include <string>
+
 #include "CollabData.h"
 #include "Timestamp.h"
-#include "ViewMDE_Operations.h"
 
 #include "collab/CmRDT/LWWMap.h"
 #include "collab/CmRDT/LWWGraph.h"
 #include "collab/CmRDT/LWWRegister.h"
-
-#include <string>
 
 namespace collab {
 
@@ -37,85 +36,185 @@ class ViewMDE : public CollabData {
         CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _modelMDE;
 
 
+    // -------------------------------------------------------------------------
+    // Operations
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * List all possible Operation on this data.
+         */
+        enum class OperationsType : int {
+            ELEMENT_ADD = 1,
+            ELEMENT_DELETE,
+            ATTRIBUTE_SET,
+        };
+
+        class ElementAddOperation : public Operation {
+            public:
+                friend ViewMDE;
+                const UUID          elementID;
+                const Timestamp     timestamp;
+
+            public:
+
+                ElementAddOperation(const std::string& id, const Timestamp& time)
+                  : elementID(id), timestamp(time) {
+                    _type = static_cast<int>(OperationsType::ELEMENT_ADD);
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(std::stringstream& buffer) {
+                    // TODO
+                    return false;
+                }
+        };
+
+        class ElementDeleteOperation : public Operation {
+            public:
+                friend ViewMDE;
+                const UUID          elementID;
+                const Timestamp     timestamp;
+
+            public:
+
+                ElementDeleteOperation(const std::string& id,
+                                       const Timestamp& time)
+                  : elementID(id), timestamp(time) {
+                    _type = static_cast<int>(OperationsType::ELEMENT_DELETE);
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(std::stringstream& buffer) {
+                    // TODO
+                    return false;
+                }
+        };
+
+        class AttributeSetOperation : public Operation {
+            public:
+                friend ViewMDE;
+                const UUID          elementID;
+                const Timestamp     timestamp;
+                const std::string   attributeName;
+                const std::string   newValue;
+                const std::string   oldValue;
+
+            public:
+
+                AttributeSetOperation(const std::string& id,
+                                      const Timestamp& time,
+                                      const std::string& name,
+                                      const std::string& nVal,
+                                      const std::string& oVal)
+                  : elementID(id), timestamp(time), attributeName(name),
+                    newValue(nVal), oldValue(oVal) {
+                    _type = static_cast<int>(OperationsType::ATTRIBUTE_SET);
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(std::stringstream& buffer) {
+                    // TODO
+                    return false;
+                }
+
+        };
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers methods
+    // -------------------------------------------------------------------------
+
     public:
 
         /**
          * Add element in the View.
+         * Notifies all OperationObservers.
          *
          * \param id The element's ID.
          */
         void addElement(const UUID& id) {
-            auto tnow = Timestamp::now();
-            AddElementOperation op(id, tnow);
-            // TODO: post 'addElement' event to all observers
-            _modelMDE.add_vertex(id, tnow);
-            // Send Operation to back CollabInstance.
+            const ElementAddOperation op = _addElement(id);
+            this->notifyOperationObservers(op);
         }
 
         /**
          * Remove elements from the view.
+         * Notifies all OperationObservers.
          *
          * \param id The element's ID.
          */
         void removeElement(const UUID& id) {
-            auto tnow = Timestamp::now();
-            _modelMDE.remove_vertex(id, tnow);
+            const ElementDeleteOperation op = _removeElement(id);
+            this->notifyOperationObservers(op);
         }
 
         /**
-         * Add attribute inside specific element.
-         *
-         * \param eltID Element's ID.
-         * \param name  Attribute's name.
-         * \param value Attribute's value.
-         */
-        void addAttribute(const UUID& eltID,
-                          const std::string& name,
-                          const std::string& value) {
-            auto tnow = Timestamp::now();
-            auto v = _modelMDE.crdt_find_vertex(eltID);
-            // TODO
-        }
-
-        /**
-         * Remove attribute from the element.
-         *
-         * \param eltID Element's ID.
-         * \param name  Attribute's name.
-         */
-        void removeAttribute(const UUID& eltID, const std::string& name) {
-            auto tnow = Timestamp::now();
-            // TODO
-        }
-
-        /**
-         * Update attribute with new value.
+         * Set value of en attribute.
+         * Creates this attribute if doesn't exists.
+         * If the eltID doesn't exists or has been removed, this also add/re-add
+         * the vertex.
          *
          * \param eltID Element's ID.
          * \param name  Attribute's name.
          * \param value Attribute's new value.
          */
-        void updateAttribute(const UUID& eltID,
-                             const std::string& name,
-                             const std::string& value) {
-            auto tnow = Timestamp::now();
-            // TODO
+        void setAttribute(const UUID& eltID,
+                          const std::string& name,
+                          const std::string& value) {
+            AttributeSetOperation op = _setAttribute(eltID, name, value);
+            this->notifyOperationObservers(op);
         }
 
-        /**
-         * Add a directed link between two elements.
-         *
-         * \param from  ID of element link is starting from.
-         * \param to    ID of element link is going to.
-         */
-        void addLink(const UUID& from, const UUID& to) {
+
+    // -------------------------------------------------------------------------
+    // Internal modifiers methods
+    // -------------------------------------------------------------------------
+
+    private:
+
+        ElementAddOperation _addElement(const UUID& id) {
             auto tnow = Timestamp::now();
-            _modelMDE.add_edge(from, to, tnow);
+            _modelMDE.add_vertex(id, tnow);
+            return {id, tnow};
         }
 
-        void removeLink(const UUID& from, const UUID& to) {
+        ElementDeleteOperation _removeElement(const UUID& id) {
             auto tnow = Timestamp::now();
-            _modelMDE.remove_edge(from, to, tnow);
+            _modelMDE.remove_vertex(id, tnow);
+            return {id, tnow};
+        }
+
+        AttributeSetOperation _setAttribute(const UUID& eltID,
+                          const std::string& name,
+                          const std::string& value) {
+            auto tnow = Timestamp::now();
+
+            _modelMDE.add_vertex(eltID, tnow);
+            auto vertex_it = _modelMDE.find_vertex(eltID);
+            auto& attrMap = vertex_it->second.content();
+
+            attrMap.add(name, tnow);
+            auto attrElt_it = attrMap.find(name);
+            auto& attrElt = attrElt_it->second;
+
+            std::string oldValue = attrElt.query();
+            attrElt.update(value, tnow);
+
+            return {eltID, tnow, name, oldValue, value};
         }
 
 
@@ -124,6 +223,7 @@ class ViewMDE : public CollabData {
     // -------------------------------------------------------------------------
 
     public:
+
         void applyOperation(const Operation& op) {
             // TODO
         }

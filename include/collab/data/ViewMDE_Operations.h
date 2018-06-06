@@ -1,15 +1,16 @@
 #pragma once
 
+#include <string>
+
 #include "Timestamp.h"
 #include "Operation.h"
-
-#include <string>
 
 class ViewMDE;
 
 namespace collab {
 
 
+    /*
 class AddElementOperation : public Operation {
     private:
         friend ViewMDE;
@@ -50,6 +51,7 @@ class AddAttributeOperation : public Operation {
         }
 };
 
+*/
 
 } // End namespace
 

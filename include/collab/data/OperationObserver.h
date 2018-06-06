@@ -31,7 +31,7 @@ class OperationObserver {
          *
          * \param op Reference the operation received.
          */
-        void receiveOperation(const Operation& op);
+        virtual void receiveOperation(const Operation& op) = 0;
 };
 
 

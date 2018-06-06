@@ -18,6 +18,13 @@ namespace collab {
  * Any data used by CollabServer implements this interface. To be fullay CRDT,
  * this data is only composed of CRDTs (From collab/CmRDT for instance).
  *
+ * \par Operation
+ * Any modification on the data creates an Operation that describe this change.
+ * This may be usefull for component using this data to update the display,
+ * for instance, in case of GUI, or broadcase the operation in case of network.
+ * To receive operation, you must register your component as an Observer of
+ * this data.
+ *
  *
  * \author  Constantin Masson
  * \date    May 2018
@@ -56,8 +63,9 @@ class CollabData {
          *
          * \param Reference to the operation to broadcast.
          */
-        void sendOperation(const Operation& op) {
-            for(OperationObserver* const obs : _operationObservers) {
+        void notifyOperationObservers(const Operation& op) {
+            assert(op.getType() != 0); // If 0, you probably forgot to set type
+            for(OperationObserver* obs : _operationObservers) {
                 obs->receiveOperation(op);
             }
         }
@@ -108,7 +116,7 @@ class CollabData {
          * \param type Type supposed for this operation.
          * \param buffer Serialized version of the operation.
          */
-        virtual void applyOperation(const int type, std::stringstream& buffer) = 0;
+        virtual void applyOperation(int type, std::stringstream& buffer) = 0;
 };
 
 
