@@ -457,6 +457,39 @@ TEST(LWWGraph, add_vertexDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, 42, false, 29, data0);
 }
 
+TEST(LWWGraph, add_vertexWithOnlyAddReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // First add vertex
+    ASSERT_TRUE(data0.add_vertex("v1", 20));
+
+    // Any other add_vertex call only update timestamp
+    ASSERT_FALSE(data0.add_vertex("v1", 10));
+    ASSERT_FALSE(data0.add_vertex("v1", 30));
+    ASSERT_FALSE(data0.add_vertex("v1", 40));
+    ASSERT_FALSE(data0.add_vertex("v1", 15));
+
+    // Add another
+    ASSERT_TRUE(data0.add_vertex("v2", 42));
+    ASSERT_FALSE(data0.add_vertex("v2", 41));
+    ASSERT_FALSE(data0.add_vertex("v2", 43));
+}
+
+TEST(LWWGraph, add_vertexWithRemoveVertexReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    ASSERT_TRUE(data0.add_vertex("v1", 20));
+
+    data0.remove_vertex("v1", 10);
+    ASSERT_FALSE(data0.add_vertex("v1", 30));
+
+    data0.remove_vertex("v1", 42);
+    ASSERT_FALSE(data0.add_vertex("v1", 30));
+    ASSERT_TRUE(data0.add_vertex("v1", 64));
+    ASSERT_FALSE(data0.add_vertex("v1", 10));
+    ASSERT_FALSE(data0.add_vertex("v1", 90));
+}
+
 
 // -----------------------------------------------------------------------------
 // remove_vertex()
@@ -533,48 +566,35 @@ TEST(LWWGraph, remove_vertexDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, "v1", true, 29, data0);
 }
 
-
-// -----------------------------------------------------------------------------
-// add_edge() || remove_vertex()
-// -----------------------------------------------------------------------------
-
-TEST(LWWGraph, remove_vertexWithEdgesDuplicateCallsTest) {
+TEST(LWWGraph, remove_vertexReturnTypeTest) {
     LWWGraph<std::string, int, int> data0;
 
-    // Create graph
-    data0.add_vertex("v1", 11);
-    data0.add_vertex("v2", 12);
-    data0.add_vertex("v3", 13);
-    data0.add_vertex("v4", 14);
+    data0.add_vertex("v1", 20);
+    ASSERT_FALSE(data0.remove_vertex("v1", 10));
+    ASSERT_TRUE(data0.remove_vertex("v1", 30));
+    ASSERT_FALSE(data0.remove_vertex("v1", 29));
+}
 
-    data0.add_edge("v1", "v1", 21);
-    data0.add_edge("v1", "v2", 22);
-    data0.add_edge("v1", "v3", 23);
-    data0.add_edge("v1", "v4", 24);
+TEST(LWWGraph, remove_vertexWithRemoveCalledBeforeAddReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
 
-    data0.add_edge("v2", "v1", 25);
-    data0.add_edge("v2", "v3", 26);
+    ASSERT_FALSE(data0.remove_vertex("v1", 20));
 
-    data0.add_edge("v3", "v4", 27);
-    data0.add_edge("v3", "v1", 28);
+    // Add vertex, but already remove later so still return false
+    data0.add_vertex("v1", 15);
+    ASSERT_FALSE(data0.remove_vertex("v1", 10));
+    ASSERT_FALSE(data0.remove_vertex("v1", 30));
+    ASSERT_FALSE(data0.remove_vertex("v1", 40));
+}
 
-    data0.add_edge("v4", "v1", 29);
+TEST(LWWGraph, remove_vertexWithAddVertexReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
 
-    data0.remove_vertex("v1", 30);
-
-    // Remove vertex, should also remove all edges
-    auto res = data0.crdt_find_vertex("v1");
-    _ASSERT_VERTEX_EQ(res, "v1", true, 30, data0);
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
-        auto& edges = it->second.value().edges();
-        auto edge_it = edges.crdt_find("v1");
-        bool isRemoved = edge_it->second.isRemoved();
-        int timestamp = edge_it->second.timestamp();
-
-        ASSERT_TRUE(edge_it != edges.crdt_end()); // They all add edge with v1
-        ASSERT_TRUE(isRemoved);
-        ASSERT_EQ(timestamp, 30);
-    }
+    data0.add_vertex("v1", 20);
+    ASSERT_FALSE(data0.remove_vertex("v1", 10));
+    ASSERT_TRUE(data0.remove_vertex("v1", 30));
+    ASSERT_FALSE(data0.remove_vertex("v1", 29));
+    ASSERT_FALSE(data0.remove_vertex("v1", 31));
 }
 
 
@@ -686,6 +706,26 @@ TEST(LWWGraph, add_edgeWithFromToEqualTest) {
     EXPECT_FALSE(v1_edge->second.isRemoved());
 }
 
+TEST(LWWGraph, add_edgeReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 11);
+    ASSERT_TRUE(data0.add_edge("v1", "v1", 20));
+    ASSERT_FALSE(data0.add_edge("v1", "v1", 19));
+    ASSERT_FALSE(data0.add_edge("v1", "v1", 21));
+}
+
+TEST(LWWGraph, add_edgeBeforeAddVertexReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    ASSERT_TRUE(data0.add_edge("v1", "v2", 42));
+
+    // Since add_edge internally created v1 and v2, add_vertex for v1 and v2
+    // does nothing (From end user point of view. Internally update timestamps).
+    ASSERT_FALSE(data0.add_vertex("v1", 10));
+    ASSERT_FALSE(data0.add_vertex("v2", 20));
+}
+
 
 // -----------------------------------------------------------------------------
 // remove_edge()
@@ -768,10 +808,100 @@ TEST(LWWGraph, remove_edgeBeforeAddedTest) {
     EXPECT_EQ(edge->second.timestamp(), 29);
 }
 
+TEST(LWWGraph, remove_edgeReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v1", 20);
+    data0.add_edge("v1", "v2", 30);
+
+    ASSERT_TRUE(data0.remove_edge("v1", "v2", 40));
+}
+
+TEST(LWWGraph, remove_edgeCalledBeforeAddEdgeReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    ASSERT_FALSE(data0.remove_edge("v1", "v2", 20));
+
+    // Add but already removed
+    ASSERT_FALSE(data0.add_edge("v1", "v2", 10));
+    ASSERT_FALSE(data0.add_edge("v1", "v2", 19));
+
+    // Add after remove (Re-add)
+    ASSERT_TRUE(data0.add_edge("v1", "v2", 30));
+    ASSERT_FALSE(data0.add_edge("v1", "v2", 31));
+}
+
+TEST(LWWGraph, remove_edgeCalledBeforeAddVertexReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Mark edge as removed + creates tmp vertex with minimal timestamp.
+    ASSERT_FALSE(data0.remove_edge("v1", "v2", 20));
+
+    // Add the vertex creates them for user view (But only updates time)
+    ASSERT_TRUE(data0.add_vertex("v1", 10));
+    ASSERT_TRUE(data0.add_vertex("v2", 20));
+}
+
+TEST(LWWGraph, remove_edgeFirstThenAddEdgeThenAddVertexReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Mark edge as removed + creates tmp vertex with minimal timestamp.
+    ASSERT_FALSE(data0.remove_edge("v1", "v2", 42));
+
+    // Add edge, but already removed. User doesn't see anything
+    ASSERT_FALSE(data0.add_edge("v1", "v2", 20));
+    ASSERT_FALSE(data0.add_edge("v1", "v2", 30)); // Duplicate call
+
+    // Add the vertex creates them for user view (But only updates time)
+    ASSERT_TRUE(data0.add_vertex("v1", 10));
+    ASSERT_TRUE(data0.add_vertex("v2", 20));
+}
+
 
 // -----------------------------------------------------------------------------
 // add_edge() || remove_vertex()
 // -----------------------------------------------------------------------------
+
+TEST(LWWGraph, remove_vertexWithEdgesDuplicateCallsTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Create graph
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+    data0.add_vertex("v4", 14);
+
+    data0.add_edge("v1", "v1", 21);
+    data0.add_edge("v1", "v2", 22);
+    data0.add_edge("v1", "v3", 23);
+    data0.add_edge("v1", "v4", 24);
+
+    data0.add_edge("v2", "v1", 25);
+    data0.add_edge("v2", "v3", 26);
+
+    data0.add_edge("v3", "v4", 27);
+    data0.add_edge("v3", "v1", 28);
+
+    data0.add_edge("v4", "v1", 29);
+
+    data0.remove_vertex("v1", 30);
+
+    // Remove vertex, should also remove all edges
+    auto res = data0.crdt_find_vertex("v1");
+    _ASSERT_VERTEX_EQ(res, "v1", true, 30, data0);
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        auto& edges = it->second.value().edges();
+        auto edge_it = edges.crdt_find("v1");
+        bool isRemoved = edge_it->second.isRemoved();
+        int timestamp = edge_it->second.timestamp();
+
+        ASSERT_TRUE(edge_it != edges.crdt_end()); // They all add edge with v1
+        ASSERT_TRUE(isRemoved);
+        ASSERT_EQ(timestamp, 30);
+    }
+}
+
 
 TEST(LWWGraph, add_edgeRemoveVertexConcurrentTest) {
     LWWGraph<std::string, int, int> data0;

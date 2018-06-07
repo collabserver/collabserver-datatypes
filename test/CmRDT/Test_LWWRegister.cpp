@@ -1,6 +1,8 @@
 #include "collab/CmRDT/LWWRegister.h"
 #include <gtest/gtest.h>
 
+#include <string>
+
 namespace collab {
 namespace CmRDT {
 
@@ -64,6 +66,25 @@ TEST(LWWRegister, updateTest) {
     data0.update(333, 3);
     ASSERT_EQ(data0.query(), 999);
     ASSERT_EQ(data0.timestamp(), 9);
+}
+
+TEST(LWWRegister, updateReturnTypeTest) {
+    LWWRegister<std::string, int> data0;
+
+    bool applied = data0.update("LittleRabbit", 10);
+    ASSERT_TRUE(applied);
+
+    applied = data0.update("SuperCarrot", 42);
+    ASSERT_TRUE(applied);
+
+    applied = data0.update("Toto", 20);
+    ASSERT_FALSE(applied);
+
+    applied = data0.update("Banana", 30);
+    ASSERT_FALSE(applied);
+
+    applied = data0.update("MagicCarrot", 64);
+    ASSERT_TRUE(applied);
 }
 
 

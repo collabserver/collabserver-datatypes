@@ -158,7 +158,7 @@ class LWWMap {
          *
          * \return Internal size of the container.
          */
-        float crdt_size() const {
+        size_type crdt_size() const {
             return _map.size();
         }
 
@@ -278,10 +278,13 @@ class LWWMap {
          *
          * \par Concurrent add / add
          * Timestamp is updated with the higher value. Key is added in any case.
+         * Returns false. This is because, it only updates timestamp of the
+         * operation. Key was already added in container before the operation.
          *
          * \par Concurrent add / remove
          * Uses the higher timestamp select the winning operation.
          * If remove timestamp wins, this add operation does nothing.
+         * Otherwise, add is applied and true is returned.
          *
          * \note
          * This only adds the key. A default element is created.
@@ -290,29 +293,35 @@ class LWWMap {
          *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
+         * \return True if key added, otherwise, return false.
          */
-        void add(const Key& key, const U& stamp) {
-            Element elt(key); // Content is not set here
-            elt._timestamp  = stamp;
-            elt._isRemoved  = false;
+        bool add(const Key& key, const U& stamp) {
+            Element newElt(key); // Content is not set here
+            newElt._timestamp  = stamp;
+            newElt._isRemoved  = false;
 
-            auto res        = _map.insert(std::make_pair(key, elt));
-            bool keyAdded   = res.second;
-            Element& keyElt = res.first->second;
-            U keyStamp      = keyElt.timestamp();
+            auto coco_it        = _map.insert(std::make_pair(key, newElt));
+            bool isKeyAdded     = coco_it.second;
+            Element& elt        = coco_it.first->second;
+            const U& keyStamp   = elt.timestamp();
 
-            if(!keyAdded) {
+            if(!isKeyAdded) {
                 assert(keyStamp != stamp);
-                if(keyStamp < stamp) {
-                    if(keyElt._isRemoved == true) {
+
+                if(stamp > keyStamp) {
+                    elt._timestamp = stamp;
+
+                    if(elt._isRemoved == true) {
+                        elt._isRemoved = false;
                         ++_sizeAlive;
+                        return true;
                     }
-                    keyElt._timestamp = stamp;
-                    keyElt._isRemoved = false;
                 }
+                return false;
             }
             else {
                 ++_sizeAlive;
+                return true;
             }
         }
 
@@ -324,28 +333,38 @@ class LWWMap {
          * received before add. (Note that receiving the actual add wont do
          * anything since its timestamps will be smaller).
          *
+         * If element is removed, returns true. In case element was already
+         * removed, returns false (Though timestamps may have been internally
+         * updated for CRDT properties). Note that remove may be called before
+         * add, this returns false anyway.
+         *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
+         * \return True if key removed, otherwise, return false.
          */
-        void remove(const Key& key, const U& stamp) {
-            Element elt(key); // Content is not set here
-            elt._timestamp  = stamp;
-            elt._isRemoved  = true;
+        bool remove(const Key& key, const U& stamp) {
+            Element newElt(key); // Content is not set here
+            newElt._timestamp   = stamp;
+            newElt._isRemoved   = true;
 
-            auto res        = _map.insert(std::make_pair(key, elt));
-            bool keyAdded   = res.second;
-            Element& keyElt = res.first->second;
-            U keyStamp      = keyElt.timestamp();
+            auto coco_it        = _map.insert(std::make_pair(key, newElt));
+            bool isKeyAdded       = coco_it.second;
+            Element& elt        = coco_it.first->second;
+            const U& keyStamp   = elt.timestamp();
 
-            if(!keyAdded) {
-                if(keyStamp < stamp) {
-                    if(keyElt._isRemoved == false) {
+            if(!isKeyAdded) {
+
+                if(stamp > keyStamp) {
+                    elt._timestamp = stamp;
+
+                    if(elt._isRemoved == false) {
+                        elt._isRemoved = true;
                         --_sizeAlive;
+                        return true;
                     }
-                    keyElt._timestamp = stamp;
-                    keyElt._isRemoved = true;
                 }
             }
+            return false; // DevNote: see LWWSet::remove
         }
 
 
@@ -506,20 +525,20 @@ class LWWMap {
             // Dev note: in the worst case, this is N2 complexity.
             // See note in LWWSet::operator==
             for(const auto& elt : lhs) {
-                const_iterator other = rhs.find(elt.first);;
-                if(other == rhs.cend()){
+                const_iterator other_it = rhs.find(elt.first);;
+                if(other_it == rhs.cend()){
                     return false;
                 }
-                if(elt.second != other->second) {
+                if(elt.second != other_it->second) {
                     return false;
                 }
             }
             for(const auto& elt: rhs) {
-                const auto other = lhs.find(elt.first);
-                if(other == lhs.cend()) {
+                const auto other_it = lhs.find(elt.first);
+                if(other_it == lhs.cend()) {
                     return false;
                 }
-                if(elt.second != other->second) {
+                if(elt.second != other_it->second) {
                     return false;
                 }
             }

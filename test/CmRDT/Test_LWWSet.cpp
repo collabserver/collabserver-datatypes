@@ -169,6 +169,32 @@ TEST(LWWSet, sizeWithOlderRemoveAfterAddTest) {
 
 
 // -----------------------------------------------------------------------------
+// crdt_size()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, crdt_sizeTest) {
+    LWWSet<int, int> data0;
+
+    // Add element and test
+    ASSERT_EQ(data0.crdt_size(), 0);
+    data0.add(1, 10);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    data0.add(2, 20);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    data0.add(3, 30);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    // Remove element, size won't change.
+    data0.remove(1, 100);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(2, 200);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    data0.remove(3, 300);
+    ASSERT_EQ(data0.crdt_size(), 3);
+}
+
+
+// -----------------------------------------------------------------------------
 // count()
 // -----------------------------------------------------------------------------
 TEST(LWWSet, countTest) {
@@ -359,6 +385,44 @@ TEST(LWWSet, addDuplicateCallsTest) {
     _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
+TEST(LWWSet, addReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    // First add the element.
+    ASSERT_TRUE(data0.add("coco", 20));
+
+    // Now, only update timestamp, but was already added
+    ASSERT_FALSE(data0.add("coco", 10));
+    ASSERT_FALSE(data0.add("coco", 15));
+    ASSERT_FALSE(data0.add("coco", 32));
+    ASSERT_FALSE(data0.add("coco", 64));
+
+    // Another test for fun
+    ASSERT_TRUE(data0.add("carrot", 1024));
+    ASSERT_FALSE(data0.add("carrot", 1023));
+    ASSERT_FALSE(data0.add("carrot", 2048));
+}
+
+TEST(LWWSet, addReturnTypeWithRemoveCalled) {
+    LWWSet<std::string, int> data0;
+
+    ASSERT_TRUE(data0.add("coco", 10));
+
+    data0.remove("coco", 42);
+    ASSERT_FALSE(data0.add("coco", 20));
+    ASSERT_FALSE(data0.add("coco", 30));
+    ASSERT_FALSE(data0.add("coco", 40));
+    ASSERT_TRUE(data0.add("coco", 50));
+
+    data0.remove("coco", 10);
+    ASSERT_FALSE(data0.add("coco", 60));
+
+    data0.remove("coco", 512);
+    ASSERT_FALSE(data0.add("coco", 70));
+    ASSERT_FALSE(data0.add("coco", 511));
+    ASSERT_TRUE(data0.add("coco", 513));
+}
+
 
 // -----------------------------------------------------------------------------
 // remove()
@@ -409,6 +473,34 @@ TEST(LWWSet, removeCalledBeforeAddCallTest) {
     data0.remove(42, 20);
     res = data0.crdt_find(42);
     _ASSERT_ELT_EQ(res, 42, true, 20, data0);
+}
+
+TEST(LWWSet, removeCalledFirstReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    ASSERT_FALSE(data0.remove("coco", 20));
+    ASSERT_FALSE(data0.remove("coco", 10));
+    ASSERT_FALSE(data0.remove("coco", 30));
+
+    data0.add("coco", 15);
+    ASSERT_FALSE(data0.remove("coco", 40));
+
+    data0.add("coco", 80);
+    ASSERT_TRUE(data0.remove("coco", 90));
+}
+
+TEST(LWWSet, removeReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    // Normal add / remove test
+    data0.add("coco", 20);
+    ASSERT_FALSE(data0.remove("coco", 10));
+    ASSERT_TRUE(data0.remove("coco", 30));
+
+    // Duplicate remove
+    ASSERT_FALSE(data0.remove("coco", 40));
+    ASSERT_FALSE(data0.remove("coco", 50));
+    ASSERT_FALSE(data0.remove("coco", 60));
 }
 
 
@@ -495,32 +587,6 @@ TEST(LWWSet, reserveTest) {
     // Not sure how to test it at this exact terrible moment.
     // For now, just do a call to be sure it compiles.
     data0.reserve(10);
-}
-
-
-// -----------------------------------------------------------------------------
-// crdt_size()
-// -----------------------------------------------------------------------------
-
-TEST(LWWSet, crdt_sizeTest) {
-    LWWSet<int, int> data0;
-
-    // Add element and test
-    ASSERT_EQ(data0.crdt_size(), 0);
-    data0.add(1, 10);
-    ASSERT_EQ(data0.crdt_size(), 1);
-    data0.add(2, 20);
-    ASSERT_EQ(data0.crdt_size(), 2);
-    data0.add(3, 30);
-    ASSERT_EQ(data0.crdt_size(), 3);
-
-    // Remove element, size won't change.
-    data0.remove(1, 100);
-    ASSERT_EQ(data0.crdt_size(), 3);
-    data0.remove(2, 200);
-    ASSERT_EQ(data0.crdt_size(), 3);
-    data0.remove(3, 300);
-    ASSERT_EQ(data0.crdt_size(), 3);
 }
 
 
@@ -701,7 +767,7 @@ TEST(LWWSet, crdt_equalEmptyVsAddTest) {
 
 
 // -----------------------------------------------------------------------------
-// Iterator Tests (Normal iterator)
+// iterator
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, iteratorAddRemoveTest) {
@@ -799,10 +865,10 @@ TEST(LWWSet, iteratorReferenceTest) {
 
 
 // -----------------------------------------------------------------------------
-// Iterator Tests (crdt iterator)
+// crdt iterator
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdtIteratorAddRemoveTest) {
+TEST(LWWSet, crdt_iteratorAddRemoveTest) {
     LWWSet<int, int> data0;
 
     // Add some elements and test iteration
@@ -843,7 +909,7 @@ TEST(LWWSet, crdtIteratorAddRemoveTest) {
     EXPECT_EQ(k, 8);
 }
 
-TEST(LWWSet, crdtIteratorEmptyTest) {
+TEST(LWWSet, crdt_iteratorEmptyTest) {
     LWWSet<int, int> data0;
 
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
@@ -851,7 +917,7 @@ TEST(LWWSet, crdtIteratorEmptyTest) {
     }
 }
 
-TEST(LWWSet, crdtIteratorRemovedTest) {
+TEST(LWWSet, crdt_iteratorRemovedTest) {
     LWWSet<int, int> data0;
 
     // Fill set with removed elt (Yes, we don't even need add before).
@@ -897,7 +963,7 @@ TEST(LWWSet, crdtIteratorRemovedTest) {
     ASSERT_EQ(k, 5);
 }
 
-TEST(LWWSet, crdtIteratorReferenceTest) {
+TEST(LWWSet, crdt_iteratorReferenceTest) {
     LWWSet<int, int> data0;
 
     // Simple test add then remove

@@ -132,7 +132,7 @@ class LWWSet {
          *
          * \return Internal size of the container.
          */
-        float crdt_size() const {
+        size_type crdt_size() const {
             return _map.size();
         }
 
@@ -230,36 +230,45 @@ class LWWSet {
          *
          * \par Concurrent add / add
          * Timestamp is updated with the higher value. Key is added in any case.
+         * Returns false. This is because, it only updates timestamp of the
+         * operation. Key was already added in container before the operation.
          *
          * \par Concurrent add / remove
          * Uses the higher timestamp select the winning operation.
          * If remove timestamp wins, this add operation does nothing.
+         * Otherwise, add is applied and true is returned.
          *
          * \param key   Key element to add.
          * \param stamp Timestamps of this operation.
+         * \return True if key added, otherwise, return false.
          */
-        void add(const Key& key, const U& stamp) {
-            Metadata elt; // Content is not set here
-            elt._timestamp  = stamp;
-            elt._isRemoved  = false;
+        bool add(const Key& key, const U& stamp) {
+            Metadata newElt;    // DevNote: Content is not set here
+            newElt._timestamp   = stamp;
+            newElt._isRemoved   = false;
 
-            auto res        = _map.insert(std::make_pair(key, elt));
-            bool isKeyAdded = res.second;
-            Metadata& keyElt= res.first->second;
-            U keyStamp      = keyElt.timestamp();
+            auto coco_it        = _map.insert(std::make_pair(key, newElt));
+            bool isKeyAdded     = coco_it.second;
+            Metadata& elt       = coco_it.first->second;
+            const U& keyStamp   = elt.timestamp();
 
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
-                if(keyStamp < stamp) {
-                    if(keyElt._isRemoved == true) {
+
+                if(stamp > keyStamp) {
+                    elt._timestamp = stamp;
+
+                    if(elt._isRemoved == true) {
+                        elt._isRemoved = false;
                         ++_sizeAlive;
+                        return true;
                     }
-                    keyElt._timestamp = stamp;
-                    keyElt._isRemoved = false;
                 }
+                return false;
             }
             else {
                 ++_sizeAlive;
+                return true;
             }
         }
 
@@ -271,29 +280,42 @@ class LWWSet {
          * received before add. (Note that receiving the actual add wont do
          * anything since its timestamps will be smaller).
          *
+         * If element is removed, returns true. In case element was already
+         * removed, returns false (Though timestamps may have been internally
+         * updated for CRDT properties). Note that remove may be called before
+         * add, this returns false anyway.
+         *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
+         * \return True if key removed, otherwise, return false.
          */
-        void remove(const Key& key, const U& stamp) {
-            Metadata elt; // Content is not set here
-            elt._timestamp  = stamp;
-            elt._isRemoved  = true;
+        bool remove(const Key& key, const U& stamp) {
+            Metadata newElt;    // Content is not set here
+            newElt._timestamp   = stamp;
+            newElt._isRemoved   = true;
 
-            auto res        = _map.insert(std::make_pair(key, elt));
-            bool isKeyAdded = res.second;
-            Metadata& keyElt= res.first->second;
-            U keyStamp      = keyElt.timestamp();
+            auto coco_it        = _map.insert(std::make_pair(key, newElt));
+            bool isKeyAdded     = coco_it.second;
+            Metadata& elt       = coco_it.first->second;
+            const U& keyStamp   = elt.timestamp();
 
             if(!isKeyAdded) {
                 assert(keyStamp != stamp);
-                if(keyStamp < stamp) {
-                    if(keyElt._isRemoved == false) {
+
+                if(stamp > keyStamp) {
+                    elt._timestamp = stamp;
+
+                    if(elt._isRemoved == false) {
+                        elt._isRemoved = true;
                         --_sizeAlive;
+                        return true;
                     }
-                    keyElt._timestamp = stamp;
-                    keyElt._isRemoved = true;
                 }
             }
+            // DevNote: in case remove called before even add, remove does the
+            // CRDT job (add and mark as deleted). However, from user point of
+            // view, this did nothing.
+            return false;
         }
 
 

@@ -35,7 +35,7 @@ namespace CmRDT {
  *
  * \warning
  * T template parameter must have a default constructor.
- * U timestamp must accept "U t = 0" (This should set with minimal value).
+ * U timestamp must accept "U t = {0}" (This should set with minimal value).
  *
  *
  * \tparam T    Type of element (Register content).
@@ -47,8 +47,8 @@ namespace CmRDT {
 template<typename T, typename U>
 class LWWRegister {
     private:
-        T   _reg;           // TODO: We should create init constructor?
-        U   _timestamp = 0; // TODO: this may create some trouble. See bug
+        T   _reg;               // TODO: We should create init constructor?
+        U   _timestamp = {0};   // TODO: this may create some trouble?
 
 
     // -------------------------------------------------------------------------
@@ -70,16 +70,23 @@ class LWWRegister {
          * Change the local register value.
          * Do nothing if given stamp is less to the current timestamps.
          *
+         * Returns true if update has been applied. For instance, if timestmap
+         * was already higher, update is actually not done and value stay as
+         * it was before. (CRDT Property)
+         *
          * \param value New value to place in this register.
          * \param stamp Timestamp of this update.
+         * \return True if update applied, otherwise, returns false.
          */
-        void update(const T& value, const U& stamp) {
+        bool update(const T& value, const U& stamp) {
             assert(stamp != _timestamp);
 
             if(stamp > _timestamp) {
                 _reg = value;
                 _timestamp = stamp;
+                return true;
             }
+            return false;
         }
 
         /**

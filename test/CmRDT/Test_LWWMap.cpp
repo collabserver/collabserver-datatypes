@@ -407,6 +407,44 @@ TEST(LWWMap, addDuplicateCallsTest) {
     _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
+TEST(LWWMap, addReturnTypeTest) {
+    LWWMap<std::string, int, int> data0;
+
+    // First add the element.
+    ASSERT_TRUE(data0.add("coco", 20));
+
+    // Now, only update timestamp, but was already added
+    ASSERT_FALSE(data0.add("coco", 10));
+    ASSERT_FALSE(data0.add("coco", 15));
+    ASSERT_FALSE(data0.add("coco", 32));
+    ASSERT_FALSE(data0.add("coco", 64));
+
+    // Another test for fun
+    ASSERT_TRUE(data0.add("carrot", 1024));
+    ASSERT_FALSE(data0.add("carrot", 1023));
+    ASSERT_FALSE(data0.add("carrot", 2048));
+}
+
+TEST(LWWMap, addReturnTypeWithRemoveCalled) {
+    LWWMap<std::string, int, int> data0;
+
+    ASSERT_TRUE(data0.add("coco", 10));
+
+    data0.remove("coco", 42);
+    ASSERT_FALSE(data0.add("coco", 20));
+    ASSERT_FALSE(data0.add("coco", 30));
+    ASSERT_FALSE(data0.add("coco", 40));
+    ASSERT_TRUE(data0.add("coco", 50));
+
+    data0.remove("coco", 10);
+    ASSERT_FALSE(data0.add("coco", 60));
+
+    data0.remove("coco", 512);
+    ASSERT_FALSE(data0.add("coco", 70));
+    ASSERT_FALSE(data0.add("coco", 511));
+    ASSERT_TRUE(data0.add("coco", 513));
+}
+
 
 // -----------------------------------------------------------------------------
 // remove()
@@ -457,6 +495,34 @@ TEST(LWWMap, removeCalledBeforeAddCallTest) {
     data0.remove(42, 20);
     res = data0.crdt_find(42);
     _ASSERT_ELT_EQ(res, 42, true, 20, data0);
+}
+
+TEST(LWWMap, removeCalledFirstReturnTypeTest) {
+    LWWMap<std::string, int, int> data0;
+
+    ASSERT_FALSE(data0.remove("coco", 20));
+    ASSERT_FALSE(data0.remove("coco", 10));
+    ASSERT_FALSE(data0.remove("coco", 30));
+
+    data0.add("coco", 15);
+    ASSERT_FALSE(data0.remove("coco", 40));
+
+    data0.add("coco", 80);
+    ASSERT_TRUE(data0.remove("coco", 90));
+}
+
+TEST(LWWMap, removeReturnTypeTest) {
+    LWWMap<std::string, int, int> data0;
+
+    // Normal add / remove test
+    data0.add("coco", 20);
+    ASSERT_FALSE(data0.remove("coco", 10));
+    ASSERT_TRUE(data0.remove("coco", 30));
+
+    // Duplicate remove
+    ASSERT_FALSE(data0.remove("coco", 40));
+    ASSERT_FALSE(data0.remove("coco", 50));
+    ASSERT_FALSE(data0.remove("coco", 60));
 }
 
 

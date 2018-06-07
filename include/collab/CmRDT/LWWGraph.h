@@ -278,10 +278,13 @@ class LWWGraph {
          *
          * \par Concurrent add_vertex / add_vertex
          * Timestamp is updated with the higher value. Key is added in any case.
+         * Returns false. This is because, it only updates timestamp of the
+         * operation. Key was already added in container before the operation.
          *
          * \par Concurrent add_vertex / remove_vertex
          * Uses the higher timestamp select the winning operation.
          * If remove timestamp wins, this add operation does nothing.
+         * Otherwise, add is applied and true is returned.
          *
          * \note
          * This only adds the key. A default vertex is created.
@@ -290,9 +293,10 @@ class LWWGraph {
          *
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
+         * \return True if vertex added, otherwise, return false.
          */
-        void add_vertex(const Key& key, const U& stamp) {
-            _adj.add(key, stamp);
+        bool add_vertex(const Key& key, const U& stamp) {
+            return _adj.add(key, stamp);
         }
 
         /**
@@ -313,24 +317,28 @@ class LWWGraph {
          *
          * \param key   The unique vertex's key.
          * \param stamp Timestamp of this operation.
+         * \return True if vertex removed, otherwise, return false.
          */
-        void remove_vertex(const Key& key, const U& stamp) {
-            _adj.remove(key, stamp);
+        bool remove_vertex(const Key& key, const U& stamp) {
+            if(_adj.remove(key, stamp)) {
 
-            // Remove all vertex's edges
-            auto from_it = _adj.crdt_find(key);
-            auto& edges = from_it->second.value()._edges;
-            for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
-                edges.remove(it->first, stamp);
-            }
-
-            // Remove all edge to this vertex (On others vertex)
-            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                auto& edges = it->second.value()._edges;
-                if(it->first != key && edges.count(key) == 1) {
-                    edges.remove(key, stamp);
+                // Remove all vertex's edges
+                auto from_it = _adj.crdt_find(key);
+                auto& edges = from_it->second.value()._edges;
+                for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
+                    edges.remove(it->first, stamp);
                 }
+
+                // Remove all edge to this vertex (On others vertex)
+                for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+                    auto& edges = it->second.value()._edges;
+                    if(it->first != key && edges.count(key) == 1) {
+                        edges.remove(key, stamp);
+                    }
+                }
+                return true;
             }
+            return false;
         }
 
         /**
@@ -349,21 +357,21 @@ class LWWGraph {
          * \param from  The origin vertex.
          * \param to    The destination vertex.
          */
-        void add_edge(const Key& from, const Key& to, const U& stamp) {
+        bool add_edge(const Key& from, const Key& to, const U& stamp) {
             _adj.add(from, stamp);
             if(from != to) {
                 _adj.add(to, stamp);
             }
 
             auto from_it = _adj.crdt_find(from);
-            Vertex &v = from_it->second.value();
-            v._edges.add(to, stamp);
+            Vertex& vertex = from_it->second.value();
+            bool isAdded = vertex._edges.add(to, stamp);
 
             // If edge added, check whether vertex from or to are not removed.
             // If one of them is removed, this newly created edge must be
             // removed now. (important for CRDT commutativity)
 
-            auto from_edge_it = v.edges().crdt_find(to);
+            auto from_edge_it = vertex.edges().crdt_find(to);
             if(!from_edge_it->second.isRemoved()) {
                 auto vertex_it_from = _adj.crdt_find(from);
                 auto vertex_it_to = _adj.crdt_find(to);
@@ -377,9 +385,11 @@ class LWWGraph {
                     U to_time   = vertex_it_to->second.timestamp();
                     U high_time  = (from_time > to_time) ? from_time : to_time;
 
-                    v._edges.remove(to, high_time);
+                    vertex._edges.remove(to, high_time);
+                    return false;
                 }
             }
+            return isAdded;
         }
 
         /**
@@ -393,15 +403,15 @@ class LWWGraph {
          * \param from  The origin vertex.
          * \param to    The destination vertex.
          */
-        void remove_edge(const Key& from, const Key& to, const U& stamp) {
+        bool remove_edge(const Key& from, const Key& to, const U& stamp) {
             _adj.remove(from, 0);
             if(from != to) {
                 _adj.remove(to, 0);
             }
 
-            auto res = _adj.crdt_find(from);
-            Vertex &v = res->second.value();
-            v._edges.remove(to, stamp);
+            auto coco_it = _adj.crdt_find(from);
+            Vertex &v = coco_it->second.value();
+            return v._edges.remove(to, stamp);
         }
 
 
