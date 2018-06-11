@@ -902,7 +902,6 @@ TEST(LWWGraph, remove_vertexWithEdgesDuplicateCallsTest) {
     }
 }
 
-
 TEST(LWWGraph, add_edgeRemoveVertexConcurrentTest) {
     LWWGraph<std::string, int, int> data0;
 
@@ -939,6 +938,89 @@ TEST(LWWGraph, add_edgeRemoveVertexConcurrentTest) {
         ASSERT_TRUE(isRemoved);
         ASSERT_EQ(timestamp, 100);
     }
+}
+
+TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    // data0 initial state
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+    data0.add_edge("v1", "v2", 21);
+    data0.add_edge("v2", "v3", 22);
+
+    // data1 initial state
+    data1.add_vertex("v1", 11);
+    data1.add_vertex("v2", 12);
+    data1.add_vertex("v3", 13);
+    data1.add_edge("v1", "v2", 21);
+    data1.add_edge("v2", "v3", 22);
+
+    // For now, data0 == data1
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+
+    // data1 remove vertex
+    data1.remove_vertex("v2", 30);
+    // data0 add edge v2 -> v2, which re-add the v2 vertex.
+    data0.add_edge("v2", "v2", 40);
+
+    // Broadcast changes
+    data0.remove_vertex("v2", 30);
+    data1.add_edge("v2", "v2", 40);
+
+    // Should be same
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+    // Check internal state of v1, v2 and v3
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v1"), "v1", false, 21, data0);
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v2"), "v2", false, 40, data0);
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v3"), "v3", false, 22, data0);
+}
+
+TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+    LWWGraph<std::string, int, int> data1;
+
+    // data0 initial state
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+    data0.add_edge("v1", "v2", 21);
+    data0.add_edge("v2", "v3", 22);
+
+    // data1 initial state
+    data1.add_vertex("v1", 11);
+    data1.add_vertex("v2", 12);
+    data1.add_vertex("v3", 13);
+    data1.add_edge("v1", "v2", 21);
+    data1.add_edge("v2", "v3", 22);
+
+    // For now, data0 == data1
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+
+    // data1 remove vertex. data0 add edge v2->v2 (Re-add v2)
+    ASSERT_TRUE(data1.remove_vertex("v2", 30));
+    ASSERT_TRUE(data0.add_edge("v2", "v2", 40));
+
+    // Broadcast changes
+    ASSERT_FALSE(data0.remove_vertex("v2", 30)); // Not actually applied: false
+    ASSERT_TRUE(data1.add_edge("v2", "v2", 40));
+
+    // Should be same
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+
+    // Check internal state of v1, v2 and v3
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v1"), "v1", false, 21, data0);
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v2"), "v2", false, 40, data0);
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v3"), "v3", false, 22, data0);
 }
 
 

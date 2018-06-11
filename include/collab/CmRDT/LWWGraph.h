@@ -320,25 +320,24 @@ class LWWGraph {
          * \return True if vertex removed, otherwise, return false.
          */
         bool remove_vertex(const Key& key, const U& stamp) {
-            if(_adj.remove(key, stamp)) {
+            bool isVertexRemoved = _adj.remove(key, stamp);
 
-                // Remove all vertex's edges
-                auto from_it = _adj.crdt_find(key);
-                auto& edges = from_it->second.value()._edges;
-                for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
-                    edges.remove(it->first, stamp);
-                }
-
-                // Remove all edge to this vertex (On others vertex)
-                for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                    auto& edges = it->second.value()._edges;
-                    if(it->first != key && edges.count(key) == 1) {
-                        edges.remove(key, stamp);
-                    }
-                }
-                return true;
+            // Remove all vertex's edges
+            auto from_it = _adj.crdt_find(key);
+            auto& edges = from_it->second.value()._edges;
+            for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
+                edges.remove(it->first, stamp);
             }
-            return false;
+
+            // Remove all edge to this vertex (On others vertex)
+            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+                auto& edges = it->second.value()._edges;
+                if(it->first != key && edges.count(key) == 1) {
+                    edges.remove(key, stamp);
+                }
+            }
+
+            return isVertexRemoved;
         }
 
         /**
