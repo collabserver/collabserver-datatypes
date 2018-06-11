@@ -10,6 +10,15 @@
 namespace collab {
 namespace CmRDT {
 
+/**
+ * Information used by add_edge method.
+ */
+struct AddEdgeInfo {
+    bool isEdgeAdded;
+    bool isFromAdded;
+    bool isToAdded;
+};
+
 
 /**
  * \brief
@@ -355,11 +364,14 @@ class LWWGraph {
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
+         * \return Structure to know if edge, from and/or, to where added.
          */
-        bool add_edge(const Key& from, const Key& to, const U& stamp) {
-            _adj.add(from, stamp);
+        AddEdgeInfo add_edge(const Key& from, const Key& to, const U& stamp) {
+            AddEdgeInfo info;
+            info.isFromAdded = _adj.add(from, stamp);
+            info.isToAdded = false;
             if(from != to) {
-                _adj.add(to, stamp);
+                info.isToAdded = _adj.add(to, stamp);
             }
 
             auto from_it = _adj.crdt_find(from);
@@ -385,10 +397,12 @@ class LWWGraph {
                     U high_time  = (from_time > to_time) ? from_time : to_time;
 
                     vertex._edges.remove(to, high_time);
-                    return false;
+                    info.isEdgeAdded = false;
+                    return info;
                 }
             }
-            return isAdded;
+            info.isEdgeAdded = isAdded;
+            return info;
         }
 
         /**
@@ -401,6 +415,7 @@ class LWWGraph {
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
+         * \return True if edge removed, otherwise, return false.
          */
         bool remove_edge(const Key& from, const Key& to, const U& stamp) {
             _adj.remove(from, 0);

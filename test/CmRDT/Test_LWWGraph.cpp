@@ -12,6 +12,13 @@
     EXPECT_EQ(vertex_it->second.isRemoved(), is_removed); \
     EXPECT_EQ(vertex_it->second.timestamp(), stamp_)
 
+// Check AddEdgeInfo data
+#define _ASSERT_ADD_EDGE_INFO_EQ(info_, edge_added_, from_added_, to_added_) \
+    ASSERT_EQ(info_.isEdgeAdded, edge_added_); \
+    ASSERT_EQ(info_.isFromAdded, from_added_); \
+    ASSERT_EQ(info_.isToAdded, to_added_)
+
+
 namespace collab {
 namespace CmRDT {
 
@@ -710,20 +717,39 @@ TEST(LWWGraph, add_edgeReturnTypeTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
-    ASSERT_TRUE(data0.add_edge("v1", "v1", 20));
-    ASSERT_FALSE(data0.add_edge("v1", "v1", 19));
-    ASSERT_FALSE(data0.add_edge("v1", "v1", 21));
+
+    auto res1 = data0.add_edge("v1", "v1", 20);
+    auto res2 = data0.add_edge("v1", "v1", 19);
+    auto res3 = data0.add_edge("v1", "v1", 21);
+
+    _ASSERT_ADD_EDGE_INFO_EQ(res1, true, false, false);
+    _ASSERT_ADD_EDGE_INFO_EQ(res2, false, false, false);
+    _ASSERT_ADD_EDGE_INFO_EQ(res3, false, false, false);
 }
 
 TEST(LWWGraph, add_edgeBeforeAddVertexReturnTypeTest) {
     LWWGraph<std::string, int, int> data0;
 
-    ASSERT_TRUE(data0.add_edge("v1", "v2", 42));
+    auto coco = data0.add_edge("v1", "v2", 42);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco, true, true, true);
 
     // Since add_edge internally created v1 and v2, add_vertex for v1 and v2
     // does nothing (From end user point of view. Internally update timestamps).
     ASSERT_FALSE(data0.add_vertex("v1", 10));
     ASSERT_FALSE(data0.add_vertex("v2", 20));
+}
+
+TEST(LWWGraph, add_edgeWithToAndFromEqualReturnTypeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // v1 (Edge without add vertex)
+    auto coco = data0.add_edge("v1", "v1", 42);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco, true, true, false); // See doc
+
+    // v2 (Edge with add vertex first)
+    data0.add_vertex("v2", 11);
+    coco = data0.add_edge("v2", "v2", 20);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco, true, false, false);
 }
 
 
@@ -823,13 +849,20 @@ TEST(LWWGraph, remove_edgeCalledBeforeAddEdgeReturnTypeTest) {
 
     ASSERT_FALSE(data0.remove_edge("v1", "v2", 20));
 
-    // Add but already removed
-    ASSERT_FALSE(data0.add_edge("v1", "v2", 10));
-    ASSERT_FALSE(data0.add_edge("v1", "v2", 19));
+    // Edge already removed. But add vertex anyway
+    auto coco1 = data0.add_edge("v1", "v2", 10);
+    auto coco2 = data0.add_edge("v1", "v2", 19);
+
+    _ASSERT_ADD_EDGE_INFO_EQ(coco1, false, true, true);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco2, false, false, false);
+
 
     // Add after remove (Re-add)
-    ASSERT_TRUE(data0.add_edge("v1", "v2", 30));
-    ASSERT_FALSE(data0.add_edge("v1", "v2", 31));
+    auto coco3 = data0.add_edge("v1", "v2", 30);
+    auto coco4 = data0.add_edge("v1", "v2", 31);
+
+    _ASSERT_ADD_EDGE_INFO_EQ(coco3, true, false, false);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco4, false, false, false);
 }
 
 TEST(LWWGraph, remove_edgeCalledBeforeAddVertexReturnTypeTest) {
@@ -850,12 +883,15 @@ TEST(LWWGraph, remove_edgeFirstThenAddEdgeThenAddVertexReturnTypeTest) {
     ASSERT_FALSE(data0.remove_edge("v1", "v2", 42));
 
     // Add edge, but already removed. User doesn't see anything
-    ASSERT_FALSE(data0.add_edge("v1", "v2", 20));
-    ASSERT_FALSE(data0.add_edge("v1", "v2", 30)); // Duplicate call
+    auto coco1 = data0.add_edge("v1", "v2", 20);
+    auto coco2 = data0.add_edge("v1", "v2", 30); // Duplicate call
 
-    // Add the vertex creates them for user view (But only updates time)
-    ASSERT_TRUE(data0.add_vertex("v1", 10));
-    ASSERT_TRUE(data0.add_vertex("v2", 20));
+    _ASSERT_ADD_EDGE_INFO_EQ(coco1, false, true, true);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco2, false, false, false);
+
+    // Add the vertex but already created by add_edge
+    ASSERT_FALSE(data0.add_vertex("v1", 10));
+    ASSERT_FALSE(data0.add_vertex("v2", 20));
 }
 
 
@@ -1007,11 +1043,13 @@ TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedReturnTypeTest) {
 
     // data1 remove vertex. data0 add edge v2->v2 (Re-add v2)
     ASSERT_TRUE(data1.remove_vertex("v2", 30));
-    ASSERT_TRUE(data0.add_edge("v2", "v2", 40));
+    auto coco0 = data0.add_edge("v2", "v2", 40);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco0, true, false, false);
 
     // Broadcast changes
     ASSERT_FALSE(data0.remove_vertex("v2", 30)); // Not actually applied: false
-    ASSERT_TRUE(data1.add_edge("v2", "v2", 40));
+    auto coco1 = data1.add_edge("v2", "v2", 40);
+    _ASSERT_ADD_EDGE_INFO_EQ(coco1, true, true, false);
 
     // Should be same
     ASSERT_TRUE(data0 == data1);
