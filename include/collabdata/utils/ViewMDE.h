@@ -5,9 +5,9 @@
 #include "CollabData.h"
 #include "Timestamp.h"
 
-#include "collab/CmRDT/LWWMap.h"
-#include "collab/CmRDT/LWWGraph.h"
-#include "collab/CmRDT/LWWRegister.h"
+#include "collabdata/CmRDT/LWWMap.h"
+#include "collabdata/CmRDT/LWWGraph.h"
+#include "collabdata/CmRDT/LWWRegister.h"
 
 namespace collab {
 
@@ -51,6 +51,7 @@ class ViewMDE : public CollabData {
             ATTRIBUTE_SET,
         };
 
+        // ---------------------------------------------------------------------
         class ElementAddOperation : public Operation {
             public:
                 friend ViewMDE;
@@ -75,6 +76,7 @@ class ViewMDE : public CollabData {
                 }
         };
 
+        // ---------------------------------------------------------------------
         class ElementDeleteOperation : public Operation {
             public:
                 friend ViewMDE;
@@ -100,6 +102,7 @@ class ViewMDE : public CollabData {
                 }
         };
 
+        // ---------------------------------------------------------------------
         class AttributeSetOperation : public Operation {
             public:
                 friend ViewMDE;
@@ -148,7 +151,7 @@ class ViewMDE : public CollabData {
          */
         void addElement(const UUID& id) {
             const ElementAddOperation op = _addElement(id);
-            this->notifyOperationObservers(op);
+            // TODO: notify connector
         }
 
         /**
@@ -159,7 +162,7 @@ class ViewMDE : public CollabData {
          */
         void removeElement(const UUID& id) {
             const ElementDeleteOperation op = _removeElement(id);
-            this->notifyOperationObservers(op);
+            // TODO: notify connector
         }
 
         /**
@@ -176,7 +179,7 @@ class ViewMDE : public CollabData {
                           const std::string& name,
                           const std::string& value) {
             AttributeSetOperation op = _setAttribute(eltID, name, value);
-            this->notifyOperationObservers(op);
+            // TODO: notify connector
         }
 
 
@@ -186,21 +189,30 @@ class ViewMDE : public CollabData {
 
     private:
 
+        // Add element. Notify observers if elt added.
         ElementAddOperation _addElement(const UUID& id) {
             auto tnow = Timestamp::now();
-            _modelMDE.add_vertex(id, tnow);
-            return {id, tnow};
+            bool isAdded = _modelMDE.add_vertex(id, tnow);
+            ElementAddOperation op = {id, tnow};
+            if(isAdded) {
+                this->notifyOperationObservers(op);
+            }
+            return op;
         }
 
         ElementDeleteOperation _removeElement(const UUID& id) {
             auto tnow = Timestamp::now();
-            _modelMDE.remove_vertex(id, tnow);
-            return {id, tnow};
+            bool isRemoved = _modelMDE.remove_vertex(id, tnow);
+            ElementDeleteOperation op = {id, tnow};
+            if(isRemoved) {
+                this->notifyOperationObservers(op);
+            }
+            return op;
         }
 
         AttributeSetOperation _setAttribute(const UUID& eltID,
-                          const std::string& name,
-                          const std::string& value) {
+                                            const std::string& name,
+                                            const std::string& value) {
             auto tnow = Timestamp::now();
 
             _modelMDE.add_vertex(eltID, tnow);
@@ -212,9 +224,13 @@ class ViewMDE : public CollabData {
             auto& attrElt = attrElt_it->second;
 
             std::string oldValue = attrElt.query();
-            attrElt.update(value, tnow);
+            bool isUpdated = attrElt.update(value, tnow);
+            AttributeSetOperation op = {eltID, tnow, name, oldValue, value};
+            if(isUpdated) {
+                this->notifyOperationObservers(op);
+            }
 
-            return {eltID, tnow, name, oldValue, value};
+            return op;
         }
 
 

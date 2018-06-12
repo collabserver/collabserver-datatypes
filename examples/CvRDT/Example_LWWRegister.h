@@ -1,6 +1,7 @@
 #pragma once
 
-#include "collab/CvRDT/LWWRegister.h"
+#include "collabdata/CvRDT/LWWRegister.h"
+
 #include <iostream>
 
 namespace collab {

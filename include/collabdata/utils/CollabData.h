@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Operation.h"
-#include "OperationObserver.h"
-
 #include <vector>
 #include <cassert>
 #include <sstream>
+
+#include "Operation.h"
+#include "OperationObserver.h"
 
 namespace collab {
 

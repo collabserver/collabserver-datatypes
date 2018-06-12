@@ -1,6 +1,6 @@
 #pragma once
 
-#include "collab/CmRDT/LWWGraph.h"
+#include "collabdata/CmRDT/LWWGraph.h"
 
 #include <iostream>
 #include <string>

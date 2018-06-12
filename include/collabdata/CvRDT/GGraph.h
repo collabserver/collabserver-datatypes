@@ -1,9 +1,9 @@
 #pragma once
 
+#include <ostream>
+
 #include "GMap.h"
 #include "GSet.h"
-
-#include <ostream>
 
 namespace collab {
 namespace CvRDT {

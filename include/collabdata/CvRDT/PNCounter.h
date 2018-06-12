@@ -1,8 +1,8 @@
 #pragma once
 
-#include "GCounter.h"
-
 #include <iostream>
+
+#include "GCounter.h"
 
 namespace collab {
 namespace CvRDT {

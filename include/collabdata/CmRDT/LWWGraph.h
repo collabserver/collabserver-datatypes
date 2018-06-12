@@ -10,8 +10,12 @@
 namespace collab {
 namespace CmRDT {
 
+
 /**
  * Information used by add_edge method.
+ * Describe return status of add_edge. (LWWGraph)
+ *
+ * \see LWWGraph
  */
 struct AddEdgeInfo {
     bool isEdgeAdded;

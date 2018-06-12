@@ -24,7 +24,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
     - LWWMap: Last-Write-Wins Map
     - LWWRegister: Last-Write-Wins Register
     - LWWSet: Last-Write-Wins Set
-- CvRDT (State-based)
+- CvRDT (State-based. See warning)
     - 2PSet: Add / Remove set (Two-phases Set)
     - GCounter: Grow-only counter
     - GGraph: Grow-only graph
@@ -32,8 +32,12 @@ To learn more about CRDTs, checkout the links at the end of this readme.
     - GSet: Grow-only set
     - LWWRegister: Last-Write-Wins Register
     - PNCounter: Increment / Decrement counter
-- Data (Custom data built in top of CRDTs. For collab-server)
-    - LWWViewMDE: custom data built for collab-server and AToMPM software.
+- utils
+    - CollabData: Example of SuperType for data built on tope of CRDTs.
+    - Operation: Interface to represents modification on data built on top of CRDTs.
+    - OperationObserver: Interface for Operation observer.
+    - Timestamp: Example of custom timestamp.
+    - LWWViewMDE: Custom data built for collab-server and AToMPM.
 
 > Warning: I wrote the CvRDTs as an example. They are not meant to be used.
 > (At least, some changes may be required).

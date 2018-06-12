@@ -1,7 +1,8 @@
-#include "collab/data/ViewMDE.h"
+#include "collabdata/utils/ViewMDE.h"
+
 #include <gtest/gtest.h>
 
-#include "collab/data/OperationObserver.h"
+#include "collabdata/utils/OperationObserver.h"
 
 
 namespace collab {
