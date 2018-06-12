@@ -26,14 +26,16 @@ namespace collab {
  * \date    May 2018
  */
 class ViewMDE : public CollabData {
+    // -------------------------------------------------------------------------
+    // Typedefs
+    // -------------------------------------------------------------------------
+
     public:
         typedef std::string UUID;
 
     private:
         typedef CmRDT::LWWRegister<std::string, Timestamp>        attribute;
         typedef CmRDT::LWWMap<std::string, attribute, Timestamp>  attributesMap;
-
-        CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _modelMDE;
 
 
     // -------------------------------------------------------------------------
@@ -138,6 +140,15 @@ class ViewMDE : public CollabData {
 
 
     // -------------------------------------------------------------------------
+    // Attributes
+    // -------------------------------------------------------------------------
+
+    private:
+
+        CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _modelMDE;
+
+
+    // -------------------------------------------------------------------------
     // Modifiers methods
     // -------------------------------------------------------------------------
 
@@ -151,7 +162,7 @@ class ViewMDE : public CollabData {
          */
         void addElement(const UUID& id) {
             const ElementAddOperation op = _addElement(id);
-            // TODO: notify connector
+            this->notifyOperationBroadcaster(op);
         }
 
         /**
@@ -162,7 +173,7 @@ class ViewMDE : public CollabData {
          */
         void removeElement(const UUID& id) {
             const ElementDeleteOperation op = _removeElement(id);
-            // TODO: notify connector
+            this->notifyOperationBroadcaster(op);
         }
 
         /**
@@ -179,7 +190,7 @@ class ViewMDE : public CollabData {
                           const std::string& name,
                           const std::string& value) {
             AttributeSetOperation op = _setAttribute(eltID, name, value);
-            // TODO: notify connector
+            this->notifyOperationBroadcaster(op);
         }
 
 

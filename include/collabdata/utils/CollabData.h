@@ -32,10 +32,11 @@ namespace collab {
 class CollabData {
     private:
         std::vector<OperationObserver*> _operationObservers;
+        OperationObserver* _broadcaster = nullptr;
 
 
     // -------------------------------------------------------------------------
-    // Methods
+    // Initialization
     // -------------------------------------------------------------------------
 
     public:
@@ -48,7 +49,34 @@ class CollabData {
 
 
     // -------------------------------------------------------------------------
-    // Operation Methods (Observers, notifications).
+    // Operation Methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Apply an external operation on this data.
+         * Operation may be received from external components (Ex: network).
+         * The exact operation is received. (already unserialized).
+         *
+         * \param Constant reference to the operation to apply.
+         */
+        virtual void applyOperation(const Operation& op) = 0;
+
+        /**
+         * Apply an external operation on this data.
+         * Operation is received in its serialized form.
+         *
+         * Do nothing if unable to unserialize (ex: Type doesn't match content).
+         *
+         * \param type Type supposed for this operation.
+         * \param buffer Serialized version of the operation.
+         */
+        virtual void applyOperation(int type, std::stringstream& buffer) = 0;
+
+
+    // -------------------------------------------------------------------------
+    // Operation Observer Methods
     // -------------------------------------------------------------------------
 
     public:
@@ -58,12 +86,11 @@ class CollabData {
          *
          * Method that modifies data creates an operations that describes this
          * modification. Several components may request to know about these
-         * operations, for instance, to broadcast the operation over the
-         * network etc...
+         * operations, for instance a UI display.
          *
-         * \param Reference to the operation to broadcast.
+         * \param Reference to the operation.
          */
-        void notifyOperationObservers(const Operation& op) {
+        void notifyOperationObservers(const Operation& op) const {
             assert(op.getType() != 0); // If 0, you probably forgot to set type
             for(OperationObserver* obs : _operationObservers) {
                 obs->receiveOperation(op);
@@ -98,25 +125,42 @@ class CollabData {
             return _operationObservers.size();
         }
 
-        /**
-         * Apply an external operation on this data.
-         * Operation may be received from external components (Ex: network).
-         * The exact operation is received. (already unserialized).
-         *
-         * \param Constant reference to the operation to apply.
-         */
-        virtual void applyOperation(const Operation& op) = 0;
+
+    // -------------------------------------------------------------------------
+    // Operation Netbroadcaster Methods
+    // -------------------------------------------------------------------------
+
+    public:
 
         /**
-         * Apply an external operation on this data.
-         * Operation is received in its serialized form.
+         * Notify the broadcaster that an operation took place.
+         * Do nothing if no broadcaster set.
          *
-         * Do nothing if unable to unserialize (ex: Type doesn't match content).
-         *
-         * \param type Type supposed for this operation.
-         * \param buffer Serialized version of the operation.
+         * \param Reference to the operation to broadcast.
          */
-        virtual void applyOperation(int type, std::stringstream& buffer) = 0;
+        void notifyOperationBroadcaster(const Operation& op) const {
+            if(_broadcaster != nullptr) {
+                _broadcaster->receiveOperation(op);
+            }
+        }
+
+        /**
+         * Associate a broadcaster for this data.
+         * If data already has a broadcaster, it is updated with this one.
+         */
+        void setOperationBroadcaster(OperationObserver* observer) {
+            assert(observer != nullptr);
+            _broadcaster = observer;
+        }
+
+        /**
+         * Check whether a broadcaster is set.
+         *
+         * \return True if broadcaster set, otherwise, return false.
+         */
+        bool hasBroadcaster() const {
+            return _broadcaster != nullptr;
+        }
 };
 
 
