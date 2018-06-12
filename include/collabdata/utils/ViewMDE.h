@@ -17,9 +17,12 @@ namespace collab {
  * View data structure for Model Driven Engineering.
  *
  * ViewMDE is built on top of collab CRDTs.
+ * This is a custom CollabData made specially for the AToMPM software.
+ * ViewMDE is a MDE model (Internally represented as a graph. Each vertex has
+ * a map of attributes.). ALl methods are CRDT.
  *
  * \todo
- * TODO Documentation
+ * Documentation to write.
  *
  *
  * \author  Constantin Masson
@@ -55,87 +58,116 @@ class ViewMDE : public CollabData {
 
         // ---------------------------------------------------------------------
         class ElementAddOperation : public Operation {
-            public:
+            private:
                 friend ViewMDE;
-                const UUID          elementID;
-                const Timestamp     timestamp;
+                UUID        _elementID;
+                Timestamp   _timestamp = {0};
 
             public:
-
+                ElementAddOperation() = default;
                 ElementAddOperation(const std::string& id, const Timestamp& time)
-                  : elementID(id), timestamp(time) {
+                  : _elementID(id), _timestamp(time) {
                     _type = static_cast<int>(OperationsType::ELEMENT_ADD);
                 }
 
             public:
-                bool serialize(std::stringstream& buffer) const {
+                bool serialize(std::stringstream& buffer) const override {
                     // TODO
                     return false;
                 }
-                bool unserialize(std::stringstream& buffer) {
+                bool unserialize(const std::stringstream& buffer) override {
                     // TODO
                     return false;
+                }
+
+            public:
+                const UUID& elementID() const {
+                    return _elementID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
                 }
         };
 
         // ---------------------------------------------------------------------
         class ElementDeleteOperation : public Operation {
-            public:
+            private:
                 friend ViewMDE;
-                const UUID          elementID;
-                const Timestamp     timestamp;
+                UUID        _elementID;
+                Timestamp   _timestamp = {0};
 
             public:
 
+                ElementDeleteOperation() = default;
                 ElementDeleteOperation(const std::string& id,
                                        const Timestamp& time)
-                  : elementID(id), timestamp(time) {
+                  : _elementID(id), _timestamp(time) {
                     _type = static_cast<int>(OperationsType::ELEMENT_DELETE);
                 }
 
             public:
-                bool serialize(std::stringstream& buffer) const {
+                bool serialize(std::stringstream& buffer) const override {
                     // TODO
                     return false;
                 }
-                bool unserialize(std::stringstream& buffer) {
+                bool unserialize(const std::stringstream& buffer) override {
                     // TODO
                     return false;
+                }
+
+            public:
+                const UUID& elementID() const {
+                    return _elementID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
                 }
         };
 
         // ---------------------------------------------------------------------
         class AttributeSetOperation : public Operation {
-            public:
+            private:
                 friend ViewMDE;
-                const UUID          elementID;
-                const Timestamp     timestamp;
-                const std::string   attributeName;
-                const std::string   newValue;
-                const std::string   oldValue;
+                UUID        _elementID;
+                Timestamp   _timestamp = {0};
+                std::string _attributeName;
+                std::string _newValue;
 
             public:
 
+                AttributeSetOperation() = default;
                 AttributeSetOperation(const std::string& id,
                                       const Timestamp& time,
                                       const std::string& name,
-                                      const std::string& nVal,
-                                      const std::string& oVal)
-                  : elementID(id), timestamp(time), attributeName(name),
-                    newValue(nVal), oldValue(oVal) {
+                                      const std::string& nVal)
+                  : _elementID(id), _timestamp(time), _attributeName(name),
+                    _newValue(nVal) {
                     _type = static_cast<int>(OperationsType::ATTRIBUTE_SET);
                 }
 
             public:
-                bool serialize(std::stringstream& buffer) const {
+                bool serialize(std::stringstream& buffer) const override {
                     // TODO
                     return false;
                 }
-                bool unserialize(std::stringstream& buffer) {
+                bool unserialize(const std::stringstream& buffer) override {
                     // TODO
                     return false;
                 }
 
+            public:
+                const UUID& elementID() const {
+                    return _elementID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
+                }
+                const std::string& attributeName() const {
+                    return _attributeName;
+                }
+                const std::string& newValue() const {
+                    return _newValue;
+                }
         };
 
 
@@ -161,7 +193,8 @@ class ViewMDE : public CollabData {
          * \param id The element's ID.
          */
         void addElement(const UUID& id) {
-            const ElementAddOperation op = _addElement(id);
+            ElementAddOperation op = {id, Timestamp::now()};
+            applyOperation(op);
             this->notifyOperationBroadcaster(op);
         }
 
@@ -172,7 +205,8 @@ class ViewMDE : public CollabData {
          * \param id The element's ID.
          */
         void removeElement(const UUID& id) {
-            const ElementDeleteOperation op = _removeElement(id);
+            ElementDeleteOperation op = {id, Timestamp::now()};
+            applyOperation(op);
             this->notifyOperationBroadcaster(op);
         }
 
@@ -189,59 +223,55 @@ class ViewMDE : public CollabData {
         void setAttribute(const UUID& eltID,
                           const std::string& name,
                           const std::string& value) {
-            AttributeSetOperation op = _setAttribute(eltID, name, value);
+            auto tnow = Timestamp::now();
+            AttributeSetOperation op = {eltID, tnow, name, value};
+            applyOperation(op);
             this->notifyOperationBroadcaster(op);
         }
 
 
     // -------------------------------------------------------------------------
-    // Internal modifiers methods
+    // Operation Methods
     // -------------------------------------------------------------------------
 
     private:
 
-        // Add element. Notify observers if elt added.
-        ElementAddOperation _addElement(const UUID& id) {
-            auto tnow = Timestamp::now();
-            bool isAdded = _modelMDE.add_vertex(id, tnow);
-            ElementAddOperation op = {id, tnow};
+        void applyOperation(const ElementAddOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& id        = op.elementID();
+            bool isAdded    = _modelMDE.add_vertex(id, tnow);
             if(isAdded) {
                 this->notifyOperationObservers(op);
             }
-            return op;
         }
 
-        ElementDeleteOperation _removeElement(const UUID& id) {
-            auto tnow = Timestamp::now();
-            bool isRemoved = _modelMDE.remove_vertex(id, tnow);
-            ElementDeleteOperation op = {id, tnow};
+        void applyOperation(const ElementDeleteOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& id        = op.elementID();
+            bool isRemoved  = _modelMDE.remove_vertex(id, tnow);
             if(isRemoved) {
                 this->notifyOperationObservers(op);
             }
-            return op;
         }
 
-        AttributeSetOperation _setAttribute(const UUID& eltID,
-                                            const std::string& name,
-                                            const std::string& value) {
-            auto tnow = Timestamp::now();
+        void applyOperation(const AttributeSetOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& id        = op.elementID();
+            auto& newValue  = op.newValue();
+            auto& attrName  = op.attributeName();
 
-            _modelMDE.add_vertex(eltID, tnow);
-            auto vertex_it = _modelMDE.find_vertex(eltID);
+            _modelMDE.add_vertex(id, tnow);
+            auto vertex_it = _modelMDE.find_vertex(id);
             auto& attrMap = vertex_it->second.content();
 
-            attrMap.add(name, tnow);
-            auto attrElt_it = attrMap.find(name);
+            attrMap.add(attrName, tnow);
+            auto attrElt_it = attrMap.find(attrName);
             auto& attrElt = attrElt_it->second;
 
-            std::string oldValue = attrElt.query();
-            bool isUpdated = attrElt.update(value, tnow);
-            AttributeSetOperation op = {eltID, tnow, name, oldValue, value};
+            bool isUpdated = attrElt.update(newValue, tnow);
             if(isUpdated) {
                 this->notifyOperationObservers(op);
             }
-
-            return op;
         }
 
 
@@ -251,14 +281,33 @@ class ViewMDE : public CollabData {
 
     public:
 
-        void applyOperation(const Operation& op) {
-            // TODO
-        }
+        void applyOperation(const int type,
+                            const std::stringstream& buffer) override {
+            switch(type) {
+                case static_cast<int>(OperationsType::ELEMENT_ADD): {
+                        ElementAddOperation op;
+                        if(op.unserialize(buffer)) {
+                            applyOperation(op);
+                        }
+                    }
+                    break;
 
-        void applyOperation(const int type, std::stringstream& buffer) {
-            // TODO Get operation by type
-            // Unserialize
-            // Call applyOperation
+                case static_cast<int>(OperationsType::ELEMENT_DELETE): {
+                        ElementDeleteOperation op;
+                        if(op.unserialize(buffer)) {
+                            applyOperation(op);
+                        }
+                    }
+                    break;
+
+                case static_cast<int>(OperationsType::ATTRIBUTE_SET): {
+                        AttributeSetOperation op;
+                        if(op.unserialize(buffer)) {
+                            applyOperation(op);
+                        }
+                    }
+                    break;
+            }
         }
 };
 

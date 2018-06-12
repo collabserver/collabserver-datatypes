@@ -18,17 +18,20 @@ class ViewMDEObserver : virtual public OperationObserver {
 
 TEST(ViewMDE, constructorTest) {
     ViewMDE v;
+    // TODO
 }
 
 TEST(ViewMDE, addElementTest) {
     ViewMDE v;
     v.addElement("e1");
+    // TODO
 }
 
 TEST(ViewMDE, removeElementTest) {
     ViewMDE v;
     v.addElement("e1");
     v.removeElement("e1");
+    // TODO
 }
 
 

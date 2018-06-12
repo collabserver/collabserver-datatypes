@@ -56,15 +56,6 @@ class CollabData {
 
         /**
          * Apply an external operation on this data.
-         * Operation may be received from external components (Ex: network).
-         * The exact operation is received. (already unserialized).
-         *
-         * \param Constant reference to the operation to apply.
-         */
-        virtual void applyOperation(const Operation& op) = 0;
-
-        /**
-         * Apply an external operation on this data.
          * Operation is received in its serialized form.
          *
          * Do nothing if unable to unserialize (ex: Type doesn't match content).
@@ -72,7 +63,7 @@ class CollabData {
          * \param type Type supposed for this operation.
          * \param buffer Serialized version of the operation.
          */
-        virtual void applyOperation(int type, std::stringstream& buffer) = 0;
+        virtual void applyOperation(int type, const std::stringstream& buffer) = 0;
 
 
     // -------------------------------------------------------------------------

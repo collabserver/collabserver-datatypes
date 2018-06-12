@@ -47,7 +47,7 @@ class Operation {
          * \param buffer Where to place unserialized data.
          * \return True if successfully unserialized, otherwise, return false.
          */
-        virtual bool unserialize(std::stringstream& buffer) = 0;
+        virtual bool unserialize(const std::stringstream& buffer) = 0;
 };
 
 
