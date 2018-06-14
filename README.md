@@ -44,7 +44,8 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 
 # Dependencies
-> All dependencies are automatically downloaded by CMake.
+> All dependencies are automatically downloaded by CMake and placed in
+> a folder `bin`.
 
 - [GoogleTest](https://github.com/google/googletest) (For unit tests).
 
@@ -55,9 +56,21 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 ```
 mkdir build
 cd build
-cmake ..
+cmake -DBUILD_TESTS=ON ..
 make -j4
 make ./runtests
+```
+
+
+# Build and run examples with CMake (Linux only)
+> Requires C++11 and "pragma once" support.
+
+```
+mkdir build
+cd build
+cmake ..
+make -j4
+make runExamplesCmRDT
 ```
 
 
