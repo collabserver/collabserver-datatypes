@@ -62,11 +62,13 @@ class CollabData {
          * other components doesn't know anything about the concrete operations.
          *
          * Do nothing if unable to unserialize (ex: Type doesn't match content).
+         * And return false.
          *
          * \param type Type supposed for this operation.
          * \param buffer Serialized version of the operation.
+         * \return True if operation is valid, otherwise, return false.
          */
-        virtual void receiveOperation(const int type,
+        virtual bool receiveOperation(const int type,
                                       const std::stringstream& buffer) = 0;
 
         /**

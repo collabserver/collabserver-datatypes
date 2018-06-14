@@ -281,33 +281,41 @@ class ViewMDE : public CollabData {
 
     public:
 
-        void receiveOperation(const int type,
+        bool receiveOperation(const int type,
                               const std::stringstream& buffer) override {
             switch(type) {
                 case static_cast<int>(OperationsType::ELEMENT_ADD): {
                         ElementAddOperation op;
-                        if(op.unserialize(buffer)) {
-                            applyOperation(op);
+                        if(!op.unserialize(buffer)) {
+                            return false;
                         }
+                        applyOperation(op);
                     }
                     break;
 
                 case static_cast<int>(OperationsType::ELEMENT_DELETE): {
                         ElementDeleteOperation op;
-                        if(op.unserialize(buffer)) {
-                            applyOperation(op);
+                        if(!op.unserialize(buffer)) {
+                            return false;
                         }
+                        applyOperation(op);
                     }
                     break;
 
                 case static_cast<int>(OperationsType::ATTRIBUTE_SET): {
                         AttributeSetOperation op;
-                        if(op.unserialize(buffer)) {
-                            applyOperation(op);
+                        if(!op.unserialize(buffer)) {
+                            return false;
                         }
+                        applyOperation(op);
                     }
                     break;
+
+                default:
+                    return false;
             }
+
+            return true;
         }
 };
 
