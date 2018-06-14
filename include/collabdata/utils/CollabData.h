@@ -12,16 +12,16 @@ namespace collab {
 
 /**
  * \brief
- * Data structure CollabServer is working with.
+ * Abstract class that defines any Data structure CollabServer is working on.
  *
  * This is the high level wrapper of any data CollabServer is working with.
- * Any data used by CollabServer implements this interface. To be fullay CRDT,
+ * Any data used by CollabServer implements this interface. To be fully CRDT,
  * this data is only composed of CRDTs (From collab/CmRDT for instance).
  *
  * \par Operation
  * Any modification on the data creates an Operation that describe this change.
- * This may be usefull for component using this data to update the display,
- * for instance, in case of GUI, or broadcase the operation in case of network.
+ * This may be useful for component using this data to update the display,
+ * for instance, in case of GUI, or broadcast the operation in case of network.
  * To receive operation, you must register your component as an Observer of
  * this data.
  *
@@ -55,19 +55,36 @@ class CollabData {
     public:
 
         /**
-         * Apply an external operation on this data.
+         * Receive an external operation an apply it.
          * Operation is received in its serialized form.
+         * This may for instance be used by a network component to apply an
+         * operation just received. Operation is in its serialized form since
+         * other components doesn't know anything about the concrete operations.
          *
          * Do nothing if unable to unserialize (ex: Type doesn't match content).
          *
          * \param type Type supposed for this operation.
          * \param buffer Serialized version of the operation.
          */
-        virtual void applyOperation(int type, const std::stringstream& buffer) = 0;
+        virtual void receiveOperation(const int type,
+                                      const std::stringstream& buffer) = 0;
+
+        /**
+         * Broadcast an operation to remote replicate.
+         * This uses the broadcaster to send operation.
+         *
+         * Note that this doesn't notify OperationObserver but only send to
+         * broadcaster.
+         *
+         * \param op The operation to broadcast.
+         */
+        void broadcastOperation(const Operation& op) const {
+            this->notifyOperationBroadcaster(op);
+        }
 
 
     // -------------------------------------------------------------------------
-    // Operation Observer Methods
+    // OperationObservers Methods
     // -------------------------------------------------------------------------
 
     public:
@@ -83,8 +100,8 @@ class CollabData {
          */
         void notifyOperationObservers(const Operation& op) const {
             assert(op.getType() != 0); // If 0, you probably forgot to set type
-            for(OperationObserver* obs : _operationObservers) {
-                obs->receiveOperation(op);
+            for(OperationObserver* superman : _operationObservers) {
+                superman->notifyOperation(op);
             }
         }
 
@@ -118,7 +135,7 @@ class CollabData {
 
 
     // -------------------------------------------------------------------------
-    // Operation Netbroadcaster Methods
+    // Broadcaster Methods
     // -------------------------------------------------------------------------
 
     public:
@@ -131,7 +148,7 @@ class CollabData {
          */
         void notifyOperationBroadcaster(const Operation& op) const {
             if(_broadcaster != nullptr) {
-                _broadcaster->receiveOperation(op);
+                _broadcaster->notifyOperation(op);
             }
         }
 
@@ -146,6 +163,7 @@ class CollabData {
 
         /**
          * Check whether a broadcaster is set.
+         * Data without a broadcaster means its a local data only.
          *
          * \return True if broadcaster set, otherwise, return false.
          */

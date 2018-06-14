@@ -194,8 +194,8 @@ class ViewMDE : public CollabData {
          */
         void addElement(const UUID& id) {
             ElementAddOperation op = {id, Timestamp::now()};
-            applyOperation(op);
-            this->notifyOperationBroadcaster(op);
+            this->applyOperation(op);
+            this->broadcastOperation(op);
         }
 
         /**
@@ -206,8 +206,8 @@ class ViewMDE : public CollabData {
          */
         void removeElement(const UUID& id) {
             ElementDeleteOperation op = {id, Timestamp::now()};
-            applyOperation(op);
-            this->notifyOperationBroadcaster(op);
+            this->applyOperation(op);
+            this->broadcastOperation(op);
         }
 
         /**
@@ -225,8 +225,8 @@ class ViewMDE : public CollabData {
                           const std::string& value) {
             auto tnow = Timestamp::now();
             AttributeSetOperation op = {eltID, tnow, name, value};
-            applyOperation(op);
-            this->notifyOperationBroadcaster(op);
+            this->applyOperation(op);
+            this->broadcastOperation(op);
         }
 
 
@@ -281,8 +281,8 @@ class ViewMDE : public CollabData {
 
     public:
 
-        void applyOperation(const int type,
-                            const std::stringstream& buffer) override {
+        void receiveOperation(const int type,
+                              const std::stringstream& buffer) override {
             switch(type) {
                 case static_cast<int>(OperationsType::ELEMENT_ADD): {
                         ElementAddOperation op;

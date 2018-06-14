@@ -10,7 +10,7 @@ namespace collab {
 
 class ViewMDEObserver : virtual public OperationObserver {
     public:
-        void receiveOperation(const Operation& op) {
+        void notifyOperation(const Operation& op) {
             // TODO
         }
 };
