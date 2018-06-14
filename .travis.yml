@@ -10,7 +10,7 @@ compiler:
 before_script:
     - mkdir build
     - cd build
-    - cmake ..
+    - cmake -DBUILD_TESTS=ON ..
 
 script:
     - make -j4
