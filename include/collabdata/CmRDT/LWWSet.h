@@ -227,7 +227,7 @@ class LWWSet {
         /**
          * Removed all elements from the container.
          *
-         * Only elements with timestamp inferior to clear's timestamp are
+         * Only elements with timestamp inferior to clear timestamp are
          * actually removed.
          *
          * \warning

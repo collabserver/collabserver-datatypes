@@ -67,9 +67,9 @@ namespace CmRDT {
  * register update function.
  *
  * \warning
- * Timestamps are strictly unique with total order.
- * If (t1 == t2) is true, replicates may diverge.
- * (See quote and implementation for further informations).
+ * Timestamps are strictly unique for each user's operation, with total order.
+ * For any distinct operations (ex: add(t1) / remove(t2)), t1==t2 must return
+ * false. (See quote and implementation for further informations).
  *
  * \warning
  * T type must have a default constructor.
@@ -112,6 +112,7 @@ class LWWMap {
     private:
         std::unordered_map<Key, Element> _map;
         size_type _sizeAlive = 0; // Nb of alive elts (Not marked as removed)
+        U _lastClearTime = {0}; // Last time a clear has been applied
 
 
     // -------------------------------------------------------------------------
@@ -273,6 +274,45 @@ class LWWMap {
     public:
 
         /**
+         * Removed all elements from the container.
+         *
+         * Only elements with timestamp inferior to clear timestamp are
+         * actually removed.
+         *
+         * \warning
+         * Container may not be empty after clear call.
+         * This is because if a really older clear is applied, this doesn't
+         * affect elements that have been added later.
+         * From a user point of view, if you display a UI after a clear, you
+         * should iterate over the set anyway.
+         *
+         * \param stamp Timestamp of this operation.
+         * \return True if clear actually applied, otherwise, return false.
+         */
+        bool clear(const U& stamp) noexcept {
+            if(stamp > _lastClearTime) {
+                _lastClearTime = stamp;
+
+                // DevNote: Same code as 'remove' but without the insert attempt
+                for(auto& elt_it : _map) {
+                    Element& elt = elt_it.second;
+
+                    if(stamp > elt._timestamp) {
+                        elt._timestamp = stamp;
+
+                        if(elt._isRemoved == false) {
+                            elt._isRemoved = true;
+                            --_sizeAlive;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
          * Inserts new key in the container.
          * If key already exists, use timestamps for concurrency control.
          *
@@ -320,8 +360,15 @@ class LWWMap {
                 return false;
             }
             else {
-                ++_sizeAlive;
-                return true;
+                if(stamp > _lastClearTime) {
+                    ++_sizeAlive;
+                    return true;
+                }
+                else {
+                    elt._timestamp = _lastClearTime;
+                    elt._isRemoved = true;
+                    return false;
+                }
             }
         }
 
