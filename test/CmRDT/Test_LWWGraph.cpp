@@ -464,6 +464,28 @@ TEST(LWWGraph, add_vertexDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, 42, false, 29, data0);
 }
 
+TEST(LWWGraph, add_vertexIdempotentTest) {
+    LWWGraph<int, int, int> data0;
+
+    // Add duplicate, check timestamps is the last value.
+    data0.add_vertex(1, 10);
+    data0.add_vertex(1, 10);
+    data0.add_vertex(1, 10);
+    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    auto res = data0.crdt_find_vertex(1);
+    _ASSERT_VERTEX_EQ(res, 1, false, 10, data0);
+
+    // Some more duplicate on another key
+    data0.add_vertex(42, 20);
+    data0.add_vertex(42, 20);
+    data0.add_vertex(42, 20);
+    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    res = data0.crdt_find_vertex(42);
+    _ASSERT_VERTEX_EQ(res, 42, false, 20, data0);
+}
+
 TEST(LWWGraph, add_vertexWithOnlyAddReturnTypeTest) {
     LWWGraph<std::string, int, int> data0;
 
@@ -571,6 +593,35 @@ TEST(LWWGraph, remove_vertexDuplicateCallsTest) {
     data0.remove_vertex("v1", 24);
     res = data0.crdt_find_vertex("v1");
     _ASSERT_VERTEX_EQ(res, "v1", true, 29, data0);
+}
+
+TEST(LWWGraph, remove_vertexIdempotentTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Add, then remove vertex
+    data0.add_vertex("v1", 10);
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v1", 20);
+
+    // Check success
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.crdt_size(), 1);
+    auto res = data0.crdt_find_vertex("v1");
+    _ASSERT_VERTEX_EQ(res, "v1", true, 20, data0);
+
+    // Add another, remove and test
+    data0.add_vertex("v2", 30);
+    data0.remove_vertex("v2", 40);
+    data0.remove_vertex("v2", 40);
+    data0.remove_vertex("v2", 40);
+
+    // Check success
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.crdt_size(), 2);
+    res = data0.crdt_find_vertex("v2");
+    _ASSERT_VERTEX_EQ(res, "v2", true, 40, data0);
 }
 
 TEST(LWWGraph, remove_vertexReturnTypeTest) {
@@ -697,6 +748,32 @@ TEST(LWWGraph, add_edgeDuplicateCallsTest) {
     EXPECT_FALSE(edge->second.isRemoved());
 }
 
+TEST(LWWGraph, add_edgeIdempotentTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Duplicate add_edge
+    data0.add_edge("v1", "v2", 10);
+    data0.add_edge("v1", "v2", 10);
+    data0.add_edge("v1", "v2", 10);
+
+    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.crdt_size(), 2);
+
+    // Vertex 1 and 2
+    auto v1 = data0.crdt_find_vertex("v1");
+    auto v2 = data0.crdt_find_vertex("v2");
+    _ASSERT_VERTEX_EQ(v1, "v1", false, 10, data0);
+    _ASSERT_VERTEX_EQ(v2, "v2", false, 10, data0);
+
+    // Edge v1 -> v2
+    auto edges = v1->second.value().edges();
+    auto edge = edges.crdt_find("v2");
+    EXPECT_TRUE(edge != edges.crdt_end());
+    EXPECT_EQ(edge->first, "v2");
+    EXPECT_EQ(edge->second.timestamp(), 10);
+    EXPECT_FALSE(edge->second.isRemoved());
+}
+
 TEST(LWWGraph, add_edgeWithFromToEqualTest) {
     LWWGraph<std::string, int, int> data0;
 
@@ -771,6 +848,32 @@ TEST(LWWGraph, remove_edgeTest) {
 
     // Vertex 2 stay the same
     auto v2 = data0.crdt_find_vertex("v2");
+    _ASSERT_VERTEX_EQ(v2, "v2", false, 12, data0);
+
+    // Edge v1 -> v2 should have been removed
+    auto edges = v1->second.value().edges();
+    auto edge = edges.crdt_find("v2");
+    EXPECT_TRUE(edge != edges.crdt_end());
+    EXPECT_EQ(edge->first, "v2");
+    EXPECT_EQ(edge->second.timestamp(), 13);
+    EXPECT_TRUE(edge->second.isRemoved());
+}
+
+TEST(LWWGraph, remove_edgeIdempotentTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Add vertex + edge
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.remove_edge("v1", "v2", 13);
+    data0.remove_edge("v1", "v2", 13);
+    data0.remove_edge("v1", "v2", 13);
+    data0.remove_edge("v1", "v2", 13);
+
+    // Vertex 1 stay the same
+    auto v1 = data0.crdt_find_vertex("v1");
+    auto v2 = data0.crdt_find_vertex("v2");
+    _ASSERT_VERTEX_EQ(v1, "v1", false, 11, data0);
     _ASSERT_VERTEX_EQ(v2, "v2", false, 12, data0);
 
     // Edge v1 -> v2 should have been removed

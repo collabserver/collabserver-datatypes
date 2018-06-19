@@ -299,6 +299,9 @@ class LWWGraph {
          * If remove timestamp wins, this add operation does nothing.
          * Otherwise, add is applied and true is returned.
          *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         *
          * \note
          * This only adds the key. A default vertex is created.
          * To add key and set its content, call this add method and query the
@@ -325,6 +328,9 @@ class LWWGraph {
          *
          * \par Concurrent add_edge / remove_vertex
          * See documentation of LWWGraph::add_edge
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
          *
          * \see LWWGraph::add_edge
          *
@@ -365,6 +371,9 @@ class LWWGraph {
          * removed. Meaning 'add_edge' was before 'remove_vertex', this edge
          * is marked as removed (With the 'remove_vertex' timestamp).
          * This resolve the concurrent 'add_edge' | 'remove_vertex'
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
@@ -416,6 +425,9 @@ class LWWGraph {
          * timestamp. This create a temporary vertex. This is use in case of
          * remove_edge is applied before 'add_edge'. (Required for CRDT
          * commutativity).
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.
