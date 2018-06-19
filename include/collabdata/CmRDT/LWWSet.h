@@ -225,13 +225,13 @@ class LWWSet {
     public:
 
         /**
-         * Removed all elements from the container.
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
+         * Removes all elements from the container.
          *
          * Only elements with timestamp inferior to clear timestamp are
          * actually removed.
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
          *
          * \warning
          * Container may not be empty after clear call.

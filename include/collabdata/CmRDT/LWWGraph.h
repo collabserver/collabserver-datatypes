@@ -285,6 +285,55 @@ class LWWGraph {
     public:
 
         /**
+         * Removes all vertex from this graph.
+         * This also remove all existing edges.
+         *
+         * Only elements with timestamp inferior to clear timestamp are
+         * actually removed.
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         *
+         * \warning
+         * Container may not be empty after clear call.
+         * This is because if a really older clear is applied, this doesn't
+         * affect elements that have been added later.
+         * From a user point of view, if you display a UI after a clear, you
+         * should iterate over the set anyway.
+         *
+         * \param stamp Timestamp of this operation.
+         * \return True if clear actually applied, otherwise, return false.
+         */
+        bool clear_vertices(const U& stamp) {
+            for(auto& vertex_elt : _adj) {
+                vertex_elt.second._edges.clear(stamp);
+            }
+            return _adj.clear(stamp);
+        }
+
+        /**
+         * Removes all edge for a specific vertex.
+         *
+         * Only elements with timestamp inferior to clear timestamp are
+         * actually removed.
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         *
+         * \param key   The unique vertex's key.
+         * \param stamp Timestamp of this operation.
+         * \return True if clear actually applied, otherwise, return false.
+         */
+        bool clear_vertex_edges(const Key& key, const U& stamp) {
+            auto vertex_it = _adj.crdt_find(key);
+            if(vertex_it == _adj.crdt_end()) {
+                return false;
+            }
+            auto& edges = vertex_it->second.value()._edges;
+            return edges.clear(stamp);
+        }
+
+        /**
          * Add a new vertex in the graph.
          *
          * If key already exists, use timestamps for concurrency control.

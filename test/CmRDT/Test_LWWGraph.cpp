@@ -406,6 +406,198 @@ TEST(LWWGraph, crdt_count_edgeTest) {
 
 
 // -----------------------------------------------------------------------------
+// clear_vertices()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, clear_verticesTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.clear_vertices(40);
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.crdt_size(), 3);
+}
+
+TEST(LWWGraph, clear_verticesIdempotentTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.clear_vertices(40);
+    data0.clear_vertices(40);
+    data0.clear_vertices(40);
+    data0.clear_vertices(40);
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.crdt_size(), 3);
+}
+
+TEST(LWWGraph, clear_verticesWithAddEdgeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 21);
+    data0.add_edge("v2", "v1", 22);
+
+    data0.clear_vertices(30);
+    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.crdt_size(), 3);
+    auto v1 = data0.crdt_find_vertex("v1");
+    auto v2 = data0.crdt_find_vertex("v2");
+    _ASSERT_VERTEX_EQ(v1, "v1", true, 30, data0);
+    _ASSERT_VERTEX_EQ(v2, "v2", true, 30, data0);
+
+    // Each vertex's edges should be empty
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        auto& edges = it->second.value().edges();
+        ASSERT_EQ(edges.size(), 0);
+        ASSERT_TRUE(edges.empty());
+    }
+}
+
+TEST(LWWGraph, clear_verticesReceivedTooLate) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Some updates (Done actually before clear)
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    data0.add_edge("v1", "v1", 30);
+    data0.add_edge("v1", "v2", 30);
+    data0.add_edge("v2", "v1", 30);
+
+    // Some updates (Done after clear)
+    data0.add_vertex("v4", 50);
+    data0.add_vertex("v5", 50);
+    data0.add_edge("v1", "v5", 60);
+    data0.add_edge("v4", "v2", 60);
+    data0.add_edge("v4", "v5", 60);
+
+    // Clear received but newer 'add' exists
+    data0.clear_vertices(42);
+
+    // Check vertex v1 and v2 not cleared (Since re-added by add_edge)
+    ASSERT_EQ(data0.size(), 4);
+    ASSERT_EQ(data0.crdt_size(), 5);
+    auto v1_it = data0.crdt_find_vertex("v1");
+    auto v2_it = data0.crdt_find_vertex("v2");
+    auto v3_it = data0.crdt_find_vertex("v3");
+    auto v4_it = data0.crdt_find_vertex("v4");
+    auto v5_it = data0.crdt_find_vertex("v5");
+    _ASSERT_VERTEX_EQ(v1_it, "v1", false, 60, data0);
+    _ASSERT_VERTEX_EQ(v2_it, "v2", false, 60, data0);
+    _ASSERT_VERTEX_EQ(v3_it, "v3", true, 42, data0);
+    _ASSERT_VERTEX_EQ(v4_it, "v4", false, 60, data0);
+    _ASSERT_VERTEX_EQ(v5_it, "v5", false, 60, data0);
+
+    // Check edges status
+    auto& v1_edges = v1_it->second.value().edges();
+    auto& v2_edges = v2_it->second.value().edges();
+    auto& v3_edges = v3_it->second.value().edges();
+    auto& v4_edges = v4_it->second.value().edges();
+    auto& v5_edges = v5_it->second.value().edges();
+    ASSERT_EQ(v1_edges.size(), 1);
+    ASSERT_EQ(v2_edges.size(), 0);
+    ASSERT_EQ(v3_edges.size(), 0);
+    ASSERT_EQ(v4_edges.size(), 2);
+    ASSERT_EQ(v5_edges.size(), 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// clear_vertex_edges()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, clear_vertex_edgesTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v1", "v3", 20);
+    data0.add_edge("v2", "v1", 20);
+    data0.add_edge("v2", "v3", 20);
+
+    data0.clear_vertex_edges("v1", 40);
+    ASSERT_EQ(data0.size(), 3);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    // Check vertex status
+    auto v1_it = data0.crdt_find_vertex("v1");
+    auto v2_it = data0.crdt_find_vertex("v2");
+    auto v3_it = data0.crdt_find_vertex("v3");
+    _ASSERT_VERTEX_EQ(v1_it, "v1", false, 20, data0);
+    _ASSERT_VERTEX_EQ(v2_it, "v2", false, 20, data0);
+    _ASSERT_VERTEX_EQ(v3_it, "v3", false, 20, data0);
+
+    // Check edges status
+    auto& v1_edges = v1_it->second.value().edges();
+    auto& v2_edges = v2_it->second.value().edges();
+    auto& v3_edges = v3_it->second.value().edges();
+    ASSERT_EQ(v1_edges.size(), 0);
+    ASSERT_EQ(v2_edges.size(), 2);
+    ASSERT_EQ(v3_edges.size(), 0);
+}
+
+TEST(LWWGraph, clear_vertex_edgesWithAddCalledLaterTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Update (Done before clear)
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v2", "v1", 20);
+    data0.add_edge("v2", "v3", 20);
+
+    // Update (With timestamp after clear, but applied before clear)
+    data0.add_edge("v1", "v3", 40);
+
+    // Clear v1 edges
+    data0.clear_vertex_edges("v1", 30);
+
+    ASSERT_EQ(data0.size(), 3);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    // Check vertex status
+    auto v1_it = data0.crdt_find_vertex("v1");
+    auto v2_it = data0.crdt_find_vertex("v2");
+    auto v3_it = data0.crdt_find_vertex("v3");
+    _ASSERT_VERTEX_EQ(v1_it, "v1", false, 40, data0);
+    _ASSERT_VERTEX_EQ(v2_it, "v2", false, 20, data0);
+    _ASSERT_VERTEX_EQ(v3_it, "v3", false, 40, data0);
+
+    // Check edges status
+    auto& v1_edges = v1_it->second.value().edges();
+    auto& v2_edges = v2_it->second.value().edges();
+    auto& v3_edges = v3_it->second.value().edges();
+    ASSERT_EQ(v1_edges.size(), 1);
+    ASSERT_EQ(v2_edges.size(), 2);
+    ASSERT_EQ(v3_edges.size(), 0);
+}
+
+TEST(LWWGraph, clear_vertex_edgesOnInvalidVertexReturnTypeTest) {
+    LWWGraph<int, int, int> data0;
+
+    ASSERT_FALSE(data0.clear_vertex_edges(64, 11));
+    ASSERT_FALSE(data0.clear_vertex_edges(42, 12));
+    ASSERT_FALSE(data0.clear_vertex_edges(32, 13));
+}
+
+
+// -----------------------------------------------------------------------------
 // add_vertex()
 // -----------------------------------------------------------------------------
 
