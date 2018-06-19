@@ -227,6 +227,9 @@ class LWWSet {
         /**
          * Removed all elements from the container.
          *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         *
          * Only elements with timestamp inferior to clear timestamp are
          * actually removed.
          *
@@ -392,7 +395,7 @@ class LWWSet {
     public:
 
         /**
-         * Check if tow containers have the exact same internal data.
+         * Check if two containers have the exact same internal data.
          * Element with removed flag are used for this comparison.
          *
          * \param other Container to compare with.

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <ostream>
 
 namespace collab {
@@ -47,12 +46,12 @@ namespace CmRDT {
 template<typename T, typename U>
 class LWWRegister {
     private:
-        T   _reg;               // TODO: We should create init constructor?
-        U   _timestamp = {0};   // TODO: this may create some trouble?
+        T   _reg;               // DevNote: We should create init constructor?
+        U   _timestamp = {0};   // DevNote: this may create some trouble?
 
 
     // -------------------------------------------------------------------------
-    // CRDT methods
+    // Query methods
     // -------------------------------------------------------------------------
 
     public:
@@ -67,6 +66,22 @@ class LWWRegister {
         }
 
         /**
+         * Get the internal current timestamps associated with this register.
+         *
+         * \return Current register's timestamps.
+         */
+        const U& timestamp() const {
+            return _timestamp;
+        }
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
          * Change the local register value.
          * Do nothing if given stamp is less to the current timestamps.
          *
@@ -74,13 +89,15 @@ class LWWRegister {
          * was already higher, update is actually not done and value stay as
          * it was before. (CRDT Property)
          *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         * This is a valid only if value is the same in all calls.
+         *
          * \param value New value to place in this register.
          * \param stamp Timestamp of this update.
          * \return True if update applied, otherwise, returns false.
          */
         bool update(const T& value, const U& stamp) {
-            assert(stamp != _timestamp);
-
             if(stamp > _timestamp) {
                 _reg = value;
                 _timestamp = stamp;
@@ -89,13 +106,22 @@ class LWWRegister {
             return false;
         }
 
+
+    // -------------------------------------------------------------------------
+    // CRDT Specific
+    // -------------------------------------------------------------------------
+
+    public:
+
         /**
-         * Get the internal current timestamps associated with this register.
+         * Check if two registers have the exact same internal data.
+         * (Data and timestamps)
          *
-         * \return Current register's timestamps.
+         * \param other Container to compare with.
+         * \return True if equals, otherwise, return false.
          */
-        const U& timestamp() const {
-            return _timestamp;
+        bool crdt_equal(const LWWRegister& other) const {
+            return (_reg == other._reg) && (_timestamp == other._timestamp);
         }
 
 

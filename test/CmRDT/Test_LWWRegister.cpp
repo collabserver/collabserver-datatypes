@@ -8,7 +8,7 @@ namespace CmRDT {
 
 
 // -----------------------------------------------------------------------------
-// Class method tests
+// query()
 // -----------------------------------------------------------------------------
 
 TEST(LWWRegister, queryTest) {
@@ -26,6 +26,11 @@ TEST(LWWRegister, queryTest) {
     ASSERT_EQ(data0.query(), 300);
     ASSERT_EQ(data0.timestamp(), 3);
 }
+
+
+// -----------------------------------------------------------------------------
+// update()
+// -----------------------------------------------------------------------------
 
 TEST(LWWRegister, updateTest) {
     LWWRegister<int, int> data0;
@@ -71,50 +76,35 @@ TEST(LWWRegister, updateTest) {
 TEST(LWWRegister, updateReturnTypeTest) {
     LWWRegister<std::string, int> data0;
 
-    bool applied = data0.update("LittleRabbit", 10);
-    ASSERT_TRUE(applied);
-
-    applied = data0.update("SuperCarrot", 42);
-    ASSERT_TRUE(applied);
-
-    applied = data0.update("Toto", 20);
-    ASSERT_FALSE(applied);
-
-    applied = data0.update("Banana", 30);
-    ASSERT_FALSE(applied);
-
-    applied = data0.update("MagicCarrot", 64);
-    ASSERT_TRUE(applied);
+    ASSERT_TRUE(data0.update("LittleRabbit", 10));
+    ASSERT_TRUE(data0.update("SuperCarrot", 42));
+    ASSERT_FALSE(data0.update("Toto", 20));
+    ASSERT_FALSE(data0.update("Banana", 30));
+    ASSERT_TRUE(data0.update("MagicCarrot", 64));
 }
 
+TEST(LWWRegister, updateIdempotentTest) {
+    LWWRegister<std::string, int> data0;
 
-// -----------------------------------------------------------------------------
-// Operator Tests
-// -----------------------------------------------------------------------------
-
-TEST(LWWRegister, operatorEQTest) {
-    LWWRegister<int, int> data0;
-    LWWRegister<int, int> data1;
-
-    // Exact EQ
-    data0.update(42, 1);
-    data1.update(42, 1);
-    ASSERT_TRUE(data0 == data1);
-    ASSERT_FALSE(data0 != data1);
-
-    // Register with different timestamp are equal anyway
-    data0.update(77, 7);
-    data1.update(77, 9);
-    ASSERT_TRUE(data0 == data1);
-    ASSERT_FALSE(data0 != data1);
+    data0.update("kara", 10);
+    data0.update("kara", 10);
+    data0.update("kara", 10);
+    data0.update("kara", 10);
+    ASSERT_EQ(data0.query(), "kara");
+    ASSERT_EQ(data0.timestamp(), 10);
 }
 
+TEST(LWWRegister, updateIdempotentReturnTypeTest) {
+    LWWRegister<std::string, int> data0;
 
-// -----------------------------------------------------------------------------
-// Use case Tests
-// -----------------------------------------------------------------------------
+    ASSERT_TRUE(data0.update("LittleRabbit", 10));
+    ASSERT_FALSE(data0.update("LittleRabbit", 10));
+    ASSERT_FALSE(data0.update("LittleRabbit", 10));
+    ASSERT_FALSE(data0.update("LittleRabbit", 10));
+    ASSERT_FALSE(data0.update("LittleRabbit", 10));
+}
 
-TEST(LWWRegister, usecaseNormalTest) {
+TEST(LWWRegister, updateUsecaseTest) {
     LWWRegister<int, int> data0;
     LWWRegister<int, int> data1;
 
@@ -160,6 +150,45 @@ TEST(LWWRegister, usecaseNormalTest) {
 
     ASSERT_EQ(data0.query(), data1.query());
     ASSERT_EQ(data0.timestamp(), data1.timestamp());
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_equal()
+// -----------------------------------------------------------------------------
+
+TEST(LWWRegister, crdt_equalTest) {
+    LWWRegister<int, int> data0;
+    LWWRegister<int, int> data1;
+
+    data0.update(42, 1);
+    ASSERT_FALSE(data0.crdt_equal(data1));
+    ASSERT_TRUE(data0.crdt_equal(data0));
+
+    data1.update(42, 1);
+    ASSERT_TRUE(data0.crdt_equal(data1));
+}
+
+
+// -----------------------------------------------------------------------------
+// operatorEQ()
+// -----------------------------------------------------------------------------
+
+TEST(LWWRegister, operatorEQTest) {
+    LWWRegister<int, int> data0;
+    LWWRegister<int, int> data1;
+
+    // Exact EQ
+    data0.update(42, 1);
+    data1.update(42, 1);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
+
+    // Register with different timestamp are equal anyway
+    data0.update(77, 7);
+    data1.update(77, 9);
+    ASSERT_TRUE(data0 == data1);
+    ASSERT_FALSE(data0 != data1);
 }
 
 
