@@ -606,6 +606,38 @@ TEST(LWWSet, addReturnTypeWithRemoveCalled) {
     ASSERT_TRUE(data0.add("coco", 513));
 }
 
+TEST(LWWSet, addIdempotentTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.add("e1", 10);
+    data0.add("e1", 10);
+    data0.add("e1", 10);
+    data0.add("e1", 10);
+    data0.add("e1", 10);
+
+    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.crdt_size(), 1);
+
+    auto coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
+}
+
+TEST(LWWSet, addIdempotentReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    ASSERT_TRUE(data0.add("e1", 10));
+    ASSERT_FALSE(data0.add("e1", 10));
+    ASSERT_FALSE(data0.add("e1", 10));
+    ASSERT_FALSE(data0.add("e1", 10));
+    ASSERT_FALSE(data0.add("e1", 10));
+
+    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.crdt_size(), 1);
+
+    auto coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
+}
+
 
 // -----------------------------------------------------------------------------
 // remove()
@@ -684,6 +716,42 @@ TEST(LWWSet, removeReturnTypeTest) {
     ASSERT_FALSE(data0.remove("coco", 40));
     ASSERT_FALSE(data0.remove("coco", 50));
     ASSERT_FALSE(data0.remove("coco", 60));
+}
+
+TEST(LWWSet, removeIdempotentTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    data0.remove("e1", 20);
+    data0.remove("e1", 20);
+    data0.remove("e1", 20);
+    data0.remove("e1", 20);
+
+    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    auto coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
+}
+
+TEST(LWWSet, removeIdempotentReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    ASSERT_TRUE(data0.remove("e1", 20));
+    ASSERT_FALSE(data0.remove("e1", 20));
+    ASSERT_FALSE(data0.remove("e1", 20));
+    ASSERT_FALSE(data0.remove("e1", 20));
+
+    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.crdt_size(), 3);
+
+    auto coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 }
 
 

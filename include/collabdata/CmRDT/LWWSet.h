@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <utility> // std::pair
-#include <cassert>
 #include <ostream>
 
 namespace collab {
@@ -55,9 +54,9 @@ namespace CmRDT {
  * "
  *
  * \warning
- * Timestamps are strictly unique with total order.
- * If (t1 == t2) is true, replicates may diverge.
- * (See quote and implementation for further informations).
+ * Timestamps are strictly unique for each user's operation, with total order.
+ * For any distinct operations (ex: add(t1) / remove(t2)), t1==t2 must return
+ * false. (See quote and implementation for further informations).
  *
  * \warning
  * U timestamp must accept "U t = {0}".
@@ -278,6 +277,9 @@ class LWWSet {
          * If remove timestamp wins, this add operation does nothing.
          * Otherwise, add is applied and true is returned.
          *
+         * \par Idempotent
+         * Duplicates call with same stamp is idempotent.
+         *
          * \param key   Key element to add.
          * \param stamp Timestamps of this operation.
          * \return True if key added, otherwise, return false.
@@ -293,8 +295,6 @@ class LWWSet {
             const U& keyStamp   = elt.timestamp();
 
             if(!isKeyAdded) {
-                assert(keyStamp != stamp);
-
                 if(stamp > keyStamp) {
                     elt._timestamp = stamp;
 
@@ -332,6 +332,9 @@ class LWWSet {
          * updated for CRDT properties). Note that remove may be called before
          * add, this returns false anyway.
          *
+         * \par Idempotent
+         * Duplicates call with same stamp is idempotent.
+         *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
          * \return True if key removed, otherwise, return false.
@@ -347,8 +350,6 @@ class LWWSet {
             const U& keyStamp   = elt.timestamp();
 
             if(!isKeyAdded) {
-                assert(keyStamp != stamp);
-
                 if(stamp > keyStamp) {
                     elt._timestamp = stamp;
 
