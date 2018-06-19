@@ -86,6 +86,7 @@ class LWWSet {
     private:
         std::unordered_map<Key, Metadata> _map;
         size_type _sizeAlive = 0; // Nb of alive elts (Not marked as removed)
+        U _lastClearTime = {0}; // Last time a clear has been applied
 
 
     // -------------------------------------------------------------------------
@@ -225,6 +226,45 @@ class LWWSet {
     public:
 
         /**
+         * Removed all elements from the container.
+         *
+         * Only elements with timestamp inferior to clear's timestamp are
+         * actually removed.
+         *
+         * \warning
+         * Container may not be empty after clear call.
+         * This is because if a really older clear is applied, this doesn't
+         * affect elements that have been added later.
+         * From a user point of view, if you display a UI after a clear, you
+         * should iterate over the set anyway.
+         *
+         * \param stamp Timestamp of this operation.
+         * \return True if clear actually applied, otherwise, return false.
+         */
+        bool clear(const U& stamp) noexcept {
+            if(stamp > _lastClearTime) {
+                _lastClearTime = stamp;
+
+                // DevNote: Same code as 'remove' but without the insert attempt
+                for(auto& elt_it : _map) {
+                    Metadata& elt = elt_it.second;
+
+                    if(stamp > elt._timestamp) {
+                        elt._timestamp = stamp;
+
+                        if(elt._isRemoved == false) {
+                            elt._isRemoved = true;
+                            --_sizeAlive;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        /**
          * Inserts new key in the container.
          * If key already exists, use timestamps for concurrency control.
          *
@@ -267,8 +307,15 @@ class LWWSet {
                 return false;
             }
             else {
-                ++_sizeAlive;
-                return true;
+                if(stamp > _lastClearTime) {
+                    ++_sizeAlive;
+                    return true;
+                }
+                else {
+                    elt._timestamp = _lastClearTime;
+                    elt._isRemoved = true;
+                    return false;
+                }
             }
         }
 
@@ -312,6 +359,7 @@ class LWWSet {
                     }
                 }
             }
+
             // DevNote: in case remove called before even add, remove does the
             // CRDT job (add and mark as deleted). However, from user point of
             // view, this did nothing.

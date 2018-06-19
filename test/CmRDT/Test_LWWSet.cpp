@@ -335,6 +335,188 @@ TEST(LWWSet, findRemovedElementTest) {
 
 
 // -----------------------------------------------------------------------------
+// clear()
+// -----------------------------------------------------------------------------
+
+TEST(LWWSet, clearTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    data0.add("e4", 14);
+    data0.add("e5", 15);
+
+    EXPECT_EQ(data0.size(), 5);
+    EXPECT_EQ(data0.crdt_size(), 5);
+    data0.clear(30);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 5);
+}
+
+TEST(LWWSet, clearCalledFirstTest) {
+    LWWSet<std::string, int> data0;
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 0);
+
+    // Older clear called first
+    data0.clear(10);
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    data0.add("e4", 14);
+    data0.add("e5", 15);
+
+    EXPECT_EQ(data0.size(), 5);
+    EXPECT_EQ(data0.crdt_size(), 5);
+
+    // Newer clear called first
+    data0.clear(30);
+    data0.add("e6", 21);
+    data0.add("e7", 22);
+    data0.add("e8", 23);
+    data0.add("e9", 24);
+    data0.add("e10", 25);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 10);
+}
+
+TEST(LWWSet, clearIndenpotentTest) {
+    LWWSet<std::string, int> data0;
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 0);
+
+    // Older clear called first
+    data0.clear(10);
+    data0.clear(10);
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    data0.add("e4", 14);
+    data0.add("e5", 15);
+
+    EXPECT_EQ(data0.size(), 5);
+    EXPECT_EQ(data0.crdt_size(), 5);
+
+    // indenpotent
+    data0.clear(10);
+    data0.clear(10);
+    data0.clear(10);
+    data0.clear(10);
+
+    EXPECT_EQ(data0.size(), 5);
+    EXPECT_EQ(data0.crdt_size(), 5);
+
+
+    // Newer clear called first
+    data0.clear(30);
+    data0.clear(30);
+    data0.clear(30);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 5);
+
+    data0.add("e6", 21);
+    data0.add("e7", 22);
+    data0.add("e8", 23);
+    data0.add("e9", 24);
+    data0.add("e10", 25);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 10);
+
+    // indenpotent
+    data0.clear(30);
+    data0.clear(30);
+    data0.clear(30);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 10);
+}
+
+TEST(LWWSet, clearIndenpotentReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 0);
+
+    // Clear at 42
+    EXPECT_TRUE(data0.clear(42));
+    EXPECT_FALSE(data0.clear(42));
+    EXPECT_FALSE(data0.clear(42));
+
+    // Clear at 20
+    EXPECT_FALSE(data0.clear(20));
+    EXPECT_FALSE(data0.clear(20));
+    EXPECT_FALSE(data0.clear(20));
+
+    // Clear at 64
+    EXPECT_TRUE(data0.clear(64));
+    EXPECT_FALSE(data0.clear(64));
+    EXPECT_FALSE(data0.clear(64));
+}
+
+TEST(LWWSet, clearReturnTypeTest) {
+    LWWSet<std::string, int> data0;
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 0);
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+    EXPECT_TRUE(data0.clear(10));
+    EXPECT_EQ(data0.size(), 3); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.crdt_size(), 3);
+
+    // Duplicate clear later (Is applied)
+    EXPECT_TRUE(data0.clear(20));
+    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.crdt_size(), 3);
+
+    // Duplicate calls (Earlier. Not applied)
+    EXPECT_FALSE(data0.clear(11));
+    EXPECT_FALSE(data0.clear(12));
+    EXPECT_FALSE(data0.clear(13));
+    EXPECT_FALSE(data0.clear(14));
+
+    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.crdt_size(), 3);
+}
+
+TEST(LWWSet, clearThenAddAfterNewerClearTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.clear(42);
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+
+    EXPECT_EQ(data0.size(), 0);
+    EXPECT_EQ(data0.crdt_size(), 3);
+}
+
+TEST(LWWSet, clearThenAddAfterOlderClearTest) {
+    LWWSet<std::string, int> data0;
+
+    data0.clear(10);
+
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+
+    EXPECT_EQ(data0.size(), 3);
+    EXPECT_EQ(data0.crdt_size(), 3);
+}
+
+
+// -----------------------------------------------------------------------------
 // add()
 // -----------------------------------------------------------------------------
 

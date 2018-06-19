@@ -2,6 +2,13 @@
  * TEST NAMING RULE (For all test files):
  * The first word of test name is generally the tested method
  * ex: addDuplicateCallsTest to test function 'add'
+ *
+ * General cases to check for any CRDT data:
+ *  - Normal example
+ *  - Indenpotent
+ *  - Commutativity (Duplicat calls with diff timestamps)
+ *  - Return type
+ *  - Called at usually invalid place (Remove before add).
  */
 
 #include <gtest/gtest.h>
