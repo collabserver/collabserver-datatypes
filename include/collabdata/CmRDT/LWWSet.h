@@ -278,7 +278,7 @@ class LWWSet {
          * Otherwise, add is applied and true is returned.
          *
          * \par Idempotent
-         * Duplicates call with same stamp is idempotent.
+         * Duplicate calls with same stamp is idempotent.
          *
          * \param key   Key element to add.
          * \param stamp Timestamps of this operation.
@@ -333,7 +333,7 @@ class LWWSet {
          * add, this returns false anyway.
          *
          * \par Idempotent
-         * Duplicates call with same stamp is idempotent.
+         * Duplicate calls with same stamp is idempotent.
          *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.

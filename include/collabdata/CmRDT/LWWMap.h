@@ -2,7 +2,6 @@
 
 #include <unordered_map>
 #include <utility> // std::pair
-#include <cassert>
 #include <ostream>
 
 namespace collab {
@@ -331,6 +330,9 @@ class LWWMap {
          * To add key and set its content, call this add method and query the
          * added element (Then update it with its default value).
          *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
+         *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
          * \return True if key added, otherwise, return false.
@@ -346,8 +348,6 @@ class LWWMap {
             const U& keyStamp   = elt.timestamp();
 
             if(!isKeyAdded) {
-                assert(keyStamp != stamp);
-
                 if(stamp > keyStamp) {
                     elt._timestamp = stamp;
 
@@ -384,6 +384,9 @@ class LWWMap {
          * removed, returns false (Though timestamps may have been internally
          * updated for CRDT properties). Note that remove may be called before
          * add, this returns false anyway.
+         *
+         * \par Idempotent
+         * Duplicate calls with same stamp is idempotent.
          *
          * \param key   Key of the element to add.
          * \param stamp Timestamps of this operation.
