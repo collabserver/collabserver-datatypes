@@ -115,15 +115,21 @@ class CollabData {
          * \param observer The observer to add.
          * \return True if added, otherwise, return false.
          */
-        bool addOperationObserver(OperationObserver* observer) {
-            assert(observer != nullptr);
+        bool addOperationObserver(OperationObserver& observer) {
             for(OperationObserver* const obs : _operationObservers) {
-                if(obs == observer) {
+                if(obs == &observer) {
                     return false;
                 }
             }
-            _operationObservers.push_back(observer);
+            _operationObservers.push_back(&observer);
             return true;
+        }
+
+        /**
+         * Removes all current operation observers.
+         */
+        void clearOperationObservers() {
+            _operationObservers.clear();
         }
 
         /**
@@ -158,9 +164,15 @@ class CollabData {
          * Associate a broadcaster for this data.
          * If data already has a broadcaster, it is updated with this one.
          */
-        void setOperationBroadcaster(OperationObserver* observer) {
-            assert(observer != nullptr);
-            _broadcaster = observer;
+        void setOperationBroadcaster(OperationObserver& observer) {
+            _broadcaster = &observer;
+        }
+
+        /**
+         * Removes broadcaster for this data.
+         */
+        void removeOperationBroadcaster() {
+            _broadcaster = nullptr;
         }
 
         /**
