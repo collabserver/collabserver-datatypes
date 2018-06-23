@@ -7,19 +7,19 @@ endif()
 
 
 # ------------------------------------------------------------------------------
-# Various
+# Dependencies and Misc
 # ------------------------------------------------------------------------------
-set(DEPENDENCY_DIR "${CMAKE_SOURCE_DIR}/bin/")
+set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/bin/")
 
 include("CMake/AddCompilerFlags.cmake")
 
 
 # ------------------------------------------------------------------------------
-# Examples
+# Examples Executables
 # ------------------------------------------------------------------------------
-option(BUILD_EXAMPLES "Build examples" ON)
+option(collab_examples "Build examples" ON)
 
-if(BUILD_EXAMPLES)
+if(collab_examples)
     message(STATUS "Build examples")
     include("CMake/AddExamples.cmake")
 else()
@@ -28,11 +28,11 @@ endif()
 
 
 # ------------------------------------------------------------------------------
-# Tests
+# Tests Executables
 # ------------------------------------------------------------------------------
-option(BUILD_TESTS "Build Tests" OFF)
+option(collab_tests "Build Tests" OFF)
 
-if(BUILD_TESTS)
+if(collab_tests)
     message(STATUS "Build tests")
     include("CMake/AddTests.cmake")
 else()

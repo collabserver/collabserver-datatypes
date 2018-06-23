@@ -1,17 +1,23 @@
 language: cpp
+sudo: false
 dist: trusty
-sudo: required
-os: linux
 
-compiler:
-    - gcc
-    - clang
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+          env: BUILD_TYPE=Debug VERBOSE=1
+        - os: linux
+          compiler: gcc
+          env: BUILD_TYPE=Release VERBOSE=1
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=Debug VERBOSE=1
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=Release VERBOSE=1
 
-before_script:
-    - mkdir build
-    - cd build
-    - cmake -DBUILD_TESTS=ON ..
+script: ./build.sh
 
-script:
-    - make -j4
-    - ./runtests
+notifications:
+  email: false
