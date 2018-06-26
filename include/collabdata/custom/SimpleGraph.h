@@ -46,23 +46,25 @@ class SimpleGraph : public CollabData {
          * List all possible Operation on this data.
          */
         enum class OperationsType : int {
-            ELEMENT_ADD = 1,
-            ELEMENT_DELETE,
+            VERTEX_ADD = 1,
+            VERTEX_DELETE,
+            ATTRIBUTE_ADD,
+            ATTRIBUTE_REMOVE,
             ATTRIBUTE_SET,
         };
 
         // ---------------------------------------------------------------------
-        class ElementAddOperation : public Operation {
+        class VertexAddOperation : public Operation {
             private:
                 friend SimpleGraph;
-                UUID        _elementID;
+                UUID        _vertexID;
                 Timestamp   _timestamp = {0};
 
             public:
-                ElementAddOperation() = default;
-                ElementAddOperation(const std::string& id, const Timestamp& time)
-                  : _elementID(id), _timestamp(time) {
-                    _type = static_cast<int>(OperationsType::ELEMENT_ADD);
+                VertexAddOperation() = default;
+                VertexAddOperation(const std::string& id, const Timestamp& time)
+                  : _vertexID(id), _timestamp(time) {
+                    _type = static_cast<int>(OperationsType::VERTEX_ADD);
                 }
 
             public:
@@ -76,8 +78,8 @@ class SimpleGraph : public CollabData {
                 }
 
             public:
-                const UUID& elementID() const {
-                    return _elementID;
+                const UUID& vertexID() const {
+                    return _vertexID;
                 }
                 const Timestamp& timestamp() const {
                     return _timestamp;
@@ -85,19 +87,19 @@ class SimpleGraph : public CollabData {
         };
 
         // ---------------------------------------------------------------------
-        class ElementDeleteOperation : public Operation {
+        class VertexDeleteOperation : public Operation {
             private:
                 friend SimpleGraph;
-                UUID        _elementID;
+                UUID        _vertexID;
                 Timestamp   _timestamp = {0};
 
             public:
 
-                ElementDeleteOperation() = default;
-                ElementDeleteOperation(const std::string& id,
+                VertexDeleteOperation() = default;
+                VertexDeleteOperation(const std::string& id,
                                        const Timestamp& time)
-                  : _elementID(id), _timestamp(time) {
-                    _type = static_cast<int>(OperationsType::ELEMENT_DELETE);
+                  : _vertexID(id), _timestamp(time) {
+                    _type = static_cast<int>(OperationsType::VERTEX_DELETE);
                 }
 
             public:
@@ -111,11 +113,97 @@ class SimpleGraph : public CollabData {
                 }
 
             public:
-                const UUID& elementID() const {
-                    return _elementID;
+                const UUID& vertexID() const {
+                    return _vertexID;
                 }
                 const Timestamp& timestamp() const {
                     return _timestamp;
+                }
+        };
+
+        // ---------------------------------------------------------------------
+        class AttributeAddOperation : public Operation {
+            private:
+                friend SimpleGraph;
+                UUID        _vertexID;
+                Timestamp   _timestamp = {0};
+                std::string _attributeName;
+                std::string _attributeValue;
+
+            public:
+                AttributeAddOperation() = default;
+                AttributeAddOperation(const std::string& id,
+                                      const Timestamp& time,
+                                      const std::string& name,
+                                      const std::string& value)
+                    : _vertexID(id),
+                      _timestamp(time),
+                      _attributeName(name),
+                      _attributeValue(value) {
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const override {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(const std::stringstream& buffer) override {
+                    // TODO
+                    return false;
+                }
+
+            public:
+                const UUID& vertexID() const {
+                    return _vertexID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
+                }
+                const std::string& attributeName() const {
+                    return _attributeName;
+                }
+                const std::string& attributeValue() const {
+                    return _attributeValue;
+                }
+        };
+
+        // ---------------------------------------------------------------------
+        class AttributeRemoveOperation : public Operation {
+            private:
+                friend SimpleGraph;
+                UUID        _vertexID;
+                Timestamp   _timestamp = {0};
+                std::string _attributeName;
+
+            public:
+                AttributeRemoveOperation() = default;
+                AttributeRemoveOperation(const std::string& id,
+                                         const Timestamp& time,
+                                         const std::string& name)
+                    : _vertexID(id),
+                      _timestamp(time),
+                      _attributeName(name) {
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const override {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(const std::stringstream& buffer) override {
+                    // TODO
+                    return false;
+                }
+
+            public:
+                const UUID& vertexID() const {
+                    return _vertexID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
+                }
+                const std::string& attributeName() const {
+                    return _attributeName;
                 }
         };
 
@@ -123,7 +211,7 @@ class SimpleGraph : public CollabData {
         class AttributeSetOperation : public Operation {
             private:
                 friend SimpleGraph;
-                UUID        _elementID;
+                UUID        _vertexID;
                 Timestamp   _timestamp = {0};
                 std::string _attributeName;
                 std::string _newValue;
@@ -135,7 +223,7 @@ class SimpleGraph : public CollabData {
                                       const Timestamp& time,
                                       const std::string& name,
                                       const std::string& nVal)
-                  : _elementID(id), _timestamp(time), _attributeName(name),
+                  : _vertexID(id), _timestamp(time), _attributeName(name),
                     _newValue(nVal) {
                     _type = static_cast<int>(OperationsType::ATTRIBUTE_SET);
                 }
@@ -151,8 +239,8 @@ class SimpleGraph : public CollabData {
                 }
 
             public:
-                const UUID& elementID() const {
-                    return _elementID;
+                const UUID& vertexID() const {
+                    return _vertexID;
                 }
                 const Timestamp& timestamp() const {
                     return _timestamp;
@@ -172,35 +260,72 @@ class SimpleGraph : public CollabData {
 
     private:
 
-        CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _modelMDE;
+        CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _graph;
 
 
     // -------------------------------------------------------------------------
-    // Modifiers methods
+    // Modifiers methods (End-User)
     // -------------------------------------------------------------------------
 
     public:
 
         /**
-         * Add element in the View.
-         * Notifies all OperationObservers.
+         * Add vertex in the View.
+         * Notifies all OperationObservers and broadcaster.
          *
-         * \param id The element's ID.
+         * \param id The vertex's ID.
          */
-        void addElement(const UUID& id) {
-            ElementAddOperation op = {id, Timestamp::now()};
+        void addVertex(const UUID& id) {
+            VertexAddOperation op = {id, Timestamp::now()};
             this->applyOperation(op);
             this->broadcastOperation(op);
         }
 
         /**
-         * Remove elements from the view.
-         * Notifies all OperationObservers.
+         * Remove vertexs from the view.
+         * Notifies all OperationObservers and broadcaster.
          *
-         * \param id The element's ID.
+         * \param id The vertex's ID.
          */
-        void removeElement(const UUID& id) {
-            ElementDeleteOperation op = {id, Timestamp::now()};
+        void removeVertex(const UUID& id) {
+            VertexDeleteOperation op = {id, Timestamp::now()};
+            this->applyOperation(op);
+            this->broadcastOperation(op);
+        }
+
+        /**
+         * Add attribute to the given vertex.
+         * Notifies all OperationObservers and broadcaster.
+         *
+         * \note
+         * This also re-add the vertex if was deleted.
+         * (Or just update 'last-modification' timestamp).
+         *
+         * \param id    vertex's ID.
+         * \param name  Attribute's name.
+         * \param value Attribute initial value.
+         */
+        void addAttribute(const UUID& id,
+                          const std::string& name,
+                          const std::string& value) {
+            AttributeAddOperation op = {id, Timestamp::now(), name, value};
+            this->applyOperation(op);
+            this->broadcastOperation(op);
+        }
+
+        /**
+         * Removes attribute from the given vertex.
+         * Notifies all OperationObservers and broadcaster.
+         *
+         * \note
+         * This also re-add the vertex if was deleted.
+         * (Or just update 'last-modification' timestamp).
+         *
+         * \param id    vertex's ID.
+         * \param name  Attribute's name.
+         */
+        void removeAttribute(const UUID& id, const std::string& name) {
+            AttributeRemoveOperation op = {id, Timestamp::now(), name};
             this->applyOperation(op);
             this->broadcastOperation(op);
         }
@@ -208,18 +333,19 @@ class SimpleGraph : public CollabData {
         /**
          * Set value of en attribute.
          * Creates this attribute if doesn't exists.
-         * If the eltID doesn't exists or has been removed, this also add/re-add
-         * the vertex.
          *
-         * \param eltID Element's ID.
+         * \note
+         * This also re-add the vertex if was deleted.
+         * (Or just update 'last-modification' timestamp).
+         *
+         * \param id    vertex's ID.
          * \param name  Attribute's name.
          * \param value Attribute's new value.
          */
-        void setAttribute(const UUID& eltID,
+        void setAttribute(const UUID& id,
                           const std::string& name,
                           const std::string& value) {
-            auto tnow = Timestamp::now();
-            AttributeSetOperation op = {eltID, tnow, name, value};
+            AttributeSetOperation op = {id, Timestamp::now(), name, value};
             this->applyOperation(op);
             this->broadcastOperation(op);
         }
@@ -231,40 +357,103 @@ class SimpleGraph : public CollabData {
 
     private:
 
-        void applyOperation(const ElementAddOperation& op) {
+        void applyOperation(const VertexAddOperation& op) {
             auto& tnow      = op.timestamp();
-            auto& id        = op.elementID();
-            bool isAdded    = _modelMDE.add_vertex(id, tnow);
+            auto& id        = op.vertexID();
+            bool isAdded    = _graph.add_vertex(id, tnow);
             if(isAdded) {
                 this->notifyOperationObservers(op);
             }
         }
 
-        void applyOperation(const ElementDeleteOperation& op) {
+        void applyOperation(const VertexDeleteOperation& op) {
             auto& tnow      = op.timestamp();
-            auto& id        = op.elementID();
-            bool isRemoved  = _modelMDE.remove_vertex(id, tnow);
+            auto& id        = op.vertexID();
+            bool isRemoved  = _graph.remove_vertex(id, tnow);
             if(isRemoved) {
+                this->notifyOperationObservers(op);
+            }
+        }
+
+        void applyOperation(const AttributeAddOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& id        = op.vertexID();
+            auto& attrName  = op.attributeName();
+            auto& attrValue = op.attributeValue();
+
+            // Also add the vertex
+            bool isVertexAdded = _graph.add_vertex(id, tnow);
+            bool isVertexAlive = _graph.count_vertex(id) > 0 ? true : false;
+            if(isVertexAdded) {
+                VertexAddOperation vertex_op = {id, tnow};
+                this->notifyOperationObservers(vertex_op);
+            }
+
+            auto vertex_it  = _graph.crdt_find_vertex(id);
+            auto& attrMap   = vertex_it->second.value().content();
+
+            bool isAdded    = attrMap.add(attrName, tnow);
+            auto attrElt_it = attrMap.crdt_find(attrName);
+            auto& attrElt   = attrElt_it->second.value();
+
+            attrElt.update(attrValue, tnow);
+            if(isAdded && isVertexAlive) {
+                this->notifyOperationObservers(op);
+            }
+        }
+
+        void applyOperation(const AttributeRemoveOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& id        = op.vertexID();
+            auto& attrName  = op.attributeName();
+
+            // Also add the vertex
+            bool isVertexAdded = _graph.add_vertex(id, tnow);
+            bool isVertexAlive = _graph.count_vertex(id) > 0 ? true : false;
+            if(isVertexAdded) {
+                VertexAddOperation vertex_op = {id, tnow};
+                this->notifyOperationObservers(vertex_op);
+            }
+
+            auto vertex_it  = _graph.crdt_find_vertex(id);
+            auto& attrMap   = vertex_it->second.value().content();
+
+            bool isRemoved  = attrMap.remove(attrName, tnow);
+            if(isRemoved && isVertexAlive) {
                 this->notifyOperationObservers(op);
             }
         }
 
         void applyOperation(const AttributeSetOperation& op) {
             auto& tnow      = op.timestamp();
-            auto& id        = op.elementID();
+            auto& id        = op.vertexID();
             auto& newValue  = op.newValue();
             auto& attrName  = op.attributeName();
 
-            _modelMDE.add_vertex(id, tnow);
-            auto vertex_it = _modelMDE.find_vertex(id);
-            auto& attrMap = vertex_it->second.content();
+            // Also add the vertex
+            bool isVertexAdded = _graph.add_vertex(id, tnow);
+            bool isVertexAlive = (_graph.count_vertex(id) > 0)? true : false;
+            if(isVertexAdded) {
+                VertexAddOperation vertex_op = {id, tnow};
+                this->notifyOperationObservers(vertex_op);
+            }
 
-            attrMap.add(attrName, tnow);
-            auto attrElt_it = attrMap.find(attrName);
-            auto& attrElt = attrElt_it->second;
+            auto vertex_it  = _graph.crdt_find_vertex(id);
+            auto& attrMap   = vertex_it->second.value().content();
 
-            bool isUpdated = attrElt.update(newValue, tnow);
-            if(isUpdated) {
+            // Also add the attribute
+            bool isAttrAdded = attrMap.add(attrName, tnow);
+            if(isAttrAdded && isVertexAlive) {
+                AttributeAddOperation add_op = {id, tnow, attrName, newValue};
+                this->notifyOperationObservers(add_op);
+            }
+
+            auto attrElt_it = attrMap.crdt_find(attrName);
+            auto& attrElt   = attrElt_it->second.value();
+
+            bool isUpdated  = attrElt.update(newValue, tnow);
+            bool attrExists = (attrMap.count(attrName) > 0) ? true : false;
+            if(isUpdated && isVertexAlive && attrExists) {
                 this->notifyOperationObservers(op);
             }
         }
@@ -279,8 +468,8 @@ class SimpleGraph : public CollabData {
         bool receiveOperation(const int type,
                               const std::stringstream& buffer) override {
             switch(type) {
-                case static_cast<int>(OperationsType::ELEMENT_ADD): {
-                        ElementAddOperation op;
+                case static_cast<int>(OperationsType::VERTEX_ADD): {
+                        VertexAddOperation op;
                         if(!op.unserialize(buffer)) {
                             return false;
                         }
@@ -288,8 +477,26 @@ class SimpleGraph : public CollabData {
                     }
                     break;
 
-                case static_cast<int>(OperationsType::ELEMENT_DELETE): {
-                        ElementDeleteOperation op;
+                case static_cast<int>(OperationsType::VERTEX_DELETE): {
+                        VertexDeleteOperation op;
+                        if(!op.unserialize(buffer)) {
+                            return false;
+                        }
+                        applyOperation(op);
+                    }
+                    break;
+
+                case static_cast<int>(OperationsType::ATTRIBUTE_ADD): {
+                        AttributeAddOperation op;
+                        if(!op.unserialize(buffer)) {
+                            return false;
+                        }
+                        applyOperation(op);
+                    }
+                    break;
+
+                case static_cast<int>(OperationsType::ATTRIBUTE_REMOVE): {
+                        AttributeRemoveOperation op;
                         if(!op.unserialize(buffer)) {
                             return false;
                         }

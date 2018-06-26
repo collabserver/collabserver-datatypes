@@ -21,16 +21,36 @@ TEST(SimpleGraph, constructorTest) {
     // TODO
 }
 
-TEST(SimpleGraph, addElementTest) {
+TEST(SimpleGraph, addVertexTest) {
     SimpleGraph v;
-    v.addElement("e1");
+    v.addVertex("e1");
     // TODO
 }
 
-TEST(SimpleGraph, removeElementTest) {
+TEST(SimpleGraph, removeVertexTest) {
     SimpleGraph v;
-    v.addElement("e1");
-    v.removeElement("e1");
+    v.addVertex("e1");
+    v.removeVertex("e1");
+    // TODO
+}
+
+TEST(SimpleGraph, addAttributeTest) {
+    SimpleGraph v;
+    v.addAttribute("e1", "attr1", "Hi coco!");
+    // TODO
+}
+
+TEST(SimpleGraph, removeAttributeTest) {
+    SimpleGraph v;
+    v.addAttribute("e1", "attr1", "Hi coco!");
+    v.removeAttribute("e1", "attr1");
+    // TODO
+}
+
+TEST(SimpleGraph, setAttributeTest) {
+    SimpleGraph v;
+    v.addAttribute("e1", "attr1", "Hi coco!");
+    v.setAttribute("e1", "attr1", "The new coco!");
     // TODO
 }
 
