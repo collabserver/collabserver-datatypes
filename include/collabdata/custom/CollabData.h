@@ -12,9 +12,9 @@ namespace collab {
 
 /**
  * \brief
- * Abstract class that defines any Data structure CollabServer is working on.
+ * Abstract class for high level data built on top of CRDTs.
  *
- * This is the high level wrapper of any data CollabServer is working with.
+ * This is the high level interface of any data CollabServer is working with.
  * Any data used by CollabServer implements this interface. To be fully CRDT,
  * this data is only composed of CRDTs (From collab/CmRDT for instance).
  *
@@ -24,6 +24,11 @@ namespace collab {
  * for instance, in case of GUI, or broadcast the operation in case of network.
  * To receive operation, you must register your component as an Observer of
  * this data.
+ *
+ * \par Custom data
+ * To build your application data on top of the implemented CRDTs such as
+ * LWWGraph, LWWMap etc, you may extend this class. This gives you the required
+ * methods.
  *
  *
  * \author  Constantin Masson

@@ -1,9 +1,9 @@
-#include "collabdata/utils/CollabData.h"
+#include "collabdata/custom/CollabData.h"
 
 #include <gtest/gtest.h>
 
-#include "collabdata/utils/OperationObserver.h"
-#include "collabdata/utils/Operation.h"
+#include "collabdata/custom/OperationObserver.h"
+#include "collabdata/custom/Operation.h"
 
 namespace collab {
 

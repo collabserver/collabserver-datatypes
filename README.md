@@ -31,12 +31,12 @@ To learn more about CRDTs, checkout the links at the end of this readme.
     - GSet: Grow-only set
     - LWWRegister: Last-Write-Wins Register
     - PNCounter: Increment / Decrement counter
-- utils
+- custom
     - CollabData: Example of SuperType for data built on tope of CRDTs.
     - Operation: Interface to represents modification on data built on top of CRDTs.
     - OperationObserver: Interface for Operation observer.
     - Timestamp: Example of custom timestamp.
-    - ViewMDE: Custom data built for collab-server and AToMPM.
+    - SimpleGraph: Example of a directed graph with attributes.
 
 > Warning: I wrote the CvRDTs as an example. They are not meant to be used.
 > (At least, some changes may be required).

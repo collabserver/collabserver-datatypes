@@ -2,33 +2,28 @@
 
 #include <string>
 
-#include "CollabData.h"
-#include "Timestamp.h"
-
 #include "collabdata/CmRDT/LWWMap.h"
 #include "collabdata/CmRDT/LWWGraph.h"
 #include "collabdata/CmRDT/LWWRegister.h"
+
+#include "CollabData.h"
+#include "Timestamp.h"
 
 namespace collab {
 
 
 /**
  * \brief
- * View data structure for Model Driven Engineering.
+ * A Simple CRDT Directed Graph.
  *
- * ViewMDE is built on top of collab CRDTs.
- * This is a custom CollabData made specially for the AToMPM software.
- * ViewMDE is a MDE model (Internally represented as a graph. Each vertex has
- * a map of attributes.). ALl methods are CRDT.
- *
- * \todo
- * Documentation to write.
+ * Each vertex has a unique string identifier and a map of attributes.
+ * (Attributes are string).
  *
  *
  * \author  Constantin Masson
  * \date    May 2018
  */
-class ViewMDE : public CollabData {
+class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------
     // Typedefs
     // -------------------------------------------------------------------------
@@ -59,7 +54,7 @@ class ViewMDE : public CollabData {
         // ---------------------------------------------------------------------
         class ElementAddOperation : public Operation {
             private:
-                friend ViewMDE;
+                friend SimpleGraph;
                 UUID        _elementID;
                 Timestamp   _timestamp = {0};
 
@@ -92,7 +87,7 @@ class ViewMDE : public CollabData {
         // ---------------------------------------------------------------------
         class ElementDeleteOperation : public Operation {
             private:
-                friend ViewMDE;
+                friend SimpleGraph;
                 UUID        _elementID;
                 Timestamp   _timestamp = {0};
 
@@ -127,7 +122,7 @@ class ViewMDE : public CollabData {
         // ---------------------------------------------------------------------
         class AttributeSetOperation : public Operation {
             private:
-                friend ViewMDE;
+                friend SimpleGraph;
                 UUID        _elementID;
                 Timestamp   _timestamp = {0};
                 std::string _attributeName;
