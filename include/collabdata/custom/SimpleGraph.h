@@ -47,7 +47,9 @@ class SimpleGraph : public CollabData {
          */
         enum class OperationsType : int {
             VERTEX_ADD = 1,
-            VERTEX_DELETE,
+            VERTEX_REMOVE,
+            EDGE_ADD,
+            EDGE_REMOVE,
             ATTRIBUTE_ADD,
             ATTRIBUTE_REMOVE,
             ATTRIBUTE_SET,
@@ -87,7 +89,7 @@ class SimpleGraph : public CollabData {
         };
 
         // ---------------------------------------------------------------------
-        class VertexDeleteOperation : public Operation {
+        class VertexRemoveOperation : public Operation {
             private:
                 friend SimpleGraph;
                 UUID        _vertexID;
@@ -95,11 +97,11 @@ class SimpleGraph : public CollabData {
 
             public:
 
-                VertexDeleteOperation() = default;
-                VertexDeleteOperation(const std::string& id,
+                VertexRemoveOperation() = default;
+                VertexRemoveOperation(const std::string& id,
                                        const Timestamp& time)
                   : _vertexID(id), _timestamp(time) {
-                    _type = static_cast<int>(OperationsType::VERTEX_DELETE);
+                    _type = static_cast<int>(OperationsType::VERTEX_REMOVE);
                 }
 
             public:
@@ -115,6 +117,82 @@ class SimpleGraph : public CollabData {
             public:
                 const UUID& vertexID() const {
                     return _vertexID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
+                }
+        };
+
+        // ---------------------------------------------------------------------
+        class EdgeAddOperation : public Operation {
+            private:
+                friend SimpleGraph;
+                UUID        _fromID;
+                UUID        _toID;
+                Timestamp   _timestamp = {0};
+
+            public:
+                EdgeAddOperation() = default;
+                EdgeAddOperation(const UUID& fromID, const UUID& toID,
+                                 const Timestamp& time)
+                    : _fromID(fromID), _toID(toID), _timestamp(time) {
+                    _type = static_cast<int>(OperationsType::EDGE_ADD);
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const override {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(const std::stringstream& buffer) override {
+                    // TODO
+                    return false;
+                }
+
+            public:
+                const UUID& fromID() const {
+                    return _fromID;
+                }
+                const UUID& toID() const {
+                    return _toID;
+                }
+                const Timestamp& timestamp() const {
+                    return _timestamp;
+                }
+        };
+
+        // ---------------------------------------------------------------------
+        class EdgeRemoveOperation : public Operation {
+            private:
+                friend SimpleGraph;
+                UUID        _fromID;
+                UUID        _toID;
+                Timestamp   _timestamp = {0};
+
+            public:
+                EdgeRemoveOperation() = default;
+                EdgeRemoveOperation(const UUID& fromID, const UUID& toID,
+                                 const Timestamp& time)
+                    : _fromID(fromID), _toID(toID), _timestamp(time) {
+                    _type = static_cast<int>(OperationsType::EDGE_REMOVE);
+                }
+
+            public:
+                bool serialize(std::stringstream& buffer) const override {
+                    // TODO
+                    return false;
+                }
+                bool unserialize(const std::stringstream& buffer) override {
+                    // TODO
+                    return false;
+                }
+
+            public:
+                const UUID& fromID() const {
+                    return _fromID;
+                }
+                const UUID& toID() const {
+                    return _toID;
                 }
                 const Timestamp& timestamp() const {
                     return _timestamp;
@@ -140,6 +218,7 @@ class SimpleGraph : public CollabData {
                       _timestamp(time),
                       _attributeName(name),
                       _attributeValue(value) {
+                    _type = static_cast<int>(OperationsType::ATTRIBUTE_ADD);
                 }
 
             public:
@@ -183,6 +262,7 @@ class SimpleGraph : public CollabData {
                     : _vertexID(id),
                       _timestamp(time),
                       _attributeName(name) {
+                    _type = static_cast<int>(OperationsType::ATTRIBUTE_REMOVE);
                 }
 
             public:
@@ -282,13 +362,37 @@ class SimpleGraph : public CollabData {
         }
 
         /**
-         * Remove vertexs from the view.
+         * Remove vertex from the view.
          * Notifies all OperationObservers and broadcaster.
          *
          * \param id The vertex's ID.
          */
         void removeVertex(const UUID& id) {
-            VertexDeleteOperation op = {id, Timestamp::now()};
+            VertexRemoveOperation op = {id, Timestamp::now()};
+            this->applyOperation(op);
+            this->broadcastOperation(op);
+        }
+
+        /**
+         * Add edge. (Directional)
+         *
+         * \param from  Origin vertex id.
+         * \param to    Destination vertex id.
+         */
+        void addEdge(const UUID& from, const UUID& to) {
+            EdgeAddOperation op = {from, to, Timestamp::now()};
+            this->applyOperation(op);
+            this->broadcastOperation(op);
+        }
+
+        /**
+         * Remove edge.
+         *
+         * \param from  Origin vertex id.
+         * \param to    Destination vertex id.
+         */
+        void removeEdge(const UUID& from, const UUID& to) {
+            EdgeRemoveOperation op = {from, to, Timestamp::now()};
             this->applyOperation(op);
             this->broadcastOperation(op);
         }
@@ -366,10 +470,38 @@ class SimpleGraph : public CollabData {
             }
         }
 
-        void applyOperation(const VertexDeleteOperation& op) {
+        void applyOperation(const VertexRemoveOperation& op) {
             auto& tnow      = op.timestamp();
             auto& id        = op.vertexID();
             bool isRemoved  = _graph.remove_vertex(id, tnow);
+            if(isRemoved) {
+                this->notifyOperationObservers(op);
+            }
+        }
+
+        void applyOperation(const EdgeAddOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& from      = op.fromID();
+            auto& to        = op.toID();
+            CmRDT::AddEdgeInfo info = _graph.add_edge(from, to, tnow);
+            if(info.isFromAdded) {
+                VertexAddOperation vertex_op = {from, tnow};
+                this->notifyOperationObservers(vertex_op);
+            }
+            if(info.isToAdded) {
+                VertexAddOperation vertex_op = {to, tnow};
+                this->notifyOperationObservers(vertex_op);
+            }
+            if(info.isEdgeAdded) {
+                this->notifyOperationObservers(op);
+            }
+        }
+
+        void applyOperation(const EdgeRemoveOperation& op) {
+            auto& tnow      = op.timestamp();
+            auto& from      = op.fromID();
+            auto& to        = op.toID();
+            bool isRemoved  = _graph.remove_edge(from, to, tnow);
             if(isRemoved) {
                 this->notifyOperationObservers(op);
             }
@@ -477,8 +609,26 @@ class SimpleGraph : public CollabData {
                     }
                     break;
 
-                case static_cast<int>(OperationsType::VERTEX_DELETE): {
-                        VertexDeleteOperation op;
+                case static_cast<int>(OperationsType::VERTEX_REMOVE): {
+                        VertexRemoveOperation op;
+                        if(!op.unserialize(buffer)) {
+                            return false;
+                        }
+                        applyOperation(op);
+                    }
+                    break;
+
+                case static_cast<int>(OperationsType::EDGE_ADD): {
+                        EdgeAddOperation op;
+                        if(!op.unserialize(buffer)) {
+                            return false;
+                        }
+                        applyOperation(op);
+                    }
+                    break;
+
+                case static_cast<int>(OperationsType::EDGE_REMOVE): {
+                        EdgeRemoveOperation op;
                         if(!op.unserialize(buffer)) {
                             return false;
                         }

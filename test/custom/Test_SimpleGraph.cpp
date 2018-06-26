@@ -34,6 +34,19 @@ TEST(SimpleGraph, removeVertexTest) {
     // TODO
 }
 
+TEST(SimpleGraph, addEdgeTest) {
+    SimpleGraph v;
+    v.addEdge("e1", "e2");
+    // TODO
+}
+
+TEST(SimpleGraph, removeEdgeTest) {
+    SimpleGraph v;
+    v.addEdge("e1", "e2");
+    v.removeEdge("e1", "e2");
+    // TODO
+}
+
 TEST(SimpleGraph, addAttributeTest) {
     SimpleGraph v;
     v.addAttribute("e1", "attr1", "Hi coco!");
