@@ -241,8 +241,7 @@ TEST(LWWGraph, count_vertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Query before exists
-    int res = data0.count_vertex(1);
-    EXPECT_EQ(res, 0);
+    EXPECT_EQ(data0.count_vertex(1), 0);
 
     // Add vertex
     data0.add_vertex(1, 10);
@@ -254,16 +253,12 @@ TEST(LWWGraph, count_vertexTest) {
     data0.remove_vertex(2, 20);
     data0.remove_vertex(3, 20);
 
-    res = data0.count_vertex(1);
-    EXPECT_EQ(res, 0);
-    res = data0.count_vertex(2);
-    EXPECT_EQ(res, 0);
-    res = data0.count_vertex(3);
-    EXPECT_EQ(res, 0);
-    res = data0.count_vertex(4);
-    EXPECT_EQ(res, 1);
-    res = data0.count_vertex(5);
-    EXPECT_EQ(res, 1);
+    // Check result
+    EXPECT_EQ(data0.count_vertex(1), 0);
+    EXPECT_EQ(data0.count_vertex(2), 0);
+    EXPECT_EQ(data0.count_vertex(3), 0);
+    EXPECT_EQ(data0.count_vertex(4), 1);
+    EXPECT_EQ(data0.count_vertex(5), 1);
 }
 
 
@@ -275,8 +270,7 @@ TEST(LWWGraph, crdt_count_vertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Query before exists
-    int res = data0.crdt_count_vertex(1);
-    EXPECT_EQ(res, 0);
+    EXPECT_EQ(data0.crdt_count_vertex(1), 0);
 
     // Add vertex
     data0.add_vertex(1, 10);
@@ -288,16 +282,76 @@ TEST(LWWGraph, crdt_count_vertexTest) {
     data0.remove_vertex(2, 20);
     data0.remove_vertex(3, 20);
 
-    res = data0.crdt_count_vertex(1);
-    EXPECT_EQ(res, 1);
-    res = data0.crdt_count_vertex(2);
-    EXPECT_EQ(res, 1);
-    res = data0.crdt_count_vertex(3);
-    EXPECT_EQ(res, 1);
-    res = data0.crdt_count_vertex(4);
-    EXPECT_EQ(res, 1);
-    res = data0.crdt_count_vertex(5);
-    EXPECT_EQ(res, 1);
+    // Check result
+    EXPECT_EQ(data0.crdt_count_vertex(1), 1);
+    EXPECT_EQ(data0.crdt_count_vertex(2), 1);
+    EXPECT_EQ(data0.crdt_count_vertex(3), 1);
+    EXPECT_EQ(data0.crdt_count_vertex(4), 1);
+    EXPECT_EQ(data0.crdt_count_vertex(5), 1);
+}
+
+// -----------------------------------------------------------------------------
+// has_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_has_vertexTest) {
+    LWWGraph<const char*, int, int> data0;
+
+    // Query before exists
+    EXPECT_FALSE(data0.has_vertex("e1"));
+
+    // Add vertex
+    data0.add_vertex("e1", 10);
+    data0.add_vertex("e2", 10);
+    data0.add_vertex("e3", 10);
+    data0.add_vertex("e4", 10);
+    data0.add_vertex("e5", 10);
+    data0.remove_vertex("e1", 20);
+    data0.remove_vertex("e2", 20);
+    data0.remove_vertex("e3", 20);
+
+    // Check result
+    EXPECT_FALSE(data0.has_vertex("e1"));
+    EXPECT_FALSE(data0.has_vertex("e2"));
+    EXPECT_FALSE(data0.has_vertex("e3"));
+    EXPECT_TRUE(data0.has_vertex("e4"));
+    EXPECT_TRUE(data0.has_vertex("e5"));
+
+    EXPECT_FALSE(data0.has_vertex("e42"));
+    EXPECT_FALSE(data0.has_vertex("e32"));
+    EXPECT_FALSE(data0.has_vertex("e64"));
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_has_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, has_vertexTest) {
+    LWWGraph<const char*, int, int> data0;
+
+    // Query before exists
+    EXPECT_FALSE(data0.crdt_has_vertex("e1"));
+
+    // Add vertex
+    data0.add_vertex("e1", 10);
+    data0.add_vertex("e2", 10);
+    data0.add_vertex("e3", 10);
+    data0.add_vertex("e4", 10);
+    data0.add_vertex("e5", 10);
+    data0.remove_vertex("e1", 20);
+    data0.remove_vertex("e2", 20);
+    data0.remove_vertex("e3", 20);
+
+    EXPECT_TRUE(data0.crdt_has_vertex("e1"));
+    EXPECT_TRUE(data0.crdt_has_vertex("e2"));
+    EXPECT_TRUE(data0.crdt_has_vertex("e3"));
+    EXPECT_TRUE(data0.crdt_has_vertex("e4"));
+    EXPECT_TRUE(data0.crdt_has_vertex("e5"));
+
+    EXPECT_FALSE(data0.crdt_has_vertex("e42"));
+    EXPECT_FALSE(data0.crdt_has_vertex("e32"));
+    EXPECT_FALSE(data0.crdt_has_vertex("e64"));
 }
 
 
@@ -308,8 +362,7 @@ TEST(LWWGraph, crdt_count_vertexTest) {
 TEST(LWWGraph, count_edgeTest) {
     LWWGraph<std::string, int, int> data0;
 
-    int res = data0.count_edge("v1", "v2");
-    ASSERT_EQ(res, 0);
+    ASSERT_EQ(data0.count_edge("v1", "v2"), 0);
 
     // Init data
     data0.add_vertex("v1", 11);
@@ -329,27 +382,20 @@ TEST(LWWGraph, count_edgeTest) {
     data0.remove_edge("v3", "v2", 33);
 
 
-    // Check
-    int v1v1 = data0.count_edge("v1", "v1");
-    int v1v2 = data0.count_edge("v1", "v2");
-    int v1v3 = data0.count_edge("v1", "v3");
-    ASSERT_EQ(v1v1, 1);
-    ASSERT_EQ(v1v2, 0);
-    ASSERT_EQ(v1v3, 0);
+    // Check v1 edges
+    ASSERT_EQ(data0.count_edge("v1", "v1"), 1);
+    ASSERT_EQ(data0.count_edge("v1", "v2"), 0);
+    ASSERT_EQ(data0.count_edge("v1", "v3"), 0);
 
-    int v2v1 = data0.count_edge("v2", "v1");
-    int v2v2 = data0.count_edge("v2", "v2");
-    int v2v3 = data0.count_edge("v2", "v3");
-    ASSERT_EQ(v2v1, 1);
-    ASSERT_EQ(v2v2, 0);
-    ASSERT_EQ(v2v3, 1);
+    // Check v2 edges
+    ASSERT_EQ(data0.count_edge("v2", "v1"), 1);
+    ASSERT_EQ(data0.count_edge("v2", "v2"), 0);
+    ASSERT_EQ(data0.count_edge("v2", "v3"), 1);
 
-    int v3v1 = data0.count_edge("v3", "v1");
-    int v3v2 = data0.count_edge("v3", "v2");
-    int v3v3 = data0.count_edge("v3", "v3");
-    ASSERT_EQ(v3v1, 0);
-    ASSERT_EQ(v3v2, 0);
-    ASSERT_EQ(v3v3, 0);
+    // Check v3 edges
+    ASSERT_EQ(data0.count_edge("v3", "v1"), 0);
+    ASSERT_EQ(data0.count_edge("v3", "v2"), 0);
+    ASSERT_EQ(data0.count_edge("v3", "v3"), 0);
 }
 
 
@@ -360,8 +406,7 @@ TEST(LWWGraph, count_edgeTest) {
 TEST(LWWGraph, crdt_count_edgeTest) {
     LWWGraph<std::string, int, int> data0;
 
-    int res = data0.crdt_count_edge("v1", "v2");
-    ASSERT_EQ(res, 0);
+    ASSERT_EQ(data0.crdt_count_edge("v1", "v2"), 0);
 
     // Init data
     data0.add_vertex("v1", 11);
@@ -381,27 +426,116 @@ TEST(LWWGraph, crdt_count_edgeTest) {
     data0.remove_edge("v3", "v2", 33);
 
 
-    // Check
-    int v1v1 = data0.crdt_count_edge("v1", "v1");
-    int v1v2 = data0.crdt_count_edge("v1", "v2");
-    int v1v3 = data0.crdt_count_edge("v1", "v3");
-    ASSERT_EQ(v1v1, 1);
-    ASSERT_EQ(v1v2, 1);
-    ASSERT_EQ(v1v3, 0);
+    // Check v1 edges
+    ASSERT_EQ(data0.crdt_count_edge("v1", "v1"), 1);
+    ASSERT_EQ(data0.crdt_count_edge("v1", "v2"), 1);
+    ASSERT_EQ(data0.crdt_count_edge("v1", "v3"), 0);
 
-    int v2v1 = data0.crdt_count_edge("v2", "v1");
-    int v2v2 = data0.crdt_count_edge("v2", "v2");
-    int v2v3 = data0.crdt_count_edge("v2", "v3");
-    ASSERT_EQ(v2v1, 1);
-    ASSERT_EQ(v2v2, 1);
-    ASSERT_EQ(v2v3, 1);
+    // Check v2 edges
+    ASSERT_EQ(data0.crdt_count_edge("v2", "v1"), 1);
+    ASSERT_EQ(data0.crdt_count_edge("v2", "v2"), 1);
+    ASSERT_EQ(data0.crdt_count_edge("v2", "v3"), 1);
 
-    int v3v1 = data0.crdt_count_edge("v3", "v1");
-    int v3v2 = data0.crdt_count_edge("v3", "v2");
-    int v3v3 = data0.crdt_count_edge("v3", "v3");
-    ASSERT_EQ(v3v1, 0);
-    ASSERT_EQ(v3v2, 1);
-    ASSERT_EQ(v3v3, 0);
+    // Check v3 edges
+    ASSERT_EQ(data0.crdt_count_edge("v3", "v1"), 0);
+    ASSERT_EQ(data0.crdt_count_edge("v3", "v2"), 1);
+    ASSERT_EQ(data0.crdt_count_edge("v3", "v3"), 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// has_edge()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, has_edgeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    ASSERT_FALSE(data0.has_edge("v1", "v2"));
+
+    // Init data
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.add_edge("v1", "v1", 21);
+    data0.add_edge("v1", "v2", 22);
+    data0.remove_edge("v1", "v2", 31);
+
+    data0.add_edge("v2", "v1", 24);
+    data0.add_edge("v2", "v2", 25);
+    data0.add_edge("v2", "v3", 26);
+    data0.remove_edge("v2", "v2", 32);
+
+    data0.add_edge("v3", "v2", 27);
+    data0.remove_edge("v3", "v2", 33);
+
+
+    // Check v1 edges
+    ASSERT_TRUE(data0.has_edge("v1", "v1"));
+    ASSERT_FALSE(data0.has_edge("v1", "v2"));
+    ASSERT_FALSE(data0.has_edge("v1", "v3"));
+
+    // Check v2 edges
+    ASSERT_TRUE(data0.has_edge("v2", "v1"));
+    ASSERT_FALSE(data0.has_edge("v2", "v2"));
+    ASSERT_TRUE(data0.has_edge("v2", "v3"));
+
+    // Check v3 edges
+    ASSERT_FALSE(data0.has_edge("v3", "v1"));
+    ASSERT_FALSE(data0.has_edge("v3", "v2"));
+    ASSERT_FALSE(data0.has_edge("v3", "v3"));
+
+    // Check some invalid edges
+    ASSERT_FALSE(data0.has_edge("v42", "v43"));
+    ASSERT_FALSE(data0.has_edge("v1024", "v1024"));
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_has_edge()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_has_edgeTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    ASSERT_FALSE(data0.crdt_has_edge("v1", "v2"));
+
+    // Init data
+    data0.add_vertex("v1", 11);
+    data0.add_vertex("v2", 12);
+    data0.add_vertex("v3", 13);
+
+    data0.add_edge("v1", "v1", 21);
+    data0.add_edge("v1", "v2", 22);
+    data0.remove_edge("v1", "v2", 31);
+
+    data0.add_edge("v2", "v1", 24);
+    data0.add_edge("v2", "v2", 25);
+    data0.add_edge("v2", "v3", 26);
+    data0.remove_edge("v2", "v2", 32);
+
+    data0.add_edge("v3", "v2", 27);
+    data0.remove_edge("v3", "v2", 33);
+
+
+    // Check v1 edges
+    ASSERT_TRUE(data0.crdt_has_edge("v1", "v1"));
+    ASSERT_TRUE(data0.crdt_has_edge("v1", "v2"));
+    ASSERT_FALSE(data0.crdt_has_edge("v1", "v3"));
+
+    // Check v2 edges
+    ASSERT_TRUE(data0.crdt_has_edge("v2", "v1"));
+    ASSERT_TRUE(data0.crdt_has_edge("v2", "v2"));
+    ASSERT_TRUE(data0.crdt_has_edge("v2", "v3"));
+
+    // Check v3 edges
+    ASSERT_FALSE(data0.crdt_has_edge("v3", "v1"));
+    ASSERT_TRUE(data0.crdt_has_edge("v3", "v2"));
+    ASSERT_FALSE(data0.crdt_has_edge("v3", "v3"));
+
+    // Check some invalid edges
+    ASSERT_FALSE(data0.crdt_has_edge("v42", "v43"));
+    ASSERT_FALSE(data0.crdt_has_edge("v1024", "v1024"));
 }
 
 

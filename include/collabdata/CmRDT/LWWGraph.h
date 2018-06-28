@@ -236,6 +236,27 @@ class LWWGraph {
             return _adj.crdt_count(key);
         }
 
+        /**
+         * Check whether vertex is in the graph.
+         *
+         * \param key Key value of the vertex to check.
+         * \return True if in graph, otherwise, return false.
+         */
+        bool has_vertex(const Key& key) const {
+            return _adj.count(key) == 1;
+        }
+
+        /**
+         * Check whether vertex is in the graph.
+         * Also lookup for element internally marked as 'removed'.
+         *
+         * \param key Key value of the vertex to check.
+         * \return True if in graph, otherwise, return false.
+         */
+        bool crdt_has_vertex(const Key& key) const {
+            return _adj.crdt_count(key) == 1;
+        }
+
 
     // -------------------------------------------------------------------------
     // Lookup methods (Edges)
@@ -275,6 +296,29 @@ class LWWGraph {
                 return vertex_it->second.value().edges().crdt_count(to);
             }
             return 0;
+        }
+
+        /**
+         * Check whether edge is in the graph.
+         *
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
+         * \return True if in graph, otherwise, return false.
+         */
+        bool has_edge(const Key& from, const Key& to) const {
+            return this->count_edge(from, to) == 1;
+        }
+
+        /**
+         * Check whether edge is in the graph.
+         * Also lookup for element internally marked as 'removed'.
+         *
+         * \param from  The origin vertex.
+         * \param to    The destination vertex.
+         * \return True if in graph, otherwise, return false.
+         */
+        bool crdt_has_edge(const Key& from, const Key& to) const {
+            return this->crdt_count_edge(from, to) == 1;
         }
 
 
@@ -748,13 +792,6 @@ class LWWGraph<Key,T,U>::Vertex {
          * Returns a reference to the vertex's edges.
          *
          * \return Reference to the set of edges.
-         */
-        LWWSet<Key,U>& edges() {
-            return _edges;
-        }
-
-        /**
-         * \copydoc Vertex::edges
          */
         const LWWSet<Key,U>& edges() const {
             return _edges;
