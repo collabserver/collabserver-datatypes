@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <utility> // std::pair
 #include <ostream>
+#include <stdexcept>
 
 namespace collab {
 namespace CmRDT {
@@ -177,6 +178,54 @@ class LWWMap {
     // -------------------------------------------------------------------------
 
     public:
+
+        /**
+         * Returns a reference to the mapped value of the element with key
+         * equivalent to key. If no such element exists, an exception of
+         * type std::out_of_range is thrown.
+         *
+         * \param key Key value of the element to search for.
+         * \return Reference to the mapped value of the requested element.
+         */
+        T& at(const Key& key) {
+            auto elt_it = _map.find(key);
+            if(elt_it == _map.end() || elt_it->second.isRemoved()) {
+                throw std::out_of_range("No element for this key");
+            }
+            return elt_it->second.value();
+        }
+
+        /**
+         * \copydoc LWWMap::at
+         */
+        const T& at(const Key& key) const {
+            return this->at(key);
+        }
+
+        /**
+         * Returns a reference to the mapped value of the element with key
+         * equivalent to key. If no such element exists, an exception of
+         * type std::out_of_range is thrown.
+         *
+         * Also lookup for 'removed' element (Internal CRDT data).
+         *
+         * \param key Key value of the element to search for.
+         * \return Reference to the mapped value of the requested element.
+         */
+        T& crdt_at(const Key& key) {
+            auto elt_it = _map.find(key);
+            if(elt_it == _map.end()) {
+                throw std::out_of_range("No element for this key");
+            }
+            return elt_it->second.value();
+        }
+
+        /**
+         * \copydoc LWWMap::crdt_at
+         */
+        const T& crdt_at(const Key& key) const {
+            return this->crdt_at(key);
+        }
 
         /**
          * Find a key-element in the container.

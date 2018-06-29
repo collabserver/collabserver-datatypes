@@ -255,51 +255,186 @@ TEST(LWWMap, crdt_countAfterRemoveTest) {
 
 
 // -----------------------------------------------------------------------------
-// crdt_find()
+// at()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_findTest) {
-    LWWMap<std::string, int, int> data0;
+TEST(LWWMap, atTest) {
+    LWWMap<const char*, const char*, int> data0;
 
-    // Query before exists
-    auto coco = data0.crdt_find("e1");
-    EXPECT_TRUE(coco == data0.crdt_end());
+    // Add all the crap there!
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
 
-    // Add element and query
-    data0.add("e1", 10);
-    coco = data0.crdt_find("e1");
-    _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
+    // Set data
+    data0.at("e1") = "Carrot";
+    data0.at("e2") = "SuperRabbit";
+    data0.at("e3") = "MagicRabbit";
 
-    // Remove this element and query
-    data0.remove("e1", 20);
-    coco = data0.crdt_find("e1");
-    _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
-
-    // Query invalid data
-    coco = data0.crdt_find("xxx");
-    EXPECT_TRUE(coco == data0.crdt_end());
+    // Find them all!
+    EXPECT_EQ(data0.at("e1"), "Carrot");
+    EXPECT_EQ(data0.at("e2"), "SuperRabbit");
+    EXPECT_EQ(data0.at("e3"), "MagicRabbit");
 }
 
-TEST(LWWMap, queryAndChangeValueTests) {
-    LWWMap<std::string, int, int> data0;
+TEST(LWWMap, atRemovedElementTest) {
+    LWWMap<std::string, const char*, int> data0;
 
     // Setup data
-    data0.add("e1", 1);
-    data0.add("e2", 2);
-    data0.remove("e1", 3);
-    data0.remove("e2", 3);
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
 
-    // Change values of container
-    auto it_e1 = data0.crdt_find("e1");
-    it_e1->second.value() = 42;
-    auto it_e2 = data0.crdt_find("e2");
-    it_e2->second.value() = 1024;
+    data0.at("e1") = "value_1";
+    data0.at("e2") = "value_2";
+    data0.at("e3") = "value_3";
 
-    // Check if container value are well changed
-    auto e1 = data0.crdt_find("e1");
-    auto e2 = data0.crdt_find("e2");
-    EXPECT_EQ(e1->second.value(), 42);
-    EXPECT_EQ(e2->second.value(), 1024);
+    data0.remove("e1", 20);
+    data0.remove("e2", 20);
+
+    // Check at() exceptions
+    int nbException = 0;
+    const char* values[3] = {"e1", "e2", "e3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.at(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 2);
+}
+
+TEST(LWWMap, atChangeValueTest) {
+    LWWMap<std::string, int, int> data0;
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    // Set values
+    data0.at("e1") = 1;
+    data0.at("e2") = 2;
+    data0.at("e3") = 3;
+    ASSERT_EQ(data0.at("e1"), 1);
+    ASSERT_EQ(data0.at("e2"), 2);
+    ASSERT_EQ(data0.at("e3"), 3);
+
+    // Change values
+    data0.at("e1") = 32;
+    data0.at("e2") = 64;
+    data0.at("e3") = 128;
+    ASSERT_EQ(data0.at("e1"), 32);
+    ASSERT_EQ(data0.at("e2"), 64);
+    ASSERT_EQ(data0.at("e3"), 128);
+}
+
+TEST(LWWMap, atInvalidKeyThrowExceptionTest) {
+    LWWMap<const char*, const char*, int> data0;
+
+    int nbException = 0;
+    const char* values[5] = {"e1", "e2", "e3", "carrot", "SuperRabbit"};
+    for(int k = 0; k < 5; ++k) {
+        try {
+            data0.at(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 5);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_at()
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdt_atTest) {
+    LWWMap<const char*, const char*, int> data0;
+
+    // Add all the crap there!
+    data0.add("e1", 11);
+    data0.add("e2", 12);
+    data0.add("e3", 13);
+
+    // Set data
+    data0.crdt_at("e1") = "Carrot";
+    data0.crdt_at("e2") = "SuperRabbit";
+    data0.crdt_at("e3") = "MagicRabbit";
+
+    // Find them all!
+    EXPECT_EQ(data0.crdt_at("e1"), "Carrot");
+    EXPECT_EQ(data0.crdt_at("e2"), "SuperRabbit");
+    EXPECT_EQ(data0.crdt_at("e3"), "MagicRabbit");
+}
+
+TEST(LWWMap, crdt_atRemovedElementTest) {
+    LWWMap<std::string, const char*, int> data0;
+
+    // Setup data
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    data0.crdt_at("e1") = "value_1";
+    data0.crdt_at("e2") = "value_2";
+    data0.crdt_at("e3") = "value_3";
+
+    data0.remove("e1", 20);
+    data0.remove("e2", 20);
+
+    // Check.crdt_at() exceptions
+    int nbException = 0;
+    const char* values[3] = {"e1", "e2", "e3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.crdt_at(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 0);
+}
+
+TEST(LWWMap, crdt_atChangeValueTest) {
+    LWWMap<std::string, int, int> data0;
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    // Set values
+    data0.crdt_at("e1") = 1;
+    data0.crdt_at("e2") = 2;
+    data0.crdt_at("e3") = 3;
+    ASSERT_EQ(data0.crdt_at("e1"), 1);
+    ASSERT_EQ(data0.crdt_at("e2"), 2);
+    ASSERT_EQ(data0.crdt_at("e3"), 3);
+
+    // Change values
+    data0.crdt_at("e1") = 32;
+    data0.crdt_at("e2") = 64;
+    data0.crdt_at("e3") = 128;
+    ASSERT_EQ(data0.crdt_at("e1"), 32);
+    ASSERT_EQ(data0.crdt_at("e2"), 64);
+    ASSERT_EQ(data0.crdt_at("e3"), 128);
+}
+
+TEST(LWWMap, crdt_atInvalidKeyThrowExceptionTest) {
+    LWWMap<const char*, const char*, int> data0;
+
+    int nbException = 0;
+    const char* values[5] = {"e1", "e2", "e3", "carrot", "SuperRabbit"};
+    for(int k = 0; k < 5; ++k) {
+        try {
+            data0.crdt_at(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 5);
 }
 
 
@@ -353,6 +488,55 @@ TEST(LWWMap, findAndChangeValueTests) {
     auto e2 = data0.find("e2");
     EXPECT_EQ(e1->second, 42);
     EXPECT_EQ(e2->second, 1024);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_find()
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdt_findTest) {
+    LWWMap<std::string, int, int> data0;
+
+    // Query before exists
+    auto coco = data0.crdt_find("e1");
+    EXPECT_TRUE(coco == data0.crdt_end());
+
+    // Add element and query
+    data0.add("e1", 10);
+    coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
+
+    // Remove this element and query
+    data0.remove("e1", 20);
+    coco = data0.crdt_find("e1");
+    _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
+
+    // Query invalid data
+    coco = data0.crdt_find("xxx");
+    EXPECT_TRUE(coco == data0.crdt_end());
+}
+
+TEST(LWWMap, queryAndChangeValueTests) {
+    LWWMap<std::string, int, int> data0;
+
+    // Setup data
+    data0.add("e1", 1);
+    data0.add("e2", 2);
+    data0.remove("e1", 3);
+    data0.remove("e2", 3);
+
+    // Change values of container
+    auto it_e1 = data0.crdt_find("e1");
+    it_e1->second.value() = 42;
+    auto it_e2 = data0.crdt_find("e2");
+    it_e2->second.value() = 1024;
+
+    // Check if container value are well changed
+    auto e1 = data0.crdt_find("e1");
+    auto e2 = data0.crdt_find("e2");
+    EXPECT_EQ(e1->second.value(), 42);
+    EXPECT_EQ(e2->second.value(), 1024);
 }
 
 
