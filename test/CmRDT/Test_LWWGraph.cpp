@@ -202,6 +202,161 @@ TEST(LWWGraph, crdt_sizeTest) {
 
 
 // -----------------------------------------------------------------------------
+// at_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, at_vertexTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Setup data
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+
+    data0.at_vertex("v1") = "Kaamelott";
+    data0.at_vertex("v2") = "Caradoc";
+    data0.at_vertex("v3") = "Perceval";
+
+    // Check data
+    ASSERT_EQ(data0.at_vertex("v1"), "Kaamelott");
+    ASSERT_EQ(data0.at_vertex("v2"), "Caradoc");
+    ASSERT_EQ(data0.at_vertex("v3"), "Perceval");
+}
+
+TEST(LWWGraph, at_vertexRemovedVertexTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Setup data
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+
+    data0.at_vertex("v1") = "Kaamelott";
+    data0.at_vertex("v2") = "Caradoc";
+    data0.at_vertex("v3") = "Perceval";
+
+    // Check data
+    ASSERT_EQ(data0.at_vertex("v1"), "Kaamelott");
+    ASSERT_EQ(data0.at_vertex("v2"), "Caradoc");
+    ASSERT_EQ(data0.at_vertex("v3"), "Perceval");
+
+    // Remove some data
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v3", 20);
+
+    // Check results
+    int nbException = 0;
+    const char* values[3] = {"v1", "v2", "v3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.at_vertex(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 2);
+}
+
+TEST(LWWGraph, at_vertexInvalidVertexThrowExceptionTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Check results
+    int nbException = 0;
+    const char* values[3] = {"v1", "v2", "v3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.at_vertex(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 3);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_at_vertex()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_at_vertexTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Setup data
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+
+    data0.crdt_at_vertex("v1") = "Kaamelott";
+    data0.crdt_at_vertex("v2") = "Caradoc";
+    data0.crdt_at_vertex("v3") = "Perceval";
+
+    // Remove elt doesn't affect crdt_at_vertex
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v2", 20);
+    data0.remove_vertex("v3", 20);
+
+    // Check data
+    ASSERT_EQ(data0.crdt_at_vertex("v1"), "Kaamelott");
+    ASSERT_EQ(data0.crdt_at_vertex("v2"), "Caradoc");
+    ASSERT_EQ(data0.crdt_at_vertex("v3"), "Perceval");
+}
+
+TEST(LWWGraph, crdt_at_vertexRemovedVertexTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Setup data
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+
+    data0.crdt_at_vertex("v1") = "Kaamelott";
+    data0.crdt_at_vertex("v2") = "Caradoc";
+    data0.crdt_at_vertex("v3") = "Perceval";
+
+    // Check data
+    ASSERT_EQ(data0.crdt_at_vertex("v1"), "Kaamelott");
+    ASSERT_EQ(data0.crdt_at_vertex("v2"), "Caradoc");
+    ASSERT_EQ(data0.crdt_at_vertex("v3"), "Perceval");
+
+    // Remove some data
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v3", 20);
+
+    // Check results
+    int nbException = 0;
+    const char* values[3] = {"v1", "v2", "v3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.crdt_at_vertex(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 0);
+}
+
+TEST(LWWGraph, crdt_at_vertexInvalidVertexThrowExceptionTest) {
+    LWWGraph<std::string, const char*, int> data0;
+
+    // Check results
+    int nbException = 0;
+    const char* values[3] = {"v1", "v2", "v3"};
+    for(int k = 0; k < 3; ++k) {
+        try {
+            data0.crdt_at_vertex(values[k]);
+        }
+        catch(std::out_of_range e) {
+            nbException++;
+        }
+    }
+    ASSERT_EQ(nbException, 3);
+}
+
+
+// -----------------------------------------------------------------------------
 // crdt_find_vertex()
 // -----------------------------------------------------------------------------
 

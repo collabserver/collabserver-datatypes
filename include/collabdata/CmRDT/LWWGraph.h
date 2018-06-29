@@ -166,6 +166,46 @@ class LWWGraph {
     public:
 
         /**
+         * Returns a reference to the vertex content for this key. If no such
+         * vertex exists, an exception of type std::out_of_range is thrown.
+         *
+         * \param key Key value of the vertex to search for.
+         * \return Reference to the mapped value of the requested vertex.
+         */
+        T& at_vertex(const Key& key) {
+            Vertex& v = _adj.at(key);
+            return v.content();
+        }
+
+        /**
+         * \copydoc LWWGraph::at_vertex
+         */
+        const T& at_vertex(const Key& key) const {
+            return this->at_vertex(key);
+        }
+
+        /**
+         * Returns a reference to the vertex content for this key. If no such
+         * vertex exists, an exception of type std::out_of_range is thrown.
+         *
+         * Also check for elements marked as 'removed'.
+         *
+         * \param key Key value of the vertex to search for.
+         * \return Reference to the mapped value of the requested vertex.
+         */
+        T& crdt_at_vertex(const Key& key) {
+            Vertex& v = _adj.crdt_at(key);
+            return v.content();
+        }
+
+        /**
+         * \copydoc LWWGraph::at_vertex
+         */
+        const T& crdt_at_vertex(const Key& key) const {
+            return this->crdt_at_vertex(key);
+        }
+
+        /**
          * Find a vertex in the graph.
          *
          * This only lookup for vertex that are not internally deleted.
