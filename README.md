@@ -54,15 +54,16 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 ### Build and run tests with CMake
 - [GoogleTest](https://github.com/google/googletest)
-(Automatically downloaded by CMake and placed in project's root folder `bin`
+(Automatically downloaded by CMake and placed in project's root
+folder `dependencies`)
 
-```cmake
-# Build and run manually instructions
+```bash
+# Build and run manually
 mkdir build
 cd build
 cmake -Dcollab_tests=ON ..
 make -j4
-make ./runtests
+make runTests
 
 # Build and run from shell script
 ./build.sh
@@ -70,7 +71,7 @@ make ./runtests
 
 
 ### Build and run examples with CMake
-```cmake
+```bash
 mkdir build
 cd build
 cmake -Dcollab_examples=ON ..
