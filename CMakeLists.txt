@@ -9,34 +9,31 @@ endif()
 # ------------------------------------------------------------------------------
 # Dependencies and Misc
 # ------------------------------------------------------------------------------
-set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/bin/")
+set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
 
 include("CMake/AddCompilerFlags.cmake")
+include("CMake/AddCustom.cmake")
 
 
 # ------------------------------------------------------------------------------
-# Examples Executables
+# Examples
 # ------------------------------------------------------------------------------
 option(collab_examples "Build examples" ON)
 
 if(collab_examples)
     message(STATUS "Build examples")
     include("CMake/AddExamples.cmake")
-else()
-    message(STATUS "Doesn't build examples")
 endif()
 
 
 # ------------------------------------------------------------------------------
-# Tests Executables
+# Tests
 # ------------------------------------------------------------------------------
 option(collab_tests "Build Tests" OFF)
 
 if(collab_tests)
     message(STATUS "Build tests")
     include("CMake/AddTests.cmake")
-else()
-    message(STATUS "Doesn't build Test")
 endif()
 
 

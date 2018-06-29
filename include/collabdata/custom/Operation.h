@@ -9,28 +9,32 @@ namespace collab {
  * \brief
  * Interface that represents any operations on CollabData.
  *
+ * \see CollabData
+ *
  * \author  Constantin Masson
  * \date    May 2018
  */
 class Operation {
     protected:
-        int _type = 0; // Unset type
+        int _type = 0; // By default, no type set
+
+    protected:
         Operation() = default;
     public:
         virtual ~Operation() = default;
 
+
     public:
 
         /**
-         * Returns the type of this operation.
+         * Get the type of this operation.
+         * Returns 0 if not type set. (This may be an internal error.)
          *
-         * \return Operation's type of 0 if unkown type.
+         * \return ID of the operation's type.
          */
         int getType() const {
             return _type;
         }
-
-    public:
 
         /**
          * Serialize the operation data in internal packed format.
