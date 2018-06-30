@@ -68,7 +68,27 @@ class SimpleGraph : public CollabData {
 
 
     // -------------------------------------------------------------------------
-    // Modifiers methods (End-User)
+    // Capacity
+    // -------------------------------------------------------------------------
+    bool empty() const noexcept;
+
+    /**
+     * Returns number of vertices in the graph.
+     *
+     * \return Number of vertices in the graph.
+     */
+    size_t nbVertices() const noexcept;
+
+    /**
+     * Returns the total number of edges in the graph.
+     *
+     * \return Number of edges in the graph.
+     */
+    size_t nbEdges() const noexcept;
+
+
+    // -------------------------------------------------------------------------
+    // Modifiers methods
     // -------------------------------------------------------------------------
 
     public:

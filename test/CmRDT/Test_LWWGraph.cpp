@@ -202,6 +202,88 @@ TEST(LWWGraph, crdt_sizeTest) {
 
 
 // -----------------------------------------------------------------------------
+// size_edges()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, size_edgesTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    EXPECT_EQ(data0.size_edges(), 0);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v2", "v3", 20);
+    data0.add_edge("v3", "v4", 20);
+    data0.add_edge("v4", "v2", 20);
+    data0.add_edge("v4", "v4", 20);
+
+    EXPECT_EQ(data0.size_edges(), 6);
+}
+
+TEST(LWWGraph, size_edgesWithRemoveCallsTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    EXPECT_EQ(data0.size_edges(), 0);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v2", "v3", 20);
+    data0.add_edge("v3", "v4", 20);
+    data0.add_edge("v4", "v2", 20);
+    data0.add_edge("v4", "v4", 20);
+
+    EXPECT_EQ(data0.size_edges(), 6);
+
+    data0.remove_edge("v3", "v4", 30);
+    data0.remove_edge("v4", "v2", 30);
+    data0.remove_edge("v4", "v4", 30);
+
+    EXPECT_EQ(data0.size_edges(), 3);
+}
+
+
+// -----------------------------------------------------------------------------
+// crdt_size_edges()
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdt_size_edgesTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    EXPECT_EQ(data0.crdt_size_edges(), 0);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v2", "v3", 20);
+    data0.add_edge("v3", "v4", 20);
+    data0.add_edge("v4", "v2", 20);
+    data0.add_edge("v4", "v4", 20);
+
+    EXPECT_EQ(data0.crdt_size_edges(), 6);
+}
+
+TEST(LWWGraph, crdt_size_edgesWithRemoveCallsTest) {
+    LWWGraph<std::string, int, int> data0;
+
+    EXPECT_EQ(data0.crdt_size_edges(), 0);
+
+    data0.add_edge("v1", "v1", 20);
+    data0.add_edge("v1", "v2", 20);
+    data0.add_edge("v2", "v3", 20);
+    data0.add_edge("v3", "v4", 20);
+    data0.add_edge("v4", "v2", 20);
+    data0.add_edge("v4", "v4", 20);
+
+    EXPECT_EQ(data0.crdt_size_edges(), 6);
+
+    data0.remove_edge("v3", "v4", 30);
+    data0.remove_edge("v4", "v2", 30);
+    data0.remove_edge("v4", "v4", 30);
+
+    EXPECT_EQ(data0.crdt_size_edges(), 6);
+}
+
+
+// -----------------------------------------------------------------------------
 // at_vertex()
 // -----------------------------------------------------------------------------
 

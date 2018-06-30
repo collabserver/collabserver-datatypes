@@ -108,6 +108,8 @@ class LWWGraph {
         typedef typename LWWMap<Key,Vertex,U>::const_crdt_iterator
             const_crdt_iterator;
 
+        typedef typename LWWSet<Key,U>::size_type               size_type_edges;
+
     private:
         LWWMap<Key, Vertex, U> _adj;
 
@@ -120,7 +122,6 @@ class LWWGraph {
 
         /**
          * Checks if the graph has no vertex.
-         * Only elements that are not marked as 'removed' count.
          *
          * \return True if the container is empty, false otherwise.
          */
@@ -140,7 +141,6 @@ class LWWGraph {
 
         /**
          * Returns the number of vertex in this graph.
-         * Only elements that are not marked as 'removed' count.
          *
          * \return Number of elements in the container.
          */
@@ -156,6 +156,35 @@ class LWWGraph {
          */
         size_type crdt_size_vertex() const noexcept {
             return _adj.crdt_size();
+        }
+
+        /**
+         * Returns the total number of edges in this graph.
+         *
+         * \return Number of edges in the graph.
+         */
+        size_type_edges size_edges() const noexcept {
+            size_type_edges total = 0;
+
+            for(const auto& elt : _adj) {
+                total += elt.second._edges.size();
+            }
+            return total;
+        }
+
+        /**
+         * Returns the total number of edges in this graph.
+         * Also check for elements marked as 'removed'.
+         *
+         * \return Number of edges in the graph.
+         */
+        size_type_edges crdt_size_edges() const noexcept {
+            size_type_edges total = 0;
+
+            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+                total += it->second.value()._edges.crdt_size();
+            }
+            return total;
         }
 
 
@@ -307,7 +336,6 @@ class LWWGraph {
         /**
          * Count the number of edge from given vertex to another.
          * Since no duplicate are allowed, return 0 or 1.
-         * Only elements that are not marked as 'removed' count.
          *
          * \param from  The origin vertex.
          * \param to    The destination vertex.

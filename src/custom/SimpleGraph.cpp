@@ -4,7 +4,20 @@ namespace collab {
 
 
 // -----------------------------------------------------------------------------
-// Modifiers methods (End-User)
+// Capacity
+// -----------------------------------------------------------------------------
+
+size_t SimpleGraph::nbVertices() const noexcept {
+    return _graph.size_vertex();
+}
+
+size_t SimpleGraph::nbEdges() const noexcept {
+    return _graph.size_edges();
+}
+
+
+// -----------------------------------------------------------------------------
+// Modifiers methods
 // -----------------------------------------------------------------------------
 
 void SimpleGraph::addVertex(const UUID& id) {
