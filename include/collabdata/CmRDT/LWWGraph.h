@@ -676,6 +676,13 @@ class LWWGraph {
         }
 
         /**
+         * \copydoc LWWGraph::begin
+         */
+        const_iterator begin() const noexcept {
+            return const_iterator(_adj);
+        }
+
+        /**
          * Returns iterator to the end.
          *
          * \return iterator to the last element.
@@ -684,13 +691,6 @@ class LWWGraph {
             iterator it(_adj);
             it._it = _adj.end();
             return it;
-        }
-
-        /**
-         * \copydoc LWWGraph::begin
-         */
-        const_iterator begin() const noexcept {
-            return const_iterator(_adj);
         }
 
         /**

@@ -241,8 +241,7 @@ class LWWMap {
         iterator find(const Key& key) {
             const auto elt_it = _map.find(key);
             if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
-                iterator it(*this);
-                it._it = elt_it;
+                iterator it(*this, elt_it);
                 return it;
             }
             else {
@@ -256,8 +255,7 @@ class LWWMap {
         const_iterator find(const Key& key) const {
             const auto elt_it = _map.find(key);
             if(elt_it != _map.end() && !elt_it->second.isRemoved()) {
-                const_iterator it(*this);
-                it._it = elt_it;
+                const_iterator it(*this, elt_it);
                 return it;
             }
             else {
@@ -528,17 +526,6 @@ class LWWMap {
         }
 
         /**
-         * Returns an iterator to the end.
-         *
-         * \return iterator to the last element.
-         */
-        iterator end() {
-            iterator it(*this);
-            it._it = _map.end();
-            return it;
-        }
-
-        /**
          * \copydoc LWWMap::begin
          */
         const_iterator begin() const noexcept {
@@ -546,11 +533,20 @@ class LWWMap {
         }
 
         /**
+         * Returns an iterator to the end.
+         *
+         * \return iterator to the last element.
+         */
+        iterator end() {
+            iterator it(*this, _map.end());
+            return it;
+        }
+
+        /**
          * \copydoc LWWMap::end
          */
         const_iterator end() const noexcept {
-            const_iterator it(*this);
-            it._it = _map.end();
+            const_iterator it(*this, _map.end());
             return it;
         }
 
@@ -565,8 +561,7 @@ class LWWMap {
          * \copydoc LWWMap::end
          */
         const_iterator cend() const noexcept {
-            const_iterator it(*this);
-            it._it = _map.end();
+            const_iterator it(*this, _map.end());
             return it;
         }
 
@@ -581,6 +576,13 @@ class LWWMap {
         }
 
         /**
+         * \copydoc LWWMap::crdt_begin
+         */
+        const_crdt_iterator crdt_begin() const noexcept {
+            return _map.cbegin();
+        }
+
+        /**
          * Returns a crdt_iterator to the end.
          *
          * \see LWWMap::crdt_iterator
@@ -588,13 +590,6 @@ class LWWMap {
          */
         crdt_iterator crdt_end() noexcept {
             return _map.end();
-        }
-
-        /**
-         * \copydoc LWWMap::crdt_begin
-         */
-        const_crdt_iterator crdt_begin() const noexcept {
-            return _map.cbegin();
         }
 
         /**
@@ -690,6 +685,7 @@ class LWWMap {
 // Nested classes
 // *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * \brief
@@ -822,16 +818,14 @@ class LWWMap<Key, T, U>::Element {
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::iterator
-: public std::iterator<std::input_iterator_tag, value_type> {
-
+        : public std::iterator<std::input_iterator_tag, value_type> {
     private:
-        friend LWWMap;
-
         LWWMap&       _data;
         crdt_iterator _it;
 
+
     public:
-        iterator(LWWMap& map) : _data(map) {
+        explicit iterator(LWWMap& map) : _data(map) {
             _it = _data._map.begin();
 
             // If first element is already removed, skip it
@@ -839,6 +833,16 @@ class LWWMap<Key, T, U>::iterator
                 ++_it;
             }
         }
+
+        explicit iterator(LWWMap& map, crdt_iterator start)
+                : _data(map) , _it(start) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
+                ++_it;
+            }
+        }
+
+
+    public:
 
         iterator& operator++() {
             ++_it;
@@ -883,16 +887,14 @@ class LWWMap<Key, T, U>::iterator
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::const_iterator
-: public std::iterator<std::input_iterator_tag, value_type> {
-
+        : public std::iterator<std::input_iterator_tag, value_type> {
     private:
-        friend LWWMap;
-
         const LWWMap&       _data;
         const_crdt_iterator _it;
 
+
     public:
-        const_iterator(const LWWMap& map) : _data(map) {
+        explicit const_iterator(const LWWMap& map) : _data(map) {
             _it = _data._map.begin();
 
             // If first element is already removed, skip it
@@ -900,6 +902,16 @@ class LWWMap<Key, T, U>::const_iterator
                 ++_it;
             }
         }
+
+        explicit const_iterator(const LWWMap& map, const_crdt_iterator start)
+                : _data(map), _it(start) {
+            while(_it != _data._map.end() && _it->second.isRemoved()) {
+                ++_it;
+            }
+        }
+
+
+    public:
 
         const_iterator& operator++() {
             ++_it;
