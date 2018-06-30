@@ -144,7 +144,7 @@ class LWWGraph {
          *
          * \return Number of elements in the container.
          */
-        size_type size() const noexcept {
+        size_type size_vertex() const noexcept {
             return _adj.size();
         }
 
@@ -154,7 +154,7 @@ class LWWGraph {
          *
          * \return Number of elements in the container.
          */
-        size_type crdt_size() const noexcept {
+        size_type crdt_size_vertex() const noexcept {
             return _adj.crdt_size();
         }
 

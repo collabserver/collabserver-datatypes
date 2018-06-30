@@ -72,64 +72,64 @@ TEST(LWWGraph, crdt_emptyTest) {
 
 
 // -----------------------------------------------------------------------------
-// size()
+// size_vertex()
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, sizeTest) {
     LWWGraph<std::string, int, int> data0;
-    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
 
     // Add vertex
     data0.add_vertex("v1", 10);
-    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 1);
     data0.add_vertex("v2", 20);
-    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 2);
     data0.add_vertex("v3", 30);
-    ASSERT_EQ(data0.size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 3);
     data0.add_vertex("v4", 40);
-    ASSERT_EQ(data0.size(), 4);
+    ASSERT_EQ(data0.size_vertex(), 4);
 
     // Remove vertex
     data0.remove_vertex("v1", 50);
-    ASSERT_EQ(data0.size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 3);
     data0.remove_vertex("v2", 60);
-    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 2);
     data0.remove_vertex("v3", 70);
-    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 1);
     data0.remove_vertex("v4", 80);
-    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
 }
 
 TEST(LWWGraph, sizeWithDuplicateAddTest) {
     LWWGraph<int, int, int> data0;
 
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
 
     data0.add_vertex(1, 10);
     data0.add_vertex(1, 18);
     data0.add_vertex(1, 19);
     data0.add_vertex(1, 11);
     data0.add_vertex(1, 15);
-    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 1);
 }
 
 TEST(LWWGraph, sizeWithAddEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_edge("v1", "v1", 10);
-    ASSERT_EQ(data0.size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 1);
     data0.add_edge("v1", "v2", 20);
-    ASSERT_EQ(data0.size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 2);
 }
 
 TEST(LWWGraph, sizeWithRemoveEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.remove_edge("v1", "v1", 10);
-    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
     data0.remove_edge("v1", "v2", 20);
-    ASSERT_EQ(data0.size(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
 }
 
 TEST(LWWGraph, sizeWithAddEdgeRemoveEdgeTest) {
@@ -138,7 +138,7 @@ TEST(LWWGraph, sizeWithAddEdgeRemoveEdgeTest) {
     data0.add_edge("v1", "v2", 10);
     data0.add_edge("v1", "v3", 20);
     data0.remove_edge("v1", "v2", 30);
-    ASSERT_EQ(data0.size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 3);
 }
 
 TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
@@ -165,9 +165,9 @@ TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
     data1.remove_vertex("v1", 150);
     data1.add_edge("v2", "v3", 140);
 
-    ASSERT_EQ(data0.size(), 2);
-    ASSERT_EQ(data1.size(), 2);
-    ASSERT_EQ(data0.size(), data1.size());
+    ASSERT_EQ(data0.size_vertex(), 2);
+    ASSERT_EQ(data1.size_vertex(), 2);
+    ASSERT_EQ(data0.size_vertex(), data1.size_vertex());
 }
 
 
@@ -177,27 +177,27 @@ TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
 
 TEST(LWWGraph, crdt_sizeTest) {
     LWWGraph<std::string, int, int> data0;
-    ASSERT_EQ(data0.crdt_size(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 0);
 
     // Add vertex
     data0.add_vertex("v1", 10);
-    ASSERT_EQ(data0.crdt_size(), 1);
+    ASSERT_EQ(data0.crdt_size_vertex(), 1);
     data0.add_vertex("v2", 20);
-    ASSERT_EQ(data0.crdt_size(), 2);
+    ASSERT_EQ(data0.crdt_size_vertex(), 2);
     data0.add_vertex("v3", 30);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
     data0.add_vertex("v4", 40);
-    ASSERT_EQ(data0.crdt_size(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 4);
 
     // Remove vertex
     data0.remove_vertex("v1", 50);
-    ASSERT_EQ(data0.crdt_size(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 4);
     data0.remove_vertex("v2", 60);
-    ASSERT_EQ(data0.crdt_size(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 4);
     data0.remove_vertex("v3", 70);
-    ASSERT_EQ(data0.crdt_size(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 4);
     data0.remove_vertex("v4", 80);
-    ASSERT_EQ(data0.crdt_size(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 4);
 }
 
 
@@ -706,8 +706,8 @@ TEST(LWWGraph, clear_verticesTest) {
     data0.add_vertex("v3", 13);
 
     data0.clear_vertices(40);
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
 }
 
 TEST(LWWGraph, clear_verticesIdempotentTest) {
@@ -721,8 +721,8 @@ TEST(LWWGraph, clear_verticesIdempotentTest) {
     data0.clear_vertices(40);
     data0.clear_vertices(40);
     data0.clear_vertices(40);
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
 }
 
 TEST(LWWGraph, clear_verticesWithAddEdgeTest) {
@@ -736,8 +736,8 @@ TEST(LWWGraph, clear_verticesWithAddEdgeTest) {
     data0.add_edge("v2", "v1", 22);
 
     data0.clear_vertices(30);
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
     auto v1 = data0.crdt_find_vertex("v1");
     auto v2 = data0.crdt_find_vertex("v2");
     _ASSERT_VERTEX_EQ(v1, "v1", true, 30, data0);
@@ -773,8 +773,8 @@ TEST(LWWGraph, clear_verticesReceivedTooLate) {
     data0.clear_vertices(42);
 
     // Check vertex v1 and v2 not cleared (Since re-added by add_edge)
-    ASSERT_EQ(data0.size(), 4);
-    ASSERT_EQ(data0.crdt_size(), 5);
+    ASSERT_EQ(data0.size_vertex(), 4);
+    ASSERT_EQ(data0.crdt_size_vertex(), 5);
     auto v1_it = data0.crdt_find_vertex("v1");
     auto v2_it = data0.crdt_find_vertex("v2");
     auto v3_it = data0.crdt_find_vertex("v3");
@@ -818,8 +818,8 @@ TEST(LWWGraph, clear_vertex_edgesTest) {
     data0.add_edge("v2", "v3", 20);
 
     data0.clear_vertex_edges("v1", 40);
-    ASSERT_EQ(data0.size(), 3);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 3);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
 
     // Check vertex status
     auto v1_it = data0.crdt_find_vertex("v1");
@@ -857,8 +857,8 @@ TEST(LWWGraph, clear_vertex_edgesWithAddCalledLaterTest) {
     // Clear v1 edges
     data0.clear_vertex_edges("v1", 30);
 
-    ASSERT_EQ(data0.size(), 3);
-    ASSERT_EQ(data0.crdt_size(), 3);
+    ASSERT_EQ(data0.size_vertex(), 3);
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
 
     // Check vertex status
     auto v1_it = data0.crdt_find_vertex("v1");
@@ -952,8 +952,8 @@ TEST(LWWGraph, add_vertexIdempotentTest) {
     data0.add_vertex(1, 10);
     data0.add_vertex(1, 10);
     data0.add_vertex(1, 10);
-    ASSERT_EQ(data0.size(), 1);
-    ASSERT_EQ(data0.crdt_size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 1);
+    ASSERT_EQ(data0.crdt_size_vertex(), 1);
     auto res = data0.crdt_find_vertex(1);
     _ASSERT_VERTEX_EQ(res, 1, false, 10, data0);
 
@@ -961,8 +961,8 @@ TEST(LWWGraph, add_vertexIdempotentTest) {
     data0.add_vertex(42, 20);
     data0.add_vertex(42, 20);
     data0.add_vertex(42, 20);
-    ASSERT_EQ(data0.size(), 2);
-    ASSERT_EQ(data0.crdt_size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 2);
+    ASSERT_EQ(data0.crdt_size_vertex(), 2);
     res = data0.crdt_find_vertex(42);
     _ASSERT_VERTEX_EQ(res, 42, false, 20, data0);
 }
@@ -1086,8 +1086,8 @@ TEST(LWWGraph, remove_vertexIdempotentTest) {
     data0.remove_vertex("v1", 20);
 
     // Check success
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.crdt_size(), 1);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 1);
     auto res = data0.crdt_find_vertex("v1");
     _ASSERT_VERTEX_EQ(res, "v1", true, 20, data0);
 
@@ -1098,9 +1098,9 @@ TEST(LWWGraph, remove_vertexIdempotentTest) {
     data0.remove_vertex("v2", 40);
 
     // Check success
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.size(), 0);
-    ASSERT_EQ(data0.crdt_size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.size_vertex(), 0);
+    ASSERT_EQ(data0.crdt_size_vertex(), 2);
     res = data0.crdt_find_vertex("v2");
     _ASSERT_VERTEX_EQ(res, "v2", true, 40, data0);
 }
@@ -1237,8 +1237,8 @@ TEST(LWWGraph, add_edgeIdempotentTest) {
     data0.add_edge("v1", "v2", 10);
     data0.add_edge("v1", "v2", 10);
 
-    ASSERT_EQ(data0.size(), 2);
-    ASSERT_EQ(data0.crdt_size(), 2);
+    ASSERT_EQ(data0.size_vertex(), 2);
+    ASSERT_EQ(data0.crdt_size_vertex(), 2);
 
     // Vertex 1 and 2
     auto v1 = data0.crdt_find_vertex("v1");
@@ -1674,9 +1674,9 @@ TEST(LWWGraph, crdt_sizeWithadd_edgeremove_vertex) {
     data1.remove_vertex("v1", 150);
     data1.add_edge("v2", "v3", 140);
 
-    ASSERT_EQ(data0.crdt_size(), 3);
-    ASSERT_EQ(data1.crdt_size(), 3);
-    ASSERT_EQ(data0.crdt_size(), data1.crdt_size());
+    ASSERT_EQ(data0.crdt_size_vertex(), 3);
+    ASSERT_EQ(data1.crdt_size_vertex(), 3);
+    ASSERT_EQ(data0.crdt_size_vertex(), data1.crdt_size_vertex());
 }
 
 
