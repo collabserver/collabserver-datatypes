@@ -1998,19 +1998,309 @@ TEST(LWWGraph, operatorEQTest) {
 // -----------------------------------------------------------------------------
 // LWWGraph::iterator
 // -----------------------------------------------------------------------------
-TEST(LWWGraph, iteratorTest) {
-    LWWGraph<const char*, std::string, int> data0;
 
-    // TODO Important. For now, it is not even compiling! Ourg! Ugly!
-    /*
+TEST(LWWGraph, iteratorTest) {
+    LWWGraph<const char*, int, int> data0;
+
     data0.add_edge("v1", "v1", 10);
     data0.add_edge("v1", "v2", 10);
     data0.add_edge("v2", "v1", 10);
     data0.add_edge("v3", "v1", 10);
 
+    data0.at_vertex("v1") = 100;
+    data0.at_vertex("v2") = 200;
+    data0.at_vertex("v3") = 300;
+
+    int k = 0;
+    int total = 0;
     for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+        total += it->second.content();
     }
-    */
+    ASSERT_EQ(k, 3);
+    ASSERT_EQ(total, 600);
+
+    // Remove elements
+    data0.remove_vertex("v1", 20);
+    k = 0;
+    total = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+        total += it->second.content();
+    }
+    ASSERT_EQ(k, 2);
+    ASSERT_EQ(total, 500);
+
+    // Readd + add more
+    data0.add_vertex("v1", 30);
+    data0.add_vertex("v4", 30);
+    data0.add_vertex("v5", 30);
+
+    data0.at_vertex("v4") = 400;
+    data0.at_vertex("v5") = 500;
+    k = 0;
+    total = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+        total += it->second.content();
+    }
+    ASSERT_EQ(k, 5);
+    ASSERT_EQ(total, 1500);
+}
+
+TEST(LWWGraph, iteratorTest_EmptyGraph) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 0);
+}
+
+TEST(LWWGraph, iteratorTest_EmptyGraphAfterRemove) {
+    LWWGraph<const char*, int, int> data0;
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    data0.add_vertex("v4", 10);
+
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v2", 20);
+    data0.remove_vertex("v3", 20);
+    data0.remove_vertex("v4", 20);
+
+    int k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 0);
+}
+
+TEST(LWWGraph, iteratorTest_end) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.end(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    k = 0;
+    for(auto it = data0.end(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// LWWGraph::const_iterator
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, constIteratorTest) {
+    LWWGraph<const char*, int, int> data0;
+
+    data0.add_edge("v1", "v1", 10);
+    data0.add_edge("v1", "v2", 10);
+    data0.add_edge("v2", "v1", 10);
+    data0.add_edge("v3", "v1", 10);
+
+    data0.at_vertex("v1") = 100;
+    data0.at_vertex("v2") = 200;
+    data0.at_vertex("v3") = 300;
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+        total += it->second.content();
+    }
+    ASSERT_EQ(k, 3);
+    ASSERT_EQ(total, 600);
+
+    // Remove elements
+    data0.remove_vertex("v1", 20);
+    k = 0;
+    total = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+        total += it->second.content();
+    }
+    ASSERT_EQ(k, 2);
+    ASSERT_EQ(total, 500);
+
+    // Readd + add more
+    data0.add_vertex("v1", 30);
+    data0.add_vertex("v4", 30);
+    data0.add_vertex("v5", 30);
+
+    data0.at_vertex("v4") = 400;
+    data0.at_vertex("v5") = 500;
+    k = 0;
+    total = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+        total += it->second.content();
+    }
+    ASSERT_EQ(k, 5);
+    ASSERT_EQ(total, 1500);
+}
+
+TEST(LWWGraph, constIteratorTest_EmptyGraph) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 0);
+}
+
+TEST(LWWGraph, constIteratorTest_EmptyGraphAfterRemove) {
+    LWWGraph<const char*, int, int> data0;
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    data0.add_vertex("v4", 10);
+
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v2", 20);
+    data0.remove_vertex("v3", 20);
+    data0.remove_vertex("v4", 20);
+
+    int k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 0);
+}
+
+TEST(LWWGraph, constIteratorTest_end) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    k = 0;
+    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// LWWGraph::crdt_iterator
+// -----------------------------------------------------------------------------
+
+TEST(LWWGraph, crdtIteratorTest) {
+    LWWGraph<const char*, int, int> data0;
+
+    data0.add_edge("v1", "v1", 10);
+    data0.add_edge("v1", "v2", 10);
+    data0.add_edge("v2", "v1", 10);
+    data0.add_edge("v3", "v1", 10);
+
+    data0.at_vertex("v1") = 100;
+    data0.at_vertex("v2") = 200;
+    data0.at_vertex("v3") = 300;
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+        total += it->second.value().content();
+    }
+    ASSERT_EQ(k, 3);
+    ASSERT_EQ(total, 600);
+
+    // Remove elements
+    data0.remove_vertex("v1", 20);
+    k = 0;
+    total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+        total += it->second.value().content();
+    }
+    ASSERT_EQ(k, 3);
+    ASSERT_EQ(total, 600);
+
+    // Readd + add more
+    data0.add_vertex("v1", 30);
+    data0.add_vertex("v4", 30);
+    data0.add_vertex("v5", 30);
+
+    data0.at_vertex("v4") = 400;
+    data0.at_vertex("v5") = 500;
+    k = 0;
+    total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+        total += it->second.value().content();
+    }
+    ASSERT_EQ(k, 5);
+    ASSERT_EQ(total, 1500);
+}
+
+TEST(LWWGraph, crdtIteratorTest_EmptyGraph) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 0);
+}
+
+TEST(LWWGraph, crdtIteratorTest_EmptyGraphAfterRemove) {
+    LWWGraph<const char*, int, int> data0;
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    data0.add_vertex("v4", 10);
+
+    data0.remove_vertex("v1", 20);
+    data0.remove_vertex("v2", 20);
+    data0.remove_vertex("v3", 20);
+    data0.remove_vertex("v4", 20);
+
+    int k = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    ASSERT_EQ(k, 4);
+}
+
+TEST(LWWGraph, crdtIteratorTest_end) {
+    LWWGraph<const char*, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add_vertex("v1", 10);
+    data0.add_vertex("v2", 10);
+    data0.add_vertex("v3", 10);
+    k = 0;
+    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
 }
 
 
