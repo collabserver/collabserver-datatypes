@@ -1,7 +1,10 @@
 /*
  * TEST NAMING RULE (For all test files):
- * The first word of test name is generally the tested method
- * ex: addDuplicateCallsTest to test function 'add'
+ *
+ * MethodName_stateUnderTest_expectedBehavior
+ *
+ * MethodName is the method name in cameCase + Test
+ * Example: addVertexTest_concurrentRemoveEdge
  *
  * General cases to check for any CRDT data:
  *  - Normal example

@@ -43,7 +43,7 @@ TEST(LWWMap, emptyTest) {
 // crdt_empty()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_emptyTest) {
+TEST(LWWMap, crdtEmptyTest) {
     LWWMap<int, int, int> data0;
     ASSERT_TRUE(data0.crdt_empty());
 
@@ -97,7 +97,7 @@ TEST(LWWMap, sizeTest) {
     ASSERT_EQ(data0.size(), 0);
 }
 
-TEST(LWWMap, sizeWithDuplicateAddTest) {
+TEST(LWWMap, sizeTest_WithDuplicateAdd) {
     LWWMap<int, int, int> data0;
 
     ASSERT_EQ(data0.size(), 0);
@@ -111,7 +111,7 @@ TEST(LWWMap, sizeWithDuplicateAddTest) {
     ASSERT_EQ(data0.size(), 1);
 }
 
-TEST(LWWMap, sizeWithDuplicateAddRemoveTest) {
+TEST(LWWMap, sizeTest_WithDuplicateAddRemove) {
     LWWMap<int, int, int> data0;
 
     ASSERT_EQ(data0.size(), 0);
@@ -135,7 +135,7 @@ TEST(LWWMap, sizeWithDuplicateAddRemoveTest) {
     ASSERT_EQ(data0.size(), 0);
 }
 
-TEST(LWWMap, sizeWithRemoveFirstTest) {
+TEST(LWWMap, sizeTest_WithRemoveFirst) {
     LWWMap<int, int, int> data0;
     ASSERT_EQ(data0.size(), 0);
 
@@ -158,7 +158,7 @@ TEST(LWWMap, sizeWithRemoveFirstTest) {
     ASSERT_EQ(data0.size(), 1);
 }
 
-TEST(LWWMap, sizeWithOlderRemoveAfterAddTest) {
+TEST(LWWMap, sizeTest_WithOlderRemoveAfterAdd) {
     LWWMap<int, int, int> data0;
     ASSERT_EQ(data0.size(), 0);
 
@@ -177,7 +177,7 @@ TEST(LWWMap, sizeWithOlderRemoveAfterAddTest) {
 // max_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, max_sizeTest) {
+TEST(LWWMap, maxSizeTest) {
     // Well, this is not really a test, my goal here is just to call max_size
     // (So that I'm sure it's compiling). But max_size itself is just a 
     // 'foward' of unordered_map::max_size. See code.
@@ -209,7 +209,7 @@ TEST(LWWMap, countTest) {
     ASSERT_EQ(data0.count("x3"), 0);
 }
 
-TEST(LWWMap, countAfterRemoveTest) {
+TEST(LWWMap, countTest_AfterRemove) {
     LWWMap<int, int, int> data0;
 
     ASSERT_EQ(data0.count(42), 0);
@@ -222,7 +222,7 @@ TEST(LWWMap, countAfterRemoveTest) {
 // -----------------------------------------------------------------------------
 // crdt_count()
 // -----------------------------------------------------------------------------
-TEST(LWWMap, crdt_countTest) {
+TEST(LWWMap, crdtCountTest) {
     LWWMap<int, int, int> data0;
 
     ASSERT_EQ(data0.crdt_count(1), 0);
@@ -244,7 +244,7 @@ TEST(LWWMap, crdt_countTest) {
     ASSERT_EQ(data0.crdt_count(42), 0);
 }
 
-TEST(LWWMap, crdt_countAfterRemoveTest) {
+TEST(LWWMap, crdtCountTest_AfterRemove) {
     LWWMap<int, int, int> data0;
 
     ASSERT_EQ(data0.crdt_count(42), 0);
@@ -277,7 +277,7 @@ TEST(LWWMap, atTest) {
     EXPECT_EQ(data0.at("e3"), "MagicRabbit");
 }
 
-TEST(LWWMap, atRemovedElementTest) {
+TEST(LWWMap, atTest_RemovedElement) {
     LWWMap<std::string, const char*, int> data0;
 
     // Setup data
@@ -306,7 +306,7 @@ TEST(LWWMap, atRemovedElementTest) {
     ASSERT_EQ(nbException, 2);
 }
 
-TEST(LWWMap, atChangeValueTest) {
+TEST(LWWMap, atTest_ChangeValue) {
     LWWMap<std::string, int, int> data0;
     data0.add("e1", 10);
     data0.add("e2", 10);
@@ -329,7 +329,7 @@ TEST(LWWMap, atChangeValueTest) {
     ASSERT_EQ(data0.at("e3"), 128);
 }
 
-TEST(LWWMap, atInvalidKeyThrowExceptionTest) {
+TEST(LWWMap, atTest_InvalidKeyThrowException) {
     LWWMap<const char*, const char*, int> data0;
 
     int nbException = 0;
@@ -350,7 +350,7 @@ TEST(LWWMap, atInvalidKeyThrowExceptionTest) {
 // crdt_at()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_atTest) {
+TEST(LWWMap, crdtAtTest) {
     LWWMap<const char*, const char*, int> data0;
 
     // Add all the crap there!
@@ -369,7 +369,7 @@ TEST(LWWMap, crdt_atTest) {
     EXPECT_EQ(data0.crdt_at("e3"), "MagicRabbit");
 }
 
-TEST(LWWMap, crdt_atRemovedElementTest) {
+TEST(LWWMap, crdtAtTest_RemovedElement) {
     LWWMap<std::string, const char*, int> data0;
 
     // Setup data
@@ -398,7 +398,7 @@ TEST(LWWMap, crdt_atRemovedElementTest) {
     ASSERT_EQ(nbException, 0);
 }
 
-TEST(LWWMap, crdt_atChangeValueTest) {
+TEST(LWWMap, crdtAtTest_ChangeValue) {
     LWWMap<std::string, int, int> data0;
     data0.add("e1", 10);
     data0.add("e2", 10);
@@ -421,7 +421,7 @@ TEST(LWWMap, crdt_atChangeValueTest) {
     ASSERT_EQ(data0.crdt_at("e3"), 128);
 }
 
-TEST(LWWMap, crdt_atInvalidKeyThrowExceptionTest) {
+TEST(LWWMap, crdtAtTest_InvalidKeyThrowException) {
     LWWMap<const char*, const char*, int> data0;
 
     int nbException = 0;
@@ -461,7 +461,7 @@ TEST(LWWMap, findTest) {
     EXPECT_EQ((*e3).first, "e3");
 }
 
-TEST(LWWMap, findRemovedElementTest) {
+TEST(LWWMap, findTest_RemovedElement) {
     LWWMap<std::string, int, int> data0;
 
     data0.add("e1", 10);
@@ -470,7 +470,7 @@ TEST(LWWMap, findRemovedElementTest) {
     EXPECT_EQ(e1, data0.end());
 }
 
-TEST(LWWMap, findAndChangeValueTests) {
+TEST(LWWMap, findTest_AndChangeValue) {
     LWWMap<std::string, int, int> data0;
 
     // Setup data
@@ -495,7 +495,7 @@ TEST(LWWMap, findAndChangeValueTests) {
 // crdt_find()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_findTest) {
+TEST(LWWMap, crdtFindTest) {
     LWWMap<std::string, int, int> data0;
 
     // Query before exists
@@ -517,7 +517,7 @@ TEST(LWWMap, crdt_findTest) {
     EXPECT_TRUE(coco == data0.crdt_end());
 }
 
-TEST(LWWMap, queryAndChangeValueTests) {
+TEST(LWWMap, findTest_QueryAndChangeValue) {
     LWWMap<std::string, int, int> data0;
 
     // Setup data
@@ -527,16 +527,16 @@ TEST(LWWMap, queryAndChangeValueTests) {
     data0.remove("e2", 3);
 
     // Change values of container
-    auto it_e1 = data0.crdt_find("e1");
-    it_e1->second.value() = 42;
-    auto it_e2 = data0.crdt_find("e2");
-    it_e2->second.value() = 1024;
+    auto e1_it = data0.crdt_find("e1");
+    auto e2_it = data0.crdt_find("e2");
+    e1_it->second.value() = 42;
+    e2_it->second.value() = 1024;
 
     // Check if container value are well changed
-    auto e1 = data0.crdt_find("e1");
-    auto e2 = data0.crdt_find("e2");
-    EXPECT_EQ(e1->second.value(), 42);
-    EXPECT_EQ(e2->second.value(), 1024);
+    e1_it = data0.crdt_find("e1");
+    e2_it = data0.crdt_find("e2");
+    EXPECT_EQ(e1_it->second.value(), 42);
+    EXPECT_EQ(e2_it->second.value(), 1024);
 }
 
 
@@ -561,7 +561,7 @@ TEST(LWWMap, clearTest) {
     EXPECT_EQ(data0.crdt_size(), 5);
 }
 
-TEST(LWWMap, clearCalledFirstTest) {
+TEST(LWWMap, clearTest_CalledFirst) {
     LWWMap<std::string, int, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -591,7 +591,7 @@ TEST(LWWMap, clearCalledFirstTest) {
     EXPECT_EQ(data0.crdt_size(), 10);
 }
 
-TEST(LWWMap, clearIndenpotentTest) {
+TEST(LWWMap, clearTest_Indenpotent) {
     LWWMap<std::string, int, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -646,7 +646,7 @@ TEST(LWWMap, clearIndenpotentTest) {
     EXPECT_EQ(data0.crdt_size(), 10);
 }
 
-TEST(LWWMap, clearIndenpotentReturnTypeTest) {
+TEST(LWWMap, clearTest_IndenpotentReturnType) {
     LWWMap<std::string, int, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -668,7 +668,7 @@ TEST(LWWMap, clearIndenpotentReturnTypeTest) {
     EXPECT_FALSE(data0.clear(64));
 }
 
-TEST(LWWMap, clearReturnTypeTest) {
+TEST(LWWMap, clearTest_ReturnType) {
     LWWMap<std::string, int, int> data0;
     EXPECT_EQ(data0.size(), 0);
     EXPECT_EQ(data0.crdt_size(), 0);
@@ -695,7 +695,7 @@ TEST(LWWMap, clearReturnTypeTest) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-TEST(LWWMap, clearThenAddAfterNewerClearTest) {
+TEST(LWWMap, clearTest_ThenAddAfterNewerClear) {
     LWWMap<std::string, int, int> data0;
 
     data0.clear(42);
@@ -708,7 +708,7 @@ TEST(LWWMap, clearThenAddAfterNewerClearTest) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-TEST(LWWMap, clearThenAddAfterOlderClearTest) {
+TEST(LWWMap, clearTest_ThenAddAfterOlderClear) {
     LWWMap<std::string, int, int> data0;
 
     data0.clear(10);
@@ -750,7 +750,7 @@ TEST(LWWMap, addTest) {
     }
 }
 
-TEST(LWWMap, addDuplicateCallsTest) {
+TEST(LWWMap, addTest_DuplicateCalls) {
     LWWMap<int, int, int> data0;
 
     // Test duplicate add, keep max timestamps 
@@ -774,7 +774,7 @@ TEST(LWWMap, addDuplicateCallsTest) {
     _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
-TEST(LWWMap, addReturnTypeTest) {
+TEST(LWWMap, addTest_ReturnType) {
     LWWMap<std::string, int, int> data0;
 
     // First add the element.
@@ -792,7 +792,7 @@ TEST(LWWMap, addReturnTypeTest) {
     ASSERT_FALSE(data0.add("carrot", 2048));
 }
 
-TEST(LWWMap, addReturnTypeWithRemoveCalled) {
+TEST(LWWMap, addTest_ReturnTypeWithRemoveCalled) {
     LWWMap<std::string, int, int> data0;
 
     ASSERT_TRUE(data0.add("coco", 10));
@@ -812,7 +812,7 @@ TEST(LWWMap, addReturnTypeWithRemoveCalled) {
     ASSERT_TRUE(data0.add("coco", 513));
 }
 
-TEST(LWWMap, addIdempotentTest) {
+TEST(LWWMap, addTest_Idempotent) {
     LWWMap<std::string, int, int> data0;
 
     data0.add("e1", 10);
@@ -828,7 +828,7 @@ TEST(LWWMap, addIdempotentTest) {
     _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 }
 
-TEST(LWWMap, addIdempotentReturnTypeTest) {
+TEST(LWWMap, addTest_IdempotentReturnType) {
     LWWMap<std::string, int, int> data0;
 
     ASSERT_TRUE(data0.add("e1", 10));
@@ -867,7 +867,7 @@ TEST(LWWMap, removeTest) {
     }
 }
 
-TEST(LWWMap, removeDuplicateCallsTest) {
+TEST(LWWMap, removeTest_DuplicateCalls) {
     LWWMap<int, int, int> data0;
 
     // Duplicate remove, set higher timestamps
@@ -882,7 +882,7 @@ TEST(LWWMap, removeDuplicateCallsTest) {
     _ASSERT_ELT_EQ(res, 42, true, 29, data0);
 }
 
-TEST(LWWMap, removeCalledBeforeAddCallTest) {
+TEST(LWWMap, removeTest_CalledBeforeAddCall) {
     LWWMap<int, int, int> data0;
 
     // Remove before even added works
@@ -896,7 +896,7 @@ TEST(LWWMap, removeCalledBeforeAddCallTest) {
     _ASSERT_ELT_EQ(res, 42, true, 20, data0);
 }
 
-TEST(LWWMap, removeCalledFirstReturnTypeTest) {
+TEST(LWWMap, removeTest_CalledFirstReturnType) {
     LWWMap<std::string, int, int> data0;
 
     ASSERT_FALSE(data0.remove("coco", 20));
@@ -910,7 +910,7 @@ TEST(LWWMap, removeCalledFirstReturnTypeTest) {
     ASSERT_TRUE(data0.remove("coco", 90));
 }
 
-TEST(LWWMap, removeReturnTypeTest) {
+TEST(LWWMap, removeTest_ReturnType) {
     LWWMap<std::string, int, int> data0;
 
     // Normal add / remove test
@@ -923,7 +923,7 @@ TEST(LWWMap, removeReturnTypeTest) {
     ASSERT_FALSE(data0.remove("coco", 50));
     ASSERT_FALSE(data0.remove("coco", 60));
 }
-TEST(LWWMap, removeIdempotentTest) {
+TEST(LWWMap, removeTest_Idempotent) {
     LWWMap<std::string, int, int> data0;
 
     data0.add("e1", 11);
@@ -941,7 +941,7 @@ TEST(LWWMap, removeIdempotentTest) {
     _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 }
 
-TEST(LWWMap, removeIdempotentReturnTypeTest) {
+TEST(LWWMap, removeTest_IdempotentReturnType) {
     LWWMap<std::string, int, int> data0;
 
     data0.add("e1", 11);
@@ -964,7 +964,7 @@ TEST(LWWMap, removeIdempotentReturnTypeTest) {
 // add() + remove()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, addRemoveTest) {
+TEST(LWWMap, addTest_ConcurrentWithRemove) {
     LWWMap<std::string, int, int> data0;
 
     // Add element
@@ -988,7 +988,7 @@ TEST(LWWMap, addRemoveTest) {
     _ASSERT_ELT_EQ(res, "v1", true, 40, data0);
 }
 
-TEST(LWWMap, addRemoveWithRemoveCalledFirstTest) {
+TEST(LWWMap, addTest_ConcurrentRemoveWithRemoveCalledFirst) {
     LWWMap<std::string, int, int> data0;
 
     // Remove elt before even added. (Is technically removed)
@@ -1012,7 +1012,7 @@ TEST(LWWMap, addRemoveWithRemoveCalledFirstTest) {
     _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 }
 
-TEST(LWWMap, addRemoveUseCaseTest) {
+TEST(LWWMap, addTest_ConcurrentRemoveUseCase) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1048,7 +1048,7 @@ TEST(LWWMap, reserveTest) {
 // crdt_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_sizeTest) {
+TEST(LWWMap, crdtSizeTest) {
     LWWMap<int, int, int> data0;
 
     // Add element and test
@@ -1074,7 +1074,7 @@ TEST(LWWMap, crdt_sizeTest) {
 // crdt_equal()
 // -----------------------------------------------------------------------------
 
-TEST(LWWMap, crdt_equalWithOnlyAddTest) {
+TEST(LWWMap, crdtEqualTest_WithOnlyAdd) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1099,7 +1099,7 @@ TEST(LWWMap, crdt_equalWithOnlyAddTest) {
     ASSERT_TRUE(data1.crdt_equal(data1));
 }
 
-TEST(LWWMap, crdt_equalWithAddRemoveTest) {
+TEST(LWWMap, crdtEqualTest_WithAddRemove) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1142,7 +1142,7 @@ TEST(LWWMap, crdt_equalWithAddRemoveTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWMap, crdt_equalSameValueButDifferentTimestampTest) {
+TEST(LWWMap, crdtEqualTest_SameValueButDifferentTimestamp) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1161,7 +1161,7 @@ TEST(LWWMap, crdt_equalSameValueButDifferentTimestampTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWMap, crdt_equalWithUsersameButInternalNotSameTest) {
+TEST(LWWMap, crdtEqualTest_WithUsersameButInternalNotSame) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1195,7 +1195,7 @@ TEST(LWWMap, crdt_equalWithUsersameButInternalNotSameTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWMap, crdt_equalEmptyVsAddTest) {
+TEST(LWWMap, crdtEqualTest_EmptyVsAdd) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1259,7 +1259,7 @@ TEST(LWWMap, iteratorTest) {
     EXPECT_EQ(k, 6);
 }
 
-TEST(LWWMap, iteratorEmptyMapTest) {
+TEST(LWWMap, iteratorTest_EmptyMap) {
     LWWMap<int, int, int> data0;
 
     // Iterate empty container should be ok (No elt)
@@ -1306,7 +1306,7 @@ TEST(LWWMap, iteratorEmptyMapTest) {
     }
 }
 
-TEST(LWWMap, iteratorReferenceTest) {
+TEST(LWWMap, iteratorTest_Reference) {
     LWWMap<std::string, int, int> data0;
 
     // Add all
@@ -1355,7 +1355,7 @@ TEST(LWWMap, operatorEQTest) {
     ASSERT_FALSE(data0 != data1);
 }
 
-TEST(LWWMap, operatorEQWithDifferentTimestampTest) {
+TEST(LWWMap, operatorEQTest_WithDifferentTimestamp) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 
@@ -1366,7 +1366,7 @@ TEST(LWWMap, operatorEQWithDifferentTimestampTest) {
     ASSERT_FALSE(data0 != data1);
 }
 
-TEST(LWWMap, operatorEQWithDifferentValueTest) {
+TEST(LWWMap, operatorEQTest_WithDifferentValue) {
     LWWMap<std::string, int, int> data0;
     LWWMap<std::string, int, int> data1;
 

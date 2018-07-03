@@ -54,8 +54,10 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 ### Build and run tests with CMake
 - [GoogleTest](https://github.com/google/googletest)
-(Automatically downloaded by CMake and placed in project's root
+(Automatically downloaded and built by CMake and placed in project's root
 folder `dependencies`)
+- Tests naming rule: `MethodName_stateUnderTest`
+
 
 ```bash
 # Build and run manually

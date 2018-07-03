@@ -66,7 +66,7 @@ TEST(CollabData, addOperationObserverTest) {
     ASSERT_EQ(data.sizeOperationObserver(), 3);
 }
 
-TEST(CollabData, addOperationObserverDuplicateCallTest) {
+TEST(CollabData, addOperationObserverTest_DuplicateCall) {
     MockCollabData data;
 
     MockOperationObserver obs1;
@@ -87,7 +87,7 @@ TEST(CollabData, addOperationObserverDuplicateCallTest) {
     ASSERT_EQ(data.sizeOperationObserver(), 3);
 }
 
-TEST(CollabData, addOperationObserverReturnTypeTest) {
+TEST(CollabData, addOperationObserverTest_ReturnType) {
     MockCollabData data;
 
     MockOperationObserver obs1;
@@ -150,7 +150,7 @@ TEST(CollabData, notifyOperationObserversTest) {
     ASSERT_EQ(nbNotified, 3);
 }
 
-TEST(CollabData, notifyOperationObserversWithAddAndClearTest) {
+TEST(CollabData, notifyOperationObserversTest_WithAddAndClear) {
     MockCollabData data;
 
     MockOperation op;

@@ -73,7 +73,7 @@ TEST(LWWRegister, updateTest) {
     ASSERT_EQ(data0.timestamp(), 9);
 }
 
-TEST(LWWRegister, updateReturnTypeTest) {
+TEST(LWWRegister, updateTest_ReturnType) {
     LWWRegister<std::string, int> data0;
 
     ASSERT_TRUE(data0.update("LittleRabbit", 10));
@@ -83,7 +83,7 @@ TEST(LWWRegister, updateReturnTypeTest) {
     ASSERT_TRUE(data0.update("MagicCarrot", 64));
 }
 
-TEST(LWWRegister, updateIdempotentTest) {
+TEST(LWWRegister, updateTest_Idempotent) {
     LWWRegister<std::string, int> data0;
 
     data0.update("kara", 10);
@@ -94,7 +94,7 @@ TEST(LWWRegister, updateIdempotentTest) {
     ASSERT_EQ(data0.timestamp(), 10);
 }
 
-TEST(LWWRegister, updateIdempotentReturnTypeTest) {
+TEST(LWWRegister, updateTest_IdempotentReturnType) {
     LWWRegister<std::string, int> data0;
 
     ASSERT_TRUE(data0.update("LittleRabbit", 10));
@@ -104,7 +104,7 @@ TEST(LWWRegister, updateIdempotentReturnTypeTest) {
     ASSERT_FALSE(data0.update("LittleRabbit", 10));
 }
 
-TEST(LWWRegister, updateUsecaseTest) {
+TEST(LWWRegister, updateTest_Usecase) {
     LWWRegister<int, int> data0;
     LWWRegister<int, int> data1;
 
@@ -157,7 +157,7 @@ TEST(LWWRegister, updateUsecaseTest) {
 // crdt_equal()
 // -----------------------------------------------------------------------------
 
-TEST(LWWRegister, crdt_equalTest) {
+TEST(LWWRegister, crdtEqualTest) {
     LWWRegister<int, int> data0;
     LWWRegister<int, int> data1;
 

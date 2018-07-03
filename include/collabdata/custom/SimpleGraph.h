@@ -70,21 +70,30 @@ class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------
     // Capacity
     // -------------------------------------------------------------------------
-    bool empty() const noexcept;
 
-    /**
-     * Returns number of vertices in the graph.
-     *
-     * \return Number of vertices in the graph.
-     */
-    size_t nbVertices() const noexcept;
+    public:
 
-    /**
-     * Returns the total number of edges in the graph.
-     *
-     * \return Number of edges in the graph.
-     */
-    size_t nbEdges() const noexcept;
+        /**
+         * Check whether this graph is empty.
+         * Empty means graph has no vertex.
+         *
+         * \return True if graph is empty, otherwise, returns false.
+         */
+        bool empty() const noexcept;
+
+        /**
+         * Returns number of vertices in the graph.
+         *
+         * \return Number of vertices in the graph.
+         */
+        size_t nbVertices() const noexcept;
+
+        /**
+         * Returns the total number of edges in the graph.
+         *
+         * \return Number of edges in the graph.
+         */
+        size_t nbEdges() const noexcept;
 
 
     // -------------------------------------------------------------------------
@@ -94,7 +103,7 @@ class SimpleGraph : public CollabData {
     public:
 
         /**
-         * Add vertex in the View.
+         * Add vertex in graph.
          * Notifies all OperationObservers and broadcaster.
          *
          * \param id The vertex's ID.

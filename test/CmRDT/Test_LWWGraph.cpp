@@ -51,7 +51,7 @@ TEST(LWWGraph, emptyTest) {
 // crdt_empty()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_emptyTest) {
+TEST(LWWGraph, crdtEmptyTest) {
     LWWGraph<std::string, int, int> data0;
     ASSERT_TRUE(data0.crdt_empty());
 
@@ -100,7 +100,7 @@ TEST(LWWGraph, sizeTest) {
     ASSERT_EQ(data0.size_vertex(), 0);
 }
 
-TEST(LWWGraph, sizeWithDuplicateAddTest) {
+TEST(LWWGraph, sizeTest_WithDuplicateAdd) {
     LWWGraph<int, int, int> data0;
 
     ASSERT_EQ(data0.size_vertex(), 0);
@@ -114,7 +114,7 @@ TEST(LWWGraph, sizeWithDuplicateAddTest) {
     ASSERT_EQ(data0.size_vertex(), 1);
 }
 
-TEST(LWWGraph, sizeWithAddEdgeTest) {
+TEST(LWWGraph, sizeTest_WithAddEdge) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_edge("v1", "v1", 10);
@@ -123,7 +123,7 @@ TEST(LWWGraph, sizeWithAddEdgeTest) {
     ASSERT_EQ(data0.size_vertex(), 2);
 }
 
-TEST(LWWGraph, sizeWithRemoveEdgeTest) {
+TEST(LWWGraph, sizeTest_WithRemoveEdge) {
     LWWGraph<std::string, int, int> data0;
 
     data0.remove_edge("v1", "v1", 10);
@@ -132,7 +132,7 @@ TEST(LWWGraph, sizeWithRemoveEdgeTest) {
     ASSERT_EQ(data0.size_vertex(), 0);
 }
 
-TEST(LWWGraph, sizeWithAddEdgeRemoveEdgeTest) {
+TEST(LWWGraph, sizeTest_WithAddEdgeRemoveEdge) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_edge("v1", "v2", 10);
@@ -175,7 +175,7 @@ TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
 // crdt_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_sizeTest) {
+TEST(LWWGraph, crdtSizeTest) {
     LWWGraph<std::string, int, int> data0;
     ASSERT_EQ(data0.crdt_size_vertex(), 0);
 
@@ -205,7 +205,7 @@ TEST(LWWGraph, crdt_sizeTest) {
 // size_edges()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, size_edgesTest) {
+TEST(LWWGraph, sizeEdgesTest) {
     LWWGraph<std::string, int, int> data0;
 
     EXPECT_EQ(data0.size_edges(), 0);
@@ -220,7 +220,7 @@ TEST(LWWGraph, size_edgesTest) {
     EXPECT_EQ(data0.size_edges(), 6);
 }
 
-TEST(LWWGraph, size_edgesWithRemoveCallsTest) {
+TEST(LWWGraph, sizeEdgesTest_WithRemoveCalls) {
     LWWGraph<std::string, int, int> data0;
 
     EXPECT_EQ(data0.size_edges(), 0);
@@ -246,7 +246,7 @@ TEST(LWWGraph, size_edgesWithRemoveCallsTest) {
 // crdt_size_edges()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_size_edgesTest) {
+TEST(LWWGraph, crdtSizeEdgesTest) {
     LWWGraph<std::string, int, int> data0;
 
     EXPECT_EQ(data0.crdt_size_edges(), 0);
@@ -261,7 +261,7 @@ TEST(LWWGraph, crdt_size_edgesTest) {
     EXPECT_EQ(data0.crdt_size_edges(), 6);
 }
 
-TEST(LWWGraph, crdt_size_edgesWithRemoveCallsTest) {
+TEST(LWWGraph, crdtSizeEdgesTest_WithRemoveCalls) {
     LWWGraph<std::string, int, int> data0;
 
     EXPECT_EQ(data0.crdt_size_edges(), 0);
@@ -287,7 +287,7 @@ TEST(LWWGraph, crdt_size_edgesWithRemoveCallsTest) {
 // at_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, at_vertexTest) {
+TEST(LWWGraph, atVertexTest) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Setup data
@@ -305,7 +305,7 @@ TEST(LWWGraph, at_vertexTest) {
     ASSERT_EQ(data0.at_vertex("v3"), "Perceval");
 }
 
-TEST(LWWGraph, at_vertexRemovedVertexTest) {
+TEST(LWWGraph, atVertexTest_RemovedVertex) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Setup data
@@ -340,7 +340,7 @@ TEST(LWWGraph, at_vertexRemovedVertexTest) {
     ASSERT_EQ(nbException, 2);
 }
 
-TEST(LWWGraph, at_vertexInvalidVertexThrowExceptionTest) {
+TEST(LWWGraph, atVertexTest_InvalidVertexThrowException) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Check results
@@ -362,7 +362,7 @@ TEST(LWWGraph, at_vertexInvalidVertexThrowExceptionTest) {
 // crdt_at_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_at_vertexTest) {
+TEST(LWWGraph, crdtAtVertexTest) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Setup data
@@ -385,7 +385,7 @@ TEST(LWWGraph, crdt_at_vertexTest) {
     ASSERT_EQ(data0.crdt_at_vertex("v3"), "Perceval");
 }
 
-TEST(LWWGraph, crdt_at_vertexRemovedVertexTest) {
+TEST(LWWGraph, crdtAtVertexTest_RemovedVertex) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Setup data
@@ -420,7 +420,7 @@ TEST(LWWGraph, crdt_at_vertexRemovedVertexTest) {
     ASSERT_EQ(nbException, 0);
 }
 
-TEST(LWWGraph, crdt_at_vertexInvalidVertexThrowExceptionTest) {
+TEST(LWWGraph, crdtAtVertexTest_InvalidVertexThrowException) {
     LWWGraph<std::string, const char*, int> data0;
 
     // Check results
@@ -442,7 +442,7 @@ TEST(LWWGraph, crdt_at_vertexInvalidVertexThrowExceptionTest) {
 // crdt_find_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_find_vertexTest) {
+TEST(LWWGraph, crdtFindVertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Query before exists
@@ -474,7 +474,7 @@ TEST(LWWGraph, crdt_find_vertexTest) {
 // count_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, count_vertexTest) {
+TEST(LWWGraph, countVertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Query before exists
@@ -503,7 +503,7 @@ TEST(LWWGraph, count_vertexTest) {
 // crdt_count_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_count_vertexTest) {
+TEST(LWWGraph, crdtCountVertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Query before exists
@@ -531,7 +531,7 @@ TEST(LWWGraph, crdt_count_vertexTest) {
 // has_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_has_vertexTest) {
+TEST(LWWGraph, crdtHasVertexTest) {
     LWWGraph<const char*, int, int> data0;
 
     // Query before exists
@@ -564,7 +564,7 @@ TEST(LWWGraph, crdt_has_vertexTest) {
 // crdt_has_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, has_vertexTest) {
+TEST(LWWGraph, hasVertexTest) {
     LWWGraph<const char*, int, int> data0;
 
     // Query before exists
@@ -596,7 +596,7 @@ TEST(LWWGraph, has_vertexTest) {
 // count_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, count_edgeTest) {
+TEST(LWWGraph, countEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_EQ(data0.count_edge("v1", "v2"), 0);
@@ -640,7 +640,7 @@ TEST(LWWGraph, count_edgeTest) {
 // crdt_count_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_count_edgeTest) {
+TEST(LWWGraph, crdtCountEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_EQ(data0.crdt_count_edge("v1", "v2"), 0);
@@ -684,7 +684,7 @@ TEST(LWWGraph, crdt_count_edgeTest) {
 // has_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, has_edgeTest) {
+TEST(LWWGraph, hasEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_FALSE(data0.has_edge("v1", "v2"));
@@ -732,7 +732,7 @@ TEST(LWWGraph, has_edgeTest) {
 // crdt_has_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_has_edgeTest) {
+TEST(LWWGraph, crdtHasEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_FALSE(data0.crdt_has_edge("v1", "v2"));
@@ -780,7 +780,7 @@ TEST(LWWGraph, crdt_has_edgeTest) {
 // clear_vertices()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, clear_verticesTest) {
+TEST(LWWGraph, clearVerticesTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -792,7 +792,7 @@ TEST(LWWGraph, clear_verticesTest) {
     ASSERT_EQ(data0.crdt_size_vertex(), 3);
 }
 
-TEST(LWWGraph, clear_verticesIdempotentTest) {
+TEST(LWWGraph, clearVerticesTest_Idempotent) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -807,7 +807,7 @@ TEST(LWWGraph, clear_verticesIdempotentTest) {
     ASSERT_EQ(data0.crdt_size_vertex(), 3);
 }
 
-TEST(LWWGraph, clear_verticesWithAddEdgeTest) {
+TEST(LWWGraph, clearVerticesTest_WithAddEdge) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -833,7 +833,7 @@ TEST(LWWGraph, clear_verticesWithAddEdgeTest) {
     }
 }
 
-TEST(LWWGraph, clear_verticesReceivedTooLate) {
+TEST(LWWGraph, clearVerticesTest_ReceivedTooLate) {
     LWWGraph<std::string, int, int> data0;
 
     // Some updates (Done actually before clear)
@@ -886,7 +886,7 @@ TEST(LWWGraph, clear_verticesReceivedTooLate) {
 // clear_vertex_edges()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, clear_vertex_edgesTest) {
+TEST(LWWGraph, clearVertexEdgesTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -920,7 +920,7 @@ TEST(LWWGraph, clear_vertex_edgesTest) {
     ASSERT_EQ(v3_edges.size(), 0);
 }
 
-TEST(LWWGraph, clear_vertex_edgesWithAddCalledLaterTest) {
+TEST(LWWGraph, clearVertexEdgesTest_WithAddCalledLater) {
     LWWGraph<std::string, int, int> data0;
 
     // Update (Done before clear)
@@ -959,7 +959,7 @@ TEST(LWWGraph, clear_vertex_edgesWithAddCalledLaterTest) {
     ASSERT_EQ(v3_edges.size(), 0);
 }
 
-TEST(LWWGraph, clear_vertex_edgesOnInvalidVertexReturnTypeTest) {
+TEST(LWWGraph, clearVertexEdgesTest_OnInvalidVertexReturnType) {
     LWWGraph<int, int, int> data0;
 
     ASSERT_FALSE(data0.clear_vertex_edges(64, 11));
@@ -972,7 +972,7 @@ TEST(LWWGraph, clear_vertex_edgesOnInvalidVertexReturnTypeTest) {
 // add_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, add_vertexTest) {
+TEST(LWWGraph, addVertexTest) {
     LWWGraph<int, int, int> data0;
 
     // Add some vertex
@@ -1005,7 +1005,7 @@ TEST(LWWGraph, add_vertexTest) {
     _ASSERT_VERTEX_EQ(res, 4, false, 39, data0);
 }
 
-TEST(LWWGraph, add_vertexDuplicateCallsTest) {
+TEST(LWWGraph, addVertexTest_DuplicateCalls) {
     LWWGraph<int, int, int> data0;
 
     // Add duplicate, check timestamps is the last value.
@@ -1027,7 +1027,7 @@ TEST(LWWGraph, add_vertexDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, 42, false, 29, data0);
 }
 
-TEST(LWWGraph, add_vertexIdempotentTest) {
+TEST(LWWGraph, addVertexTest_Idempotent) {
     LWWGraph<int, int, int> data0;
 
     // Add duplicate, check timestamps is the last value.
@@ -1049,7 +1049,7 @@ TEST(LWWGraph, add_vertexIdempotentTest) {
     _ASSERT_VERTEX_EQ(res, 42, false, 20, data0);
 }
 
-TEST(LWWGraph, add_vertexWithOnlyAddReturnTypeTest) {
+TEST(LWWGraph, addVertexTest_WithOnlyAddReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     // First add vertex
@@ -1067,7 +1067,7 @@ TEST(LWWGraph, add_vertexWithOnlyAddReturnTypeTest) {
     ASSERT_FALSE(data0.add_vertex("v2", 43));
 }
 
-TEST(LWWGraph, add_vertexWithRemoveVertexReturnTypeTest) {
+TEST(LWWGraph, addVertexTest_WithRemoveVertexReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_TRUE(data0.add_vertex("v1", 20));
@@ -1087,7 +1087,7 @@ TEST(LWWGraph, add_vertexWithRemoveVertexReturnTypeTest) {
 // remove_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, remove_vertexTest) {
+TEST(LWWGraph, removeVertexTest) {
     LWWGraph<std::string, int, int> data0;
 
     // Add a vertex and remove it
@@ -1124,7 +1124,7 @@ TEST(LWWGraph, remove_vertexTest) {
     }
 }
 
-TEST(LWWGraph, remove_vertexBeforeVertexCreatedTest) {
+TEST(LWWGraph, removeVertexTest_BeforeVertexCreated) {
     LWWGraph<std::string, int, int> data0;
 
     // Remove vertex before even added (Remove it anyway)
@@ -1138,7 +1138,7 @@ TEST(LWWGraph, remove_vertexBeforeVertexCreatedTest) {
     _ASSERT_VERTEX_EQ(res, "v1", true, 20, data0);
 }
 
-TEST(LWWGraph, remove_vertexDuplicateCallsTest) {
+TEST(LWWGraph, removeVertexTest_DuplicateCalls) {
     LWWGraph<std::string, int, int> data0;
 
     // Add, then remove vertex
@@ -1158,7 +1158,7 @@ TEST(LWWGraph, remove_vertexDuplicateCallsTest) {
     _ASSERT_VERTEX_EQ(res, "v1", true, 29, data0);
 }
 
-TEST(LWWGraph, remove_vertexIdempotentTest) {
+TEST(LWWGraph, removeVertexTest_Idempotent) {
     LWWGraph<std::string, int, int> data0;
 
     // Add, then remove vertex
@@ -1187,7 +1187,7 @@ TEST(LWWGraph, remove_vertexIdempotentTest) {
     _ASSERT_VERTEX_EQ(res, "v2", true, 40, data0);
 }
 
-TEST(LWWGraph, remove_vertexReturnTypeTest) {
+TEST(LWWGraph, removeVertexTest_ReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 20);
@@ -1196,7 +1196,7 @@ TEST(LWWGraph, remove_vertexReturnTypeTest) {
     ASSERT_FALSE(data0.remove_vertex("v1", 29));
 }
 
-TEST(LWWGraph, remove_vertexWithRemoveCalledBeforeAddReturnTypeTest) {
+TEST(LWWGraph, removeVertexTest_WithRemoveCalledBeforeAddReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_FALSE(data0.remove_vertex("v1", 20));
@@ -1208,7 +1208,7 @@ TEST(LWWGraph, remove_vertexWithRemoveCalledBeforeAddReturnTypeTest) {
     ASSERT_FALSE(data0.remove_vertex("v1", 40));
 }
 
-TEST(LWWGraph, remove_vertexWithAddVertexReturnTypeTest) {
+TEST(LWWGraph, removeVertexTest_WithAddVertexReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 20);
@@ -1223,7 +1223,7 @@ TEST(LWWGraph, remove_vertexWithAddVertexReturnTypeTest) {
 // add_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, add_edgeTest) {
+TEST(LWWGraph, addEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -1247,7 +1247,7 @@ TEST(LWWGraph, add_edgeTest) {
     EXPECT_FALSE(edge->second.isRemoved());
 }
 
-TEST(LWWGraph, add_edgeBeforeVertexCreatedTest) {
+TEST(LWWGraph, addEdgeTest_BeforeVertexCreated) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_edge("v1", "v2", 10);
@@ -1282,7 +1282,7 @@ TEST(LWWGraph, add_edgeBeforeVertexCreatedTest) {
     EXPECT_EQ(edge->second.timestamp(), 10);
 }
 
-TEST(LWWGraph, add_edgeDuplicateCallsTest) {
+TEST(LWWGraph, addEdgeTest_DuplicateCalls) {
     LWWGraph<std::string, int, int> data0;
 
     // Received many duplicate add_edge calls
@@ -1311,7 +1311,7 @@ TEST(LWWGraph, add_edgeDuplicateCallsTest) {
     EXPECT_FALSE(edge->second.isRemoved());
 }
 
-TEST(LWWGraph, add_edgeIdempotentTest) {
+TEST(LWWGraph, addEdgeTest_Idempotent) {
     LWWGraph<std::string, int, int> data0;
 
     // Duplicate add_edge
@@ -1337,7 +1337,7 @@ TEST(LWWGraph, add_edgeIdempotentTest) {
     EXPECT_FALSE(edge->second.isRemoved());
 }
 
-TEST(LWWGraph, add_edgeWithFromToEqualTest) {
+TEST(LWWGraph, addEdgeTest_WithFromToEqual) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -1353,7 +1353,7 @@ TEST(LWWGraph, add_edgeWithFromToEqualTest) {
     EXPECT_FALSE(v1_edge->second.isRemoved());
 }
 
-TEST(LWWGraph, add_edgeReturnTypeTest) {
+TEST(LWWGraph, addEdgeTest_ReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 11);
@@ -1367,7 +1367,7 @@ TEST(LWWGraph, add_edgeReturnTypeTest) {
     _ASSERT_ADD_EDGE_INFO_EQ(res3, false, false, false);
 }
 
-TEST(LWWGraph, add_edgeBeforeAddVertexReturnTypeTest) {
+TEST(LWWGraph, addEdgeTest_BeforeAddVertexReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     auto coco = data0.add_edge("v1", "v2", 42);
@@ -1379,7 +1379,7 @@ TEST(LWWGraph, add_edgeBeforeAddVertexReturnTypeTest) {
     ASSERT_FALSE(data0.add_vertex("v2", 20));
 }
 
-TEST(LWWGraph, add_edgeWithToAndFromEqualReturnTypeTest) {
+TEST(LWWGraph, addEdgeTest_WithToAndFromEqualReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     // v1 (Edge without add vertex)
@@ -1397,7 +1397,7 @@ TEST(LWWGraph, add_edgeWithToAndFromEqualReturnTypeTest) {
 // remove_edge()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, remove_edgeTest) {
+TEST(LWWGraph, removeEdgeTest) {
     LWWGraph<std::string, int, int> data0;
 
     // Add vertex + edge
@@ -1422,7 +1422,7 @@ TEST(LWWGraph, remove_edgeTest) {
     EXPECT_TRUE(edge->second.isRemoved());
 }
 
-TEST(LWWGraph, remove_edgeIdempotentTest) {
+TEST(LWWGraph, removeEdgeTest_Idempotent) {
     LWWGraph<std::string, int, int> data0;
 
     // Add vertex + edge
@@ -1448,7 +1448,7 @@ TEST(LWWGraph, remove_edgeIdempotentTest) {
     EXPECT_TRUE(edge->second.isRemoved());
 }
 
-TEST(LWWGraph, remove_edgeBeforeAddedTest) {
+TEST(LWWGraph, removeEdgeTest_BeforeAdded) {
     LWWGraph<std::string, int, int> data0;
 
     // Remove edge before added. Two tmp vertex are added.
@@ -1500,7 +1500,7 @@ TEST(LWWGraph, remove_edgeBeforeAddedTest) {
     EXPECT_EQ(edge->second.timestamp(), 29);
 }
 
-TEST(LWWGraph, remove_edgeReturnTypeTest) {
+TEST(LWWGraph, removeEdgeTest_ReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     data0.add_vertex("v1", 10);
@@ -1510,7 +1510,7 @@ TEST(LWWGraph, remove_edgeReturnTypeTest) {
     ASSERT_TRUE(data0.remove_edge("v1", "v2", 40));
 }
 
-TEST(LWWGraph, remove_edgeCalledBeforeAddEdgeReturnTypeTest) {
+TEST(LWWGraph, removeEdgeTest_CalledBeforeAddEdgeReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     ASSERT_FALSE(data0.remove_edge("v1", "v2", 20));
@@ -1531,7 +1531,7 @@ TEST(LWWGraph, remove_edgeCalledBeforeAddEdgeReturnTypeTest) {
     _ASSERT_ADD_EDGE_INFO_EQ(coco4, false, false, false);
 }
 
-TEST(LWWGraph, remove_edgeCalledBeforeAddVertexReturnTypeTest) {
+TEST(LWWGraph, removeEdgeTest_CalledBeforeAddVertexReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     // Mark edge as removed + creates tmp vertex with minimal timestamp.
@@ -1542,7 +1542,7 @@ TEST(LWWGraph, remove_edgeCalledBeforeAddVertexReturnTypeTest) {
     ASSERT_TRUE(data0.add_vertex("v2", 20));
 }
 
-TEST(LWWGraph, remove_edgeFirstThenAddEdgeThenAddVertexReturnTypeTest) {
+TEST(LWWGraph, removeEdgeTest_FirstThenAddEdgeThenAddVertexReturnType) {
     LWWGraph<std::string, int, int> data0;
 
     // Mark edge as removed + creates tmp vertex with minimal timestamp.
@@ -1565,7 +1565,7 @@ TEST(LWWGraph, remove_edgeFirstThenAddEdgeThenAddVertexReturnTypeTest) {
 // add_edge() || remove_vertex()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, remove_vertexWithEdgesDuplicateCallsTest) {
+TEST(LWWGraph, removeVertexTest_WithEdgesDuplicateCalls) {
     LWWGraph<std::string, int, int> data0;
 
     // Create graph
@@ -1604,7 +1604,7 @@ TEST(LWWGraph, remove_vertexWithEdgesDuplicateCallsTest) {
     }
 }
 
-TEST(LWWGraph, add_edgeRemoveVertexConcurrentTest) {
+TEST(LWWGraph, addEdgeTest_RemoveVertexConcurrent) {
     LWWGraph<std::string, int, int> data0;
 
     // Someone create a vertex and delete it.
@@ -1642,7 +1642,7 @@ TEST(LWWGraph, add_edgeRemoveVertexConcurrentTest) {
     }
 }
 
-TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedTest) {
+TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReadded) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1684,7 +1684,7 @@ TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedTest) {
     _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v3"), "v3", false, 22, data0);
 }
 
-TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedReturnTypeTest) {
+TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReaddedReturnType) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1732,7 +1732,7 @@ TEST(LWWGraph, remove_vertexAddEdgeWithVertexReaddedReturnTypeTest) {
 // crdt_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_sizeWithadd_edgeremove_vertex) {
+TEST(LWWGraph, crdtSizeTest_WithAddEdgeRemoveVertex) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1766,7 +1766,7 @@ TEST(LWWGraph, crdt_sizeWithadd_edgeremove_vertex) {
 // crdt_equal()
 // -----------------------------------------------------------------------------
 
-TEST(LWWGraph, crdt_equalWithOnlyAddVertexTest) {
+TEST(LWWGraph, crdtEqualTest_WithOnlyAddVertex) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1805,7 +1805,7 @@ TEST(LWWGraph, crdt_equalWithOnlyAddVertexTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWGraph, crdt_equalWithAddVertexRemoveVertexTest) {
+TEST(LWWGraph, crdtEqualTest_WithAddVertexRemoveVertex) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1853,7 +1853,7 @@ TEST(LWWGraph, crdt_equalWithAddVertexRemoveVertexTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWGraph, crdt_equalWithAddEdgeRemoveVertexTest) {
+TEST(LWWGraph, crdtEqualTest_WithAddEdgeRemoveVertex) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1900,7 +1900,7 @@ TEST(LWWGraph, crdt_equalWithAddEdgeRemoveVertexTest) {
     ASSERT_TRUE(data1.crdt_equal(data1));
 }
 
-TEST(LWWGraph, crdt_equalOnEmptyGraphTest) {
+TEST(LWWGraph, crdtEqualTest_OnEmptyGraph) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 
@@ -1908,7 +1908,7 @@ TEST(LWWGraph, crdt_equalOnEmptyGraphTest) {
     ASSERT_TRUE(data1.crdt_equal(data1));
 }
 
-TEST(LWWGraph, crdt_equalEmptyVsAddVertexTest) {
+TEST(LWWGraph, crdtEqualTest_EmptyVsAddVertex) {
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
 

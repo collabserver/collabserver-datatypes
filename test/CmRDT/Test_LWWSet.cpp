@@ -40,7 +40,7 @@ TEST(LWWSet, emptyTest) {
 // crdt_empty()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdt_emptyTest) {
+TEST(LWWSet, crdtEmptyTest) {
     LWWSet<int, int> data0;
     ASSERT_TRUE(data0.crdt_empty());
 
@@ -93,7 +93,7 @@ TEST(LWWSet, sizeTest) {
     ASSERT_EQ(data0.size(), 0);
 }
 
-TEST(LWWSet, sizeWithDuplicateAddTest) {
+TEST(LWWSet, sizeTest_WithDuplicateAdd) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.size(), 0);
@@ -107,7 +107,7 @@ TEST(LWWSet, sizeWithDuplicateAddTest) {
     ASSERT_EQ(data0.size(), 1);
 }
 
-TEST(LWWSet, sizeWithDuplicateAddRemoveTest) {
+TEST(LWWSet, sizeTest_WithDuplicateAddRemove) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.size(), 0);
@@ -131,7 +131,7 @@ TEST(LWWSet, sizeWithDuplicateAddRemoveTest) {
     ASSERT_EQ(data0.size(), 0);
 }
 
-TEST(LWWSet, sizeWithRemoveFirstTest) {
+TEST(LWWSet, sizeTest_WithRemoveFirst) {
     LWWSet<int, int> data0;
     ASSERT_EQ(data0.size(), 0);
 
@@ -154,7 +154,7 @@ TEST(LWWSet, sizeWithRemoveFirstTest) {
     ASSERT_EQ(data0.size(), 1);
 }
 
-TEST(LWWSet, sizeWithOlderRemoveAfterAddTest) {
+TEST(LWWSet, sizeTest_WithOlderRemoveAfterAdd) {
     LWWSet<int, int> data0;
     ASSERT_EQ(data0.size(), 0);
 
@@ -173,7 +173,7 @@ TEST(LWWSet, sizeWithOlderRemoveAfterAddTest) {
 // crdt_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdt_sizeTest) {
+TEST(LWWSet, crdtSizeTest) {
     LWWSet<int, int> data0;
 
     // Add element and test
@@ -217,7 +217,7 @@ TEST(LWWSet, countTest) {
     ASSERT_EQ(data0.count(42), 0);
 }
 
-TEST(LWWSet, countAfterRemoveTest) {
+TEST(LWWSet, countTest_AfterRemove) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.count(42), 0);
@@ -230,7 +230,7 @@ TEST(LWWSet, countAfterRemoveTest) {
 // -----------------------------------------------------------------------------
 // crdt_count()
 // -----------------------------------------------------------------------------
-TEST(LWWSet, crdt_countTest) {
+TEST(LWWSet, crdtCountTest) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.crdt_count(1), 0);
@@ -252,7 +252,7 @@ TEST(LWWSet, crdt_countTest) {
     ASSERT_EQ(data0.crdt_count(42), 0);
 }
 
-TEST(LWWSet, crdt_countAfterRemoveTest) {
+TEST(LWWSet, crdtCountTest_AfterRemove) {
     LWWSet<int, int> data0;
 
     ASSERT_EQ(data0.crdt_count(42), 0);
@@ -266,7 +266,7 @@ TEST(LWWSet, crdt_countAfterRemoveTest) {
 // max_size()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, max_sizeTest) {
+TEST(LWWSet, maxSizeTest) {
     // Well, this is not really a test, my goal here is just to call max_size
     // (So that I'm sure it's compiling). But max_size itself is just a 
     // 'foward' of unordered_map::max_size. See code.
@@ -280,7 +280,7 @@ TEST(LWWSet, max_sizeTest) {
 // crdt_find()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdt_findTest) {
+TEST(LWWSet, crdtFindTest) {
     LWWSet<std::string, int> data0;
 
     // Query before exists
@@ -324,7 +324,7 @@ TEST(LWWSet, findTest) {
     EXPECT_EQ(*e3, "e3");
 }
 
-TEST(LWWSet, findRemovedElementTest) {
+TEST(LWWSet, findTest_RemovedElement) {
     LWWSet<std::string, int> data0;
 
     data0.add("e1", 10);
@@ -355,7 +355,7 @@ TEST(LWWSet, clearTest) {
     EXPECT_EQ(data0.crdt_size(), 5);
 }
 
-TEST(LWWSet, clearCalledFirstTest) {
+TEST(LWWSet, clearTest_CalledFirst) {
     LWWSet<std::string, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -385,7 +385,7 @@ TEST(LWWSet, clearCalledFirstTest) {
     EXPECT_EQ(data0.crdt_size(), 10);
 }
 
-TEST(LWWSet, clearIndenpotentTest) {
+TEST(LWWSet, clearTest_Indenpotent) {
     LWWSet<std::string, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -440,7 +440,7 @@ TEST(LWWSet, clearIndenpotentTest) {
     EXPECT_EQ(data0.crdt_size(), 10);
 }
 
-TEST(LWWSet, clearIndenpotentReturnTypeTest) {
+TEST(LWWSet, clearTest_IndenpotentReturnType) {
     LWWSet<std::string, int> data0;
 
     EXPECT_EQ(data0.size(), 0);
@@ -462,7 +462,7 @@ TEST(LWWSet, clearIndenpotentReturnTypeTest) {
     EXPECT_FALSE(data0.clear(64));
 }
 
-TEST(LWWSet, clearReturnTypeTest) {
+TEST(LWWSet, clearTest_ReturnType) {
     LWWSet<std::string, int> data0;
     EXPECT_EQ(data0.size(), 0);
     EXPECT_EQ(data0.crdt_size(), 0);
@@ -489,7 +489,7 @@ TEST(LWWSet, clearReturnTypeTest) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-TEST(LWWSet, clearThenAddAfterNewerClearTest) {
+TEST(LWWSet, clearTest_ThenAddAfterNewerClear) {
     LWWSet<std::string, int> data0;
 
     data0.clear(42);
@@ -502,7 +502,7 @@ TEST(LWWSet, clearThenAddAfterNewerClearTest) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-TEST(LWWSet, clearThenAddAfterOlderClearTest) {
+TEST(LWWSet, clearTest_ThenAddAfterOlderClear) {
     LWWSet<std::string, int> data0;
 
     data0.clear(10);
@@ -544,7 +544,7 @@ TEST(LWWSet, addTest) {
     }
 }
 
-TEST(LWWSet, addDuplicateCallsTest) {
+TEST(LWWSet, addTest_DuplicateCalls) {
     LWWSet<int, int> data0;
 
     // Test duplicate add, keep max timestamps 
@@ -568,7 +568,7 @@ TEST(LWWSet, addDuplicateCallsTest) {
     _ASSERT_ELT_EQ(carrot, 64, false, 29, data0);
 }
 
-TEST(LWWSet, addReturnTypeTest) {
+TEST(LWWSet, addTest_ReturnType) {
     LWWSet<std::string, int> data0;
 
     // First add the element.
@@ -586,7 +586,7 @@ TEST(LWWSet, addReturnTypeTest) {
     ASSERT_FALSE(data0.add("carrot", 2048));
 }
 
-TEST(LWWSet, addReturnTypeWithRemoveCalled) {
+TEST(LWWSet, addTest_ReturnTypeWithRemoveCalled) {
     LWWSet<std::string, int> data0;
 
     ASSERT_TRUE(data0.add("coco", 10));
@@ -606,7 +606,7 @@ TEST(LWWSet, addReturnTypeWithRemoveCalled) {
     ASSERT_TRUE(data0.add("coco", 513));
 }
 
-TEST(LWWSet, addIdempotentTest) {
+TEST(LWWSet, addTest_Idempotent) {
     LWWSet<std::string, int> data0;
 
     data0.add("e1", 10);
@@ -622,7 +622,7 @@ TEST(LWWSet, addIdempotentTest) {
     _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 }
 
-TEST(LWWSet, addIdempotentReturnTypeTest) {
+TEST(LWWSet, addTest_IdempotentReturnType) {
     LWWSet<std::string, int> data0;
 
     ASSERT_TRUE(data0.add("e1", 10));
@@ -661,7 +661,7 @@ TEST(LWWSet, removeTest) {
     }
 }
 
-TEST(LWWSet, removeDuplicateCallsTest) {
+TEST(LWWSet, removeTest_DuplicateCalls) {
     LWWSet<int, int> data0;
 
     // Duplicate remove, set higher timestamps
@@ -676,7 +676,7 @@ TEST(LWWSet, removeDuplicateCallsTest) {
     _ASSERT_ELT_EQ(res, 42, true, 29, data0);
 }
 
-TEST(LWWSet, removeCalledBeforeAddCallTest) {
+TEST(LWWSet, removeTest_CalledBeforeAddCall) {
     LWWSet<int, int> data0;
 
     // Remove before even added works
@@ -690,7 +690,7 @@ TEST(LWWSet, removeCalledBeforeAddCallTest) {
     _ASSERT_ELT_EQ(res, 42, true, 20, data0);
 }
 
-TEST(LWWSet, removeCalledFirstReturnTypeTest) {
+TEST(LWWSet, removeTest_CalledFirstReturnType) {
     LWWSet<std::string, int> data0;
 
     ASSERT_FALSE(data0.remove("coco", 20));
@@ -704,7 +704,7 @@ TEST(LWWSet, removeCalledFirstReturnTypeTest) {
     ASSERT_TRUE(data0.remove("coco", 90));
 }
 
-TEST(LWWSet, removeReturnTypeTest) {
+TEST(LWWSet, removeTest_ReturnType) {
     LWWSet<std::string, int> data0;
 
     // Normal add / remove test
@@ -718,7 +718,7 @@ TEST(LWWSet, removeReturnTypeTest) {
     ASSERT_FALSE(data0.remove("coco", 60));
 }
 
-TEST(LWWSet, removeIdempotentTest) {
+TEST(LWWSet, removeTest_Idempotent) {
     LWWSet<std::string, int> data0;
 
     data0.add("e1", 11);
@@ -736,7 +736,7 @@ TEST(LWWSet, removeIdempotentTest) {
     _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 }
 
-TEST(LWWSet, removeIdempotentReturnTypeTest) {
+TEST(LWWSet, removeTest_IdempotentReturnType) {
     LWWSet<std::string, int> data0;
 
     data0.add("e1", 11);
@@ -759,7 +759,7 @@ TEST(LWWSet, removeIdempotentReturnTypeTest) {
 // add() + remove()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, addRemoveTest) {
+TEST(LWWSet, addTest_ConcurrentRemove) {
     LWWSet<std::string, int> data0;
 
     // Add element
@@ -783,7 +783,7 @@ TEST(LWWSet, addRemoveTest) {
     _ASSERT_ELT_EQ(res, "v1", true, 40, data0);
 }
 
-TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
+TEST(LWWSet, addTest_ConcurrentRemoveWithRemoveCalledFirst) {
     LWWSet<std::string, int> data0;
 
     // Remove elt before even added. (Is technically removed)
@@ -807,7 +807,7 @@ TEST(LWWSet, addRemoveWithRemoveCalledFirstTest) {
     _ASSERT_ELT_EQ(res, "v1", false, 1001, data0);
 }
 
-TEST(LWWSet, addRemoveUseCaseTest) {
+TEST(LWWSet, addTest_ConcurrentRemoveUseCase) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -845,7 +845,7 @@ TEST(LWWSet, reserveTest) {
 // crdt_equal()
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdt_equalWithOnlyAddTest) {
+TEST(LWWSet, crdtEqualTest_WithOnlyAdd) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -870,7 +870,7 @@ TEST(LWWSet, crdt_equalWithOnlyAddTest) {
     ASSERT_TRUE(data1.crdt_equal(data1));
 }
 
-TEST(LWWSet, crdt_equalWithAddRemoveTest) {
+TEST(LWWSet, crdtEqualTest_WithAddRemove) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -908,7 +908,7 @@ TEST(LWWSet, crdt_equalWithAddRemoveTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWSet, crdt_equalAddRemoveUsercaseTest) {
+TEST(LWWSet, crdtEqualTest_AddRemoveUsercase) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -941,7 +941,7 @@ TEST(LWWSet, crdt_equalAddRemoveUsercaseTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWSet, crdt_equalSameValueButDifferentTimestampTest) {
+TEST(LWWSet, crdtEqualTest_SameValueButDifferentTimestamp) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -960,7 +960,7 @@ TEST(LWWSet, crdt_equalSameValueButDifferentTimestampTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWSet, crdt_equalWithUsersameButInternalNotSameTest) {
+TEST(LWWSet, crdtEqualTest_WithUsersameButInternalNotSame) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -994,7 +994,7 @@ TEST(LWWSet, crdt_equalWithUsersameButInternalNotSameTest) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-TEST(LWWSet, crdt_equalEmptyVsAddTest) {
+TEST(LWWSet, crdtEqualTest_EmptyVsAdd) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
@@ -1021,7 +1021,7 @@ TEST(LWWSet, crdt_equalEmptyVsAddTest) {
 // iterator
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, iteratorAddRemoveTest) {
+TEST(LWWSet, iteratorTest_AddRemove) {
     LWWSet<int, int> data0;
 
     // Add some elements and test iteration
@@ -1052,13 +1052,13 @@ TEST(LWWSet, iteratorAddRemoveTest) {
     data0.add(6, 32);
     data0.add(7, 33);
     k = 0;
-    for(auto& elt : data0) {
+    for(const auto& elt : data0) { // Just to test 'const' iterator style
         ++k;
     }
     EXPECT_EQ(k, 6);
 }
 
-TEST(LWWSet, iteratorEmptySetTest) {
+TEST(LWWSet, iteratorTest_EmptySet) {
     LWWSet<int, int> data0;
 
     // Iterate empty set should be ok (No elt)
@@ -1105,7 +1105,7 @@ TEST(LWWSet, iteratorEmptySetTest) {
     }
 }
 
-TEST(LWWSet, iteratorReferenceTest) {
+TEST(LWWSet, iteratorTest_Reference) {
     LWWSet<int, int> data0;
 
     // Add all
@@ -1119,7 +1119,7 @@ TEST(LWWSet, iteratorReferenceTest) {
 // crdt iterator
 // -----------------------------------------------------------------------------
 
-TEST(LWWSet, crdt_iteratorAddRemoveTest) {
+TEST(LWWSet, crdtIteratorTest_AddRemove) {
     LWWSet<int, int> data0;
 
     // Add some elements and test iteration
@@ -1160,7 +1160,7 @@ TEST(LWWSet, crdt_iteratorAddRemoveTest) {
     EXPECT_EQ(k, 8);
 }
 
-TEST(LWWSet, crdt_iteratorEmptyTest) {
+TEST(LWWSet, crdtIteratorTest_Empty) {
     LWWSet<int, int> data0;
 
     for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
@@ -1168,7 +1168,7 @@ TEST(LWWSet, crdt_iteratorEmptyTest) {
     }
 }
 
-TEST(LWWSet, crdt_iteratorRemovedTest) {
+TEST(LWWSet, crdtIteratorTest_Removed) {
     LWWSet<int, int> data0;
 
     // Fill set with removed elt (Yes, we don't even need add before).
@@ -1214,7 +1214,7 @@ TEST(LWWSet, crdt_iteratorRemovedTest) {
     ASSERT_EQ(k, 5);
 }
 
-TEST(LWWSet, crdt_iteratorReferenceTest) {
+TEST(LWWSet, crdtIteratorTest_Reference) {
     LWWSet<int, int> data0;
 
     // Simple test add then remove
@@ -1290,7 +1290,7 @@ TEST(LWWSet, operatorEQTest) {
     ASSERT_FALSE(data0 != data1);
 }
 
-TEST(LWWSet, operatorEQDifferentTimestampTest) {
+TEST(LWWSet, operatorEQTest_DifferentTimestamp) {
     LWWSet<std::string, int> data0;
     LWWSet<std::string, int> data1;
 
