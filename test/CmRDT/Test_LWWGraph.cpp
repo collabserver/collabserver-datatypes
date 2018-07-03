@@ -1995,6 +1995,25 @@ TEST(LWWGraph, operatorEQTest) {
 }
 
 
+// -----------------------------------------------------------------------------
+// LWWGraph::iterator
+// -----------------------------------------------------------------------------
+TEST(LWWGraph, iteratorTest) {
+    LWWGraph<const char*, std::string, int> data0;
+
+    // TODO Important. For now, it is not even compiling! Ourg! Ugly!
+    /*
+    data0.add_edge("v1", "v1", 10);
+    data0.add_edge("v1", "v2", 10);
+    data0.add_edge("v2", "v1", 10);
+    data0.add_edge("v3", "v1", 10);
+
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    }
+    */
+}
+
+
 }} // End namespaces
 
 

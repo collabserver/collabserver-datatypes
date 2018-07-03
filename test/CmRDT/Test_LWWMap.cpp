@@ -1219,104 +1219,6 @@ TEST(LWWMap, crdtEqualTest_EmptyVsAdd) {
 
 
 // -----------------------------------------------------------------------------
-// Iterator Tests (Normal iterator)
-// -----------------------------------------------------------------------------
-
-TEST(LWWMap, iteratorTest) {
-    LWWMap<int, int, int> data0;
-
-    // Add some elements and test iteration
-    data0.add(0, 10);
-    data0.add(1, 11);
-    data0.add(2, 12);
-    data0.add(3, 13);
-    int k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
-        // Dev note: I'm not sure order is predictable.
-        // I use number of iteration instead.
-        ++k;
-    }
-    EXPECT_EQ(k, 4);
-
-    // Remove elements, then iterator should not use them
-    data0.remove(0, 20);
-    data0.remove(1, 21);
-    k = 0;
-    for(auto& elt : data0) {
-        ++k;
-    }
-    EXPECT_EQ(k, 2);
-
-    // Add again some more and test
-    data0.add(4, 30);
-    data0.add(5, 31);
-    data0.add(6, 32);
-    data0.add(7, 33);
-    k = 0;
-    for(auto& elt : data0) {
-        ++k;
-    }
-    EXPECT_EQ(k, 6);
-}
-
-TEST(LWWMap, iteratorTest_EmptyMap) {
-    LWWMap<int, int, int> data0;
-
-    // Iterate empty container should be ok (No elt)
-    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
-        EXPECT_TRUE(false) << "Iterator should be empty but found ";
-    }
-
-    // Add / remove some elements and iterate
-    data0.add(0, 10);
-    data0.add(1, 11);
-    data0.add(2, 12);
-    data0.add(3, 13);
-    data0.add(4, 14);
-    data0.remove(0, 20);
-    data0.remove(1, 21);
-    data0.remove(2, 22);
-    data0.remove(3, 23);
-    data0.remove(4, 24);
-    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
-        // data0 should be empty from iterator point of view
-        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
-    }
-
-    // Add more and remove
-    data0.add(5, 30);
-    data0.remove(5, 31);
-    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
-        // Should be Still empty
-        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
-    }
-
-    // Add / remove again
-    data0.add(6, 40);
-    data0.add(7, 41);
-    data0.add(8, 42);
-    data0.add(9, 43);
-    data0.remove(6, 44);
-    data0.remove(7, 45);
-    data0.remove(8, 46);
-    data0.remove(9, 47);
-    for(LWWMap<int,int,int>::iterator it = data0.begin(); it != data0.end(); ++it) {
-        // Should be Still empty
-        ASSERT_TRUE(false) << "Iterator should be empty but elt found ";
-    }
-}
-
-TEST(LWWMap, iteratorTest_Reference) {
-    LWWMap<std::string, int, int> data0;
-
-    // Add all
-    data0.add("e1", 1);
-    auto it = data0.begin();
-    ASSERT_EQ(it->first, "e1");
-}
-
-
-// -----------------------------------------------------------------------------
 // Operator==
 // -----------------------------------------------------------------------------
 
@@ -1386,6 +1288,417 @@ TEST(LWWMap, operatorEQTest_WithDifferentValue) {
     it_1->second = 42; // v1 == 42
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
+}
+
+
+// -----------------------------------------------------------------------------
+// LWWMap::iterator
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, iteratorTest) {
+    LWWMap<const char*, int, int> data0;
+
+    data0.add("e0", 10);
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    data0.at("e0") = 0;
+    data0.at("e1") = 100;
+    data0.at("e2") = 200;
+    data0.at("e3") = 300;
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        ++k;
+        total += it->second;
+    }
+    EXPECT_EQ(k, 4);
+    EXPECT_EQ(total, 600);
+
+
+    // Remove elements, then iterator should not use them
+    data0.remove("e1", 20);
+    data0.remove("e2", 20);
+    k = 0;
+    total = 0;
+    for(auto& elt : data0) {
+        ++k;
+        total += elt.second;
+    }
+    EXPECT_EQ(k, 2);
+    EXPECT_EQ(total, 300);
+
+    // Add again some more and test
+    data0.add("e4", 30);
+    data0.add("e5", 30);
+    data0.add("e6", 30);
+    data0.add("e7", 30);
+    data0.at("e4") = 400;
+    data0.at("e5") = 500;
+    data0.at("e6") = 600;
+    data0.at("e7") = 700;
+    k = 0;
+    total = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        ++k;
+        total += it->second;
+    }
+    EXPECT_EQ(k, 6);
+    EXPECT_EQ(total, 2500);
+}
+
+TEST(LWWMap, iteratorTest_EmptyMap) {
+    LWWMap<int, int, int> data0;
+
+    int k = 0;
+    // If you wonder: LWWMap<int,int,int>::iterator it = data0.begin();
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+}
+
+TEST(LWWMap, iteratorTest_EmptyMapAfterAddRemove) {
+    LWWMap<int, int, int> data0;
+
+    data0.add(0, 10);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+    data0.add(4, 10);
+    data0.remove(0, 20);
+    data0.remove(1, 20);
+    data0.remove(2, 20);
+    data0.remove(3, 20);
+    data0.remove(4, 20);
+    int k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+
+    // Add more and remove
+    data0.add(5, 30);
+    data0.remove(5, 31);
+    k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        ++k;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+
+    // Add / remove again
+    data0.add(6, 40);
+    data0.add(7, 41);
+    data0.add(8, 42);
+    data0.add(9, 43);
+    data0.remove(6, 44);
+    data0.remove(7, 45);
+    data0.remove(8, 46);
+    data0.remove(9, 47);
+    k = 0;
+    for(auto it = data0.begin(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+}
+
+TEST(LWWMap, iteratorTest_Reference) {
+    LWWMap<std::string, int, int> data0;
+
+    // Add all
+    data0.add("e1", 1);
+    auto it = data0.begin();
+    ASSERT_EQ(it->first, "e1");
+}
+
+TEST(LWWMap, iteratorTest_end) {
+    LWWMap<std::string, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.end(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    k = 0;
+    for(auto it = data0.end(); it != data0.end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// LWWMap::const_iterator
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, constIteratorTest) {
+    LWWMap<const char*, int, int> data0;
+
+    data0.add("e0", 10);
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    data0.at("e0") = 0;
+    data0.at("e1") = 100;
+    data0.at("e2") = 200;
+    data0.at("e3") = 300;
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        ++k;
+        total += it->second;
+    }
+    EXPECT_EQ(k, 4);
+    EXPECT_EQ(total, 600);
+
+
+    // Remove elements, then iterator should not use them
+    data0.remove("e1", 20);
+    data0.remove("e2", 20);
+    k = 0;
+    total = 0;
+    for(const auto& elt : data0) {
+        ++k;
+        total += elt.second;
+    }
+    EXPECT_EQ(k, 2);
+    EXPECT_EQ(total, 300);
+
+    // Add again some more and test
+    data0.add("e4", 30);
+    data0.add("e5", 30);
+    data0.add("e6", 30);
+    data0.add("e7", 30);
+    data0.at("e4") = 400;
+    data0.at("e5") = 500;
+    data0.at("e6") = 600;
+    data0.at("e7") = 700;
+    k = 0;
+    total = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        ++k;
+        total += it->second;
+    }
+    EXPECT_EQ(k, 6);
+    EXPECT_EQ(total, 2500);
+}
+
+TEST(LWWMap, constIteratorTest_EmptyMap) {
+    LWWMap<int, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+}
+
+TEST(LWWMap, constIteratorTest_EmptyMapAfterAddRemove) {
+    LWWMap<int, int, int> data0;
+
+    data0.add(0, 10);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+    data0.add(4, 10);
+    data0.remove(0, 20);
+    data0.remove(1, 20);
+    data0.remove(2, 20);
+    data0.remove(3, 20);
+    data0.remove(4, 20);
+    int k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+
+    // Add more and remove
+    data0.add(5, 30);
+    data0.remove(5, 31);
+    k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        ++k;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+
+    // Add / remove again
+    data0.add(6, 40);
+    data0.add(7, 41);
+    data0.add(8, 42);
+    data0.add(9, 43);
+    data0.remove(6, 44);
+    data0.remove(7, 45);
+    data0.remove(8, 46);
+    data0.remove(9, 47);
+    k = 0;
+    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+}
+
+TEST(LWWMap, constIteratorTest_Reference) {
+    LWWMap<std::string, int, int> data0;
+
+    // Add all
+    data0.add("e1", 1);
+    auto it = data0.cbegin();
+    ASSERT_EQ(it->first, "e1");
+}
+
+TEST(LWWMap, constIteratorTest_end) {
+    LWWMap<std::string, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    k = 0;
+    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+}
+
+
+// -----------------------------------------------------------------------------
+// LWWMap::crdt_iterator
+// -----------------------------------------------------------------------------
+
+TEST(LWWMap, crdtIteratorTest) {
+    LWWMap<const char*, int, int> data0;
+
+    data0.add("e0", 10);
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+
+    data0.at("e0") = 0;
+    data0.at("e1") = 100;
+    data0.at("e2") = 200;
+    data0.at("e3") = 300;
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        ++k;
+        total += it->second.value();
+    }
+    EXPECT_EQ(k, 4);
+    EXPECT_EQ(total, 600);
+
+
+    // Remove elements
+    data0.remove("e1", 20);
+    data0.remove("e2", 20);
+    k = 0;
+    total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        ++k;
+        total += it->second.value();
+    }
+    EXPECT_EQ(k, 4);
+    EXPECT_EQ(total, 600);
+
+    // Add again some more and test
+    data0.add("e4", 30);
+    data0.add("e5", 30);
+    data0.add("e6", 30);
+    data0.add("e7", 30);
+    data0.at("e4") = 400;
+    data0.at("e5") = 500;
+    data0.at("e6") = 600;
+    data0.at("e7") = 700;
+    k = 0;
+    total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        ++k;
+        total += it->second.value();
+    }
+    EXPECT_EQ(k, 8);
+    EXPECT_EQ(total, 2800);
+}
+
+TEST(LWWMap, crdtIteratorTest_EmptyMap) {
+    LWWMap<int, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0) << "Iterator should be empty";
+}
+
+TEST(LWWMap, crdtIteratorTest_EmptyMapAfterAddRemove) {
+    LWWMap<int, int, int> data0;
+
+    data0.add(0, 10);
+    data0.add(1, 10);
+    data0.add(2, 10);
+    data0.add(3, 10);
+    data0.add(4, 10);
+
+    data0.at(0) = 0;
+    data0.at(1) = 100;
+    data0.at(2) = 200;
+    data0.at(3) = 300;
+    data0.at(4) = 400;
+
+    data0.remove(0, 20);
+    data0.remove(1, 20);
+    data0.remove(2, 20);
+    data0.remove(3, 20);
+    data0.remove(4, 20);
+
+    int k = 0;
+    int total = 0;
+    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        k++;
+        total += it->second.value();
+    }
+    EXPECT_EQ(k, 5) << "Iterator should be empty";
+    EXPECT_EQ(total, 1000);
+}
+
+TEST(LWWMap, crdtIteratorTest_Reference) {
+    LWWMap<std::string, int, int> data0;
+
+    // Add all
+    data0.add("e1", 1);
+    auto it = data0.crdt_begin();
+    ASSERT_EQ(it->first, "e1");
+}
+
+TEST(LWWMap, crdtIteratorTest_end) {
+    LWWMap<std::string, int, int> data0;
+
+    int k = 0;
+    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
+
+    data0.add("e1", 10);
+    data0.add("e2", 10);
+    data0.add("e3", 10);
+    k = 0;
+    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+        k++;
+    }
+    EXPECT_EQ(k, 0);
 }
 
 

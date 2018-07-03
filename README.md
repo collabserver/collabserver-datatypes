@@ -56,7 +56,7 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 - [GoogleTest](https://github.com/google/googletest)
 (Automatically downloaded and built by CMake and placed in project's root
 folder `dependencies`)
-- Tests naming rule: `MethodName_stateUnderTest`
+- Tests naming rule: `MethodName_StateUnderTest`
 
 
 ```bash

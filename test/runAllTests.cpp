@@ -1,10 +1,10 @@
 /*
  * TEST NAMING RULE (For all test files):
  *
- * MethodName_stateUnderTest_expectedBehavior
+ * MethodName_StateUnderTest_ExpectedBehavior
  *
- * MethodName is the method name in cameCase + Test
- * Example: addVertexTest_concurrentRemoveEdge
+ * MethodName is the method name in PascalCase + Test
+ * Example: addVertexTest_ConcurrentRemoveEdge
  *
  * General cases to check for any CRDT data:
  *  - Normal example
