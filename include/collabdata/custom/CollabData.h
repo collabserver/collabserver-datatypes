@@ -44,13 +44,10 @@ class CollabData {
     // Initialization
     // -------------------------------------------------------------------------
 
+    protected:
+        CollabData() = default;
     public:
-
-        CollabData() {
-            _operationObservers.reserve(3); // Usually I have only 1 observer.
-        }
-
-        virtual ~CollabData() = default; // Virtual important for polymorphism
+        virtual ~CollabData() = default; // For polymorphism
 
 
     // -------------------------------------------------------------------------
