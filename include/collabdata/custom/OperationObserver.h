@@ -1,8 +1,9 @@
 #pragma once
 
-class Operation;
-
 namespace collab {
+
+
+class Operation;
 
 
 /**
@@ -18,7 +19,6 @@ namespace collab {
  * \date    May 2018
  */
 class OperationObserver {
-
     protected:
         OperationObserver() = default;
     public:

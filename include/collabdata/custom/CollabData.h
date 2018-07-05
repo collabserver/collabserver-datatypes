@@ -4,8 +4,8 @@
 #include <cassert>
 #include <sstream>
 
-#include "Operation.h"
 #include "OperationObserver.h"
+#include "Operation.h"
 
 namespace collab {
 
@@ -104,7 +104,9 @@ class CollabData {
          */
         void notifyOperationObservers(const Operation& op) const {
             assert(op.getType() != 0); // If 0, you probably forgot to set type
+
             for(OperationObserver* superman : _operationObservers) {
+                assert(superman != nullptr);
                 superman->notifyOperation(op);
             }
         }
