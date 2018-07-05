@@ -19,6 +19,12 @@ namespace collab {
  */
 class OperationObserver {
 
+    protected:
+        OperationObserver() = default;
+    public:
+        virtual ~OperationObserver() = default;
+
+
     public:
 
         /**
