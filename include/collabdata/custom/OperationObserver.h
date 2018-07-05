@@ -18,6 +18,8 @@ class Operation;
 class OperationObserver {
     protected:
         OperationObserver() = default;
+        OperationObserver(const OperationObserver& other) = default;
+        OperationObserver& operator=(const OperationObserver& other) = default;
     public:
         virtual ~OperationObserver() = default;
 

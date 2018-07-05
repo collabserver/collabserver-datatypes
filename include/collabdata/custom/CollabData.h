@@ -42,6 +42,8 @@ class CollabData {
 
     protected:
         CollabData() = default;
+        CollabData(const CollabData& other) = default;
+        CollabData& operator=(const CollabData& other) = default;
     public:
         virtual ~CollabData() = default; // For polymorphism
 

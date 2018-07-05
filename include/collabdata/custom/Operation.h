@@ -17,6 +17,8 @@ class Operation {
 
     protected:
         Operation() = default;
+        Operation(const Operation& other) = default;
+        Operation& operator=(const Operation& other) = default;
     public:
         virtual ~Operation() = default;
 
