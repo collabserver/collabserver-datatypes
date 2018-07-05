@@ -68,9 +68,6 @@ namespace CmRDT {
  *
  * \tparam Key  Type of set elements.
  * \tparam U    Type of timestamps (Must implements operators > and <).
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename U>
 class LWWSet {
@@ -551,9 +548,6 @@ class LWWSet {
  *
  * \tparam Key  Type of set elements.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::Metadata {
@@ -606,9 +600,6 @@ class LWWSet<Key,U>::Metadata {
  *
  * \tparam Key  Type of set elements.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename U>
 class LWWSet<Key,U>::const_iterator

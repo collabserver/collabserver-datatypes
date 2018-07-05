@@ -39,9 +39,6 @@ namespace CmRDT {
  *
  * \tparam T    Type of element (Register content).
  * \tparam U    Type of timestamps (Must implements operators > and <).
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename T, typename U>
 class LWWRegister {

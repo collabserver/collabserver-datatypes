@@ -14,9 +14,6 @@ class Operation;
  * This operation is broadcasted to all OperationObservers.
  * For instance, a server may listen to operation in order to send then over
  * the network whenever local data is modified (And then observer notified).
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 class OperationObserver {
     protected:

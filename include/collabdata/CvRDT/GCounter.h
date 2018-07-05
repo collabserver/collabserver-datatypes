@@ -27,9 +27,6 @@ namespace CvRDT {
  *
  * \tparam T    Type of counter.
  * \tparam ID   Type of the id used to identify each replicated. (Each unique).
- *
- * \author  Constantin Masson
- * \date    March 2018
  */
 template<typename T, typename ID>
 class GCounter {

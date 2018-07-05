@@ -81,9 +81,6 @@ namespace CmRDT {
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps (Must implements operators > and <).
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWMap {
@@ -704,9 +701,6 @@ class LWWMap {
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::Element {
@@ -812,9 +806,6 @@ class LWWMap<Key, T, U>::Element {
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::iterator
@@ -881,9 +872,6 @@ class LWWMap<Key, T, U>::iterator
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWMap<Key, T, U>::const_iterator

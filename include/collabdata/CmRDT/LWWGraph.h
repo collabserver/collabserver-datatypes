@@ -92,9 +92,6 @@ struct AddEdgeInfo {
  * \tparam Key  Type of unique identifier for each graph vertex
  * \tparam T    Type of vertex content data.
  * \tparam U    Type of timestamps (Must implements operators > and <).
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWGraph {
@@ -824,9 +821,6 @@ class LWWGraph {
  * \tparam Key  Type of key.
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps.
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 template<typename Key, typename T, typename U>
 class LWWGraph<Key,T,U>::Vertex {

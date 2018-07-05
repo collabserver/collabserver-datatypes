@@ -30,9 +30,6 @@ namespace CvRDT {
  *
  * \tparam Key  Key.
  * \tparam T    Element.
- *
- * \author  Constantin Masson
- * \date    March 2018
  */
 template<typename Key, typename T>
 class GMap {

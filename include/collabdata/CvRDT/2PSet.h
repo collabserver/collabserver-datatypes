@@ -31,9 +31,6 @@ namespace CvRDT {
  *
  *
  * \tparam T Type of element.
- *
- * \author  Constantin Masson
- * \date    March 2018
  */
 template<typename T>
 class TwoPSet {

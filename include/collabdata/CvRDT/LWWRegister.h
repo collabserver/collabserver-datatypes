@@ -40,9 +40,6 @@ namespace CvRDT {
  *
  * \tparam T    Type of element.
  * \tparam Key  Timestamps key.
- *
- * \author  Constantin Masson
- * \date    March 2018
  */
 template<typename T, typename Key>
 class LWWRegister {

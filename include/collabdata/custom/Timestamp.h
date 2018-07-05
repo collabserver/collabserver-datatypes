@@ -16,10 +16,6 @@ namespace collab {
  * \bug
  * Unique ID is hard coded for now.
  * Should be unique per user. For instance hash of MAC address.
- *
- *
- * \author  Constantin Masson
- * \date    Nov 2018
  */
 class Timestamp {
     private:

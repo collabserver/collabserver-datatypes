@@ -24,9 +24,6 @@ namespace CvRDT {
  *
  * \tparam T Data type on a vertex
  * \tparam K ID type (unique for each vertex).
- *
- * \author  Constantin Masson
- * \date    March 2018
  */
 template<typename K, typename T>
 class GGraph {

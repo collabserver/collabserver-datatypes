@@ -29,10 +29,6 @@ namespace collab {
  * To build your application data on top of the implemented CRDTs such as
  * LWWGraph, LWWMap etc, you may extend this class. This gives you the required
  * methods.
- *
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 class CollabData {
     private:

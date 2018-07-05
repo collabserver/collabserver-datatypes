@@ -18,10 +18,6 @@ namespace collab {
  *
  * Each vertex has a unique string identifier and a map of attributes.
  * (Attributes are string).
- *
- *
- * \author  Constantin Masson
- * \date    May 2018
  */
 class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------
