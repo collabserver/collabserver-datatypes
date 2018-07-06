@@ -16,8 +16,7 @@ static int nbNotified = 0; // Tracks nb of observer notified
 
 class MockCollabData : public CollabData {
     public:
-        bool receiveOperation(const int type,
-                              const std::stringstream& buffer) override {
+        bool applyExternOperation(const std::stringstream& buffer) override {
             return false;
         }
 };

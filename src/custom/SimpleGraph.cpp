@@ -23,45 +23,45 @@ size_t SimpleGraph::nbEdges() const noexcept {
 void SimpleGraph::addVertex(const UUID& id) {
     VertexAddOperation op = {id, Timestamp::now()};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::removeVertex(const UUID& id) {
     VertexRemoveOperation op = {id, Timestamp::now()};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::addEdge(const UUID& from, const UUID& to) {
     EdgeAddOperation op = {from, to, Timestamp::now()};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::removeEdge(const UUID& from, const UUID& to) {
     EdgeRemoveOperation op = {from, to, Timestamp::now()};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::addAttribute(const UUID& id, const std::string& name,
                                const std::string& value) {
     AttributeAddOperation op = {id, Timestamp::now(), name, value};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::removeAttribute(const UUID& id, const std::string& name) {
     AttributeRemoveOperation op = {id, Timestamp::now(), name};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 void SimpleGraph::setAttribute(const UUID& id, const std::string& name,
                                const std::string& value) {
     AttributeSetOperation op = {id, Timestamp::now(), name, value};
     this->applyOperation(op);
-    this->broadcastOperation(op);
+    this->notifyOperationBroadcaster(op);
 }
 
 
@@ -203,8 +203,11 @@ void SimpleGraph::applyOperation(const AttributeSetOperation& op) {
 // OperationObserver
 // -----------------------------------------------------------------------------
 
-bool SimpleGraph::receiveOperation(const int type,
-                                   const std::stringstream& buffer) {
+bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
+    // TODO get type from buffer. We know type is always the first integer!
+    // TODO TMP HARDCODED TYPE
+    const int type = -1;
+
     switch(type) {
         case static_cast<int>(OperationsType::VERTEX_ADD): {
                 VertexAddOperation op;

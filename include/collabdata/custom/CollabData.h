@@ -55,34 +55,20 @@ class CollabData {
     public:
 
         /**
-         * Receive an external operation an apply it.
+         * Apply an operation received from external component.
          * Operation is received in its serialized form.
+         * This doesn't notify the broadcaster but only the Operation Observers.
+         * Do nothing if unable to unserialize and return false.
+         *
          * This may for instance be used by a network component to apply an
          * operation just received. Operation is in its serialized form since
          * other components doesn't know anything about the concrete operations.
+         * (Only concrete CollabData implementation knowns)
          *
-         * Do nothing if unable to unserialize (ex: Type doesn't match content).
-         * And return false.
-         *
-         * \param type Type supposed for this operation.
          * \param buffer Serialized version of the operation.
          * \return True if operation is valid, otherwise, return false.
          */
-        virtual bool receiveOperation(const int type,
-                                      const std::stringstream& buffer) = 0;
-
-        /**
-         * Broadcast an operation to remote replicate.
-         * This uses the broadcaster to send operation.
-         *
-         * Note that this doesn't notify OperationObserver but only send to
-         * broadcaster.
-         *
-         * \param op The operation to broadcast.
-         */
-        void broadcastOperation(const Operation& op) const {
-            this->notifyOperationBroadcaster(op);
-        }
+        virtual bool applyExternOperation(const std::stringstream& buffer) = 0;
 
 
     // -------------------------------------------------------------------------
@@ -135,7 +121,7 @@ class CollabData {
         }
 
         /**
-         * Return the number of operation observer registered in this data.
+         * Returns the number of operation observer registered in this data.
          *
          * \return Number of registered OperationObserver.
          */

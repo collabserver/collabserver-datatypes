@@ -195,15 +195,9 @@ class SimpleGraph : public CollabData {
 
     public:
 
-        /**
-         * \copydoc CollabData::receiveOperation
-         */
-        bool receiveOperation(const int type,
-                              const std::stringstream& buffer) override;
+        /** \copydoc CollabData::receiveOperation */
+        bool applyExternOperation(const std::stringstream& buffer) override;
 };
-
-
-
 
 
 // /////////////////////////////////////////////////////////////////////////////
