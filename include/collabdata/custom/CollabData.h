@@ -5,11 +5,9 @@
 #include <sstream>
 
 #include "OperationObserver.h"
+#include "Operation.h"
 
 namespace collab {
-
-
-class Operation;
 
 
 /**
