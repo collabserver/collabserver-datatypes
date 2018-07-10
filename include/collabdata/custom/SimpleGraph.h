@@ -5,8 +5,8 @@
 #include "collabdata/CmRDT/LWWMap.h"
 #include "collabdata/CmRDT/LWWGraph.h"
 #include "collabdata/CmRDT/LWWRegister.h"
-
 #include "CollabData.h"
+#include "Operation.h"
 #include "Timestamp.h"
 
 namespace collab {
@@ -14,10 +14,22 @@ namespace collab {
 
 /**
  * \brief
- * A Simple CRDT Directed Graph.
+ * A Simple Directed Graph using CRDT concurrentcy control.
  *
  * Each vertex has a unique string identifier and a map of attributes.
- * (Attributes are string).
+ * Attributes name and value are both strings.
+ *
+ * \par Operations
+ * The SimpleGraph's operations are available as nested classes.
+ *
+ * \par Help
+ * You may read the documentation from CollabData to understand about
+ * Operation, OperationObserver and broadcaster.
+ *
+ *
+ * \see CollabData
+ * \see Operation
+ * \see OperationObserver
  */
 class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------

@@ -9,6 +9,9 @@ namespace collab {
  * \brief
  * Interface that represents any operations on CollabData.
  *
+ * Each operation on a CollabData has a unique ID for this data.
+ *
+ * \see OperationObserver
  * \see CollabData
  */
 class Operation {
