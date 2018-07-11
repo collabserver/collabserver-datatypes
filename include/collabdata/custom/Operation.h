@@ -2,6 +2,8 @@
 
 #include <sstream>
 
+#include "OperationVisitor.h"
+
 namespace collab {
 
 
@@ -54,6 +56,8 @@ class Operation {
          * \return True if successfully unserialized, otherwise, return false.
          */
         virtual bool unserialize(const std::stringstream& buffer) = 0;
+
+        virtual void accept(OperationVisitor& visitor) = 0;
 };
 
 

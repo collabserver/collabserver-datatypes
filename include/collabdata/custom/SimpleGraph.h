@@ -5,9 +5,10 @@
 #include "collabdata/CmRDT/LWWMap.h"
 #include "collabdata/CmRDT/LWWGraph.h"
 #include "collabdata/CmRDT/LWWRegister.h"
+#include "Timestamp.h"
 #include "CollabData.h"
 #include "Operation.h"
-#include "Timestamp.h"
+#include "OperationVisitor.h"
 
 namespace collab {
 
@@ -51,6 +52,8 @@ class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------
 
     public:
+
+        class OperationEvents;
 
         /**
          * List all possible Operation on this data.
@@ -214,6 +217,24 @@ class SimpleGraph : public CollabData {
 
 // /////////////////////////////////////////////////////////////////////////////
 // *****************************************************************************
+// Nested classes (OPERATIONS VISITOR)
+// *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
+
+class SimpleGraph::OperationEvents : public OperationVisitor {
+    public:
+        virtual void onOperation(const VertexAddOperation& op) = 0;
+        virtual void onOperation(const VertexRemoveOperation& op) = 0;
+        virtual void onOperation(const EdgeAddOperation& op) = 0;
+        virtual void onOperation(const EdgeRemoveOperation& op) = 0;
+        virtual void onOperation(const AttributeAddOperation& op) = 0;
+        virtual void onOperation(const AttributeRemoveOperation& op) = 0;
+        virtual void onOperation(const AttributeSetOperation& op) = 0;
+};
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// *****************************************************************************
 // Nested classes (OPERATIONS)
 // *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
@@ -231,6 +252,7 @@ class SimpleGraph::VertexAddOperation : public Operation {
         VertexAddOperation(const std::string& id, const Timestamp& time);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
 };
@@ -248,6 +270,7 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
         VertexRemoveOperation(const std::string& id, const Timestamp& time);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
 };
@@ -267,6 +290,7 @@ class SimpleGraph::EdgeAddOperation : public Operation {
                          const Timestamp& time);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& fromID() const;
         const UUID& toID() const;
         const Timestamp& timestamp() const;
@@ -287,6 +311,7 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
                             const Timestamp& time);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& fromID() const;
         const UUID& toID() const;
         const Timestamp& timestamp() const;
@@ -308,6 +333,7 @@ class SimpleGraph::AttributeAddOperation : public Operation {
                               const std::string& name, const std::string& value);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;
@@ -329,6 +355,7 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
                                  const std::string& name);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;
@@ -351,6 +378,7 @@ class SimpleGraph::AttributeSetOperation : public Operation {
                               const std::string& name, const std::string& nVal);
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
+        void accept(OperationVisitor& visitor) override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;

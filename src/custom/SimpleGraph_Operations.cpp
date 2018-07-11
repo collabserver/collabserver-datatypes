@@ -24,6 +24,10 @@ bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffe
     return false;
 }
 
+void SimpleGraph::VertexAddOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
+}
+
 const SimpleGraph::UUID& SimpleGraph::VertexAddOperation::vertexID() const {
     return _vertexID;
 }
@@ -52,6 +56,10 @@ bool SimpleGraph::VertexRemoveOperation::serialize(std::stringstream& buffer) co
 bool SimpleGraph::VertexRemoveOperation::unserialize(const std::stringstream& buffer) {
     // TODO
     return false;
+}
+
+void SimpleGraph::VertexRemoveOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::VertexRemoveOperation::vertexID() const {
@@ -87,6 +95,10 @@ bool SimpleGraph::EdgeAddOperation::unserialize(const std::stringstream& buffer)
     return false;
 }
 
+void SimpleGraph::EdgeAddOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
+}
+
 const SimpleGraph::UUID& SimpleGraph::EdgeAddOperation::fromID() const {
     return _fromID;
 }
@@ -119,6 +131,10 @@ bool SimpleGraph::EdgeRemoveOperation::serialize(std::stringstream& buffer) cons
 bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buffer) {
     // TODO
     return false;
+}
+
+void SimpleGraph::EdgeRemoveOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::EdgeRemoveOperation::fromID() const {
@@ -158,6 +174,10 @@ bool SimpleGraph::AttributeAddOperation::serialize(std::stringstream& buffer) co
 bool SimpleGraph::AttributeAddOperation::unserialize(const std::stringstream& buffer) {
     // TODO
     return false;
+}
+
+void SimpleGraph::AttributeAddOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::AttributeAddOperation::vertexID() const {
@@ -201,6 +221,10 @@ bool SimpleGraph::AttributeRemoveOperation::unserialize(const std::stringstream&
     return false;
 }
 
+void SimpleGraph::AttributeRemoveOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
+}
+
 const SimpleGraph::UUID& SimpleGraph::AttributeRemoveOperation::vertexID() const {
     return _vertexID;
 }
@@ -238,6 +262,10 @@ bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) co
 bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& buffer) {
     // TODO
     return false;
+}
+
+void SimpleGraph::AttributeSetOperation::accept(OperationVisitor& visitor) {
+    static_cast<SimpleGraph::OperationEvents&>(visitor).visit(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::AttributeSetOperation::vertexID() const {

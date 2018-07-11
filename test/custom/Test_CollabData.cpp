@@ -2,8 +2,9 @@
 
 #include <gtest/gtest.h>
 
-#include "collabdata/custom/OperationObserver.h"
 #include "collabdata/custom/Operation.h"
+#include "collabdata/custom/OperationObserver.h"
+#include "collabdata/custom/OperationVisitor.h"
 
 namespace collab {
 
@@ -14,6 +15,7 @@ namespace collab {
 
 static int nbNotified = 0; // Tracks nb of observer notified
 
+// -----------------------------------------------------------------------------
 class MockCollabData : public CollabData {
     public:
         bool applyExternOperation(const std::stringstream& buffer) override {
@@ -21,6 +23,7 @@ class MockCollabData : public CollabData {
         }
 };
 
+// -----------------------------------------------------------------------------
 class MockOperationObserver : public OperationObserver {
     public:
         MockOperationObserver() = default;
@@ -31,6 +34,7 @@ class MockOperationObserver : public OperationObserver {
         }
 };
 
+// -----------------------------------------------------------------------------
 class MockOperation : public Operation {
     public:
         MockOperation() {
@@ -41,6 +45,8 @@ class MockOperation : public Operation {
         }
         bool unserialize(const std::stringstream& buffer) override {
             return false;
+        }
+        void accept(OperationVisitor& visitor) override {
         }
 };
 
