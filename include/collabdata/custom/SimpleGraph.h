@@ -59,14 +59,14 @@ class SimpleGraph : public CollabData {
          * List all possible Operation on this data.
          * Each enum element is the Operation's unique ID for this data.
          */
-        enum class OperationsType : int {
-            VERTEX_ADD = 1,
-            VERTEX_REMOVE,
-            EDGE_ADD,
-            EDGE_REMOVE,
-            ATTRIBUTE_ADD,
-            ATTRIBUTE_REMOVE,
-            ATTRIBUTE_SET,
+        enum Operations : int {
+            OPERATION_VERTEX_ADD = 1,
+            OPERATION_VERTEX_REMOVE,
+            OPERATION_EDGE_ADD,
+            OPERATION_EDGE_REMOVE,
+            OPERATION_ATTRIBUTE_ADD,
+            OPERATION_ATTRIBUTE_REMOVE,
+            OPERATION_ATTRIBUTE_SET,
         };
 
         class VertexAddOperation;
@@ -250,6 +250,7 @@ class SimpleGraph::VertexAddOperation : public Operation {
     public:
         VertexAddOperation() = default;
         VertexAddOperation(const std::string& id, const Timestamp& time);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -268,6 +269,7 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
     public:
         VertexRemoveOperation() = default;
         VertexRemoveOperation(const std::string& id, const Timestamp& time);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -288,6 +290,7 @@ class SimpleGraph::EdgeAddOperation : public Operation {
         EdgeAddOperation() = default;
         EdgeAddOperation(const UUID& fromID, const UUID& toID,
                          const Timestamp& time);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -309,6 +312,7 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
         EdgeRemoveOperation() = default;
         EdgeRemoveOperation(const UUID& fromID, const UUID& toID,
                             const Timestamp& time);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -331,6 +335,7 @@ class SimpleGraph::AttributeAddOperation : public Operation {
         AttributeAddOperation() = default;
         AttributeAddOperation(const std::string& id, const Timestamp& time,
                               const std::string& name, const std::string& value);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -353,6 +358,7 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
         AttributeRemoveOperation() = default;
         AttributeRemoveOperation(const std::string& id, const Timestamp& time,
                                  const std::string& name);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;
@@ -376,6 +382,7 @@ class SimpleGraph::AttributeSetOperation : public Operation {
         AttributeSetOperation() = default;
         AttributeSetOperation(const std::string& id, const Timestamp& time,
                               const std::string& name, const std::string& nVal);
+        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationVisitor& visitor) override;

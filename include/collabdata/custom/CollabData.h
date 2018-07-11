@@ -158,7 +158,7 @@ class CollabData {
 
             for(OperationObserver* superman : _operationObservers) {
                 assert(superman != nullptr);
-                superman->notifyOperation(op);
+                superman->onOperation(op);
             }
         }
 
@@ -211,7 +211,7 @@ class CollabData {
          */
         void notifyOperationBroadcaster(const Operation& op) const {
             if(_broadcaster != nullptr) {
-                _broadcaster->notifyOperation(op);
+                _broadcaster->onOperation(op);
             }
         }
 

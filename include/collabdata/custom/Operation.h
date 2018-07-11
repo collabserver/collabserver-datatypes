@@ -18,9 +18,6 @@ namespace collab {
  */
 class Operation {
     protected:
-        int _type = 0; // By default, no type set
-
-    protected:
         Operation() = default;
         Operation(const Operation& other) = default;
         Operation& operator=(const Operation& other) = default;
@@ -36,9 +33,7 @@ class Operation {
          *
          * \return ID of the operation's type.
          */
-        int getType() const {
-            return _type;
-        }
+        virtual int getType() const = 0;
 
         /**
          * Serialize the operation data in internal packed format.

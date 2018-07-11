@@ -10,7 +10,7 @@ namespace collab {
 
 class SimpleGraphObserver : virtual public OperationObserver {
     public:
-        void notifyOperation(const Operation& op) {
+        void onOperation(const Operation& op) {
             // TODO
         }
 };
