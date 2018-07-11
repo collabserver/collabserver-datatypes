@@ -46,7 +46,7 @@ class MockOperation : public Operation {
         bool unserialize(const std::stringstream& buffer) override {
             return false;
         }
-        void accept(OperationVisitor& visitor) override {
+        void accept(OperationVisitor& visitor) const override {
         }
 };
 

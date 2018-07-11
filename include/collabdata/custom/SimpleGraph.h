@@ -217,11 +217,15 @@ class SimpleGraph : public CollabData {
 
 // /////////////////////////////////////////////////////////////////////////////
 // *****************************************************************************
-// Nested classes (OPERATIONS VISITOR)
+// Nested classes (OPERATIONS EVENTS)
 // *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
 
 class SimpleGraph::OperationEvents : public OperationVisitor {
+    protected:
+        OperationEvents() = default;
+        OperationEvents(const OperationEvents& other) = default;
+        OperationEvents& operator=(const OperationEvents& other) = default;
     public:
         virtual void onOperation(const VertexAddOperation& op) = 0;
         virtual void onOperation(const VertexRemoveOperation& op) = 0;
@@ -253,7 +257,7 @@ class SimpleGraph::VertexAddOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
 };
@@ -272,7 +276,7 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
 };
@@ -293,7 +297,7 @@ class SimpleGraph::EdgeAddOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& fromID() const;
         const UUID& toID() const;
         const Timestamp& timestamp() const;
@@ -315,7 +319,7 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& fromID() const;
         const UUID& toID() const;
         const Timestamp& timestamp() const;
@@ -338,7 +342,7 @@ class SimpleGraph::AttributeAddOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;
@@ -361,7 +365,7 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;
@@ -385,7 +389,7 @@ class SimpleGraph::AttributeSetOperation : public Operation {
         int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
-        void accept(OperationVisitor& visitor) override;
+        void accept(OperationVisitor& visitor) const override;
         const UUID& vertexID() const;
         const Timestamp& timestamp() const;
         const std::string& attributeName() const;

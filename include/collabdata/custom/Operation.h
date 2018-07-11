@@ -44,7 +44,6 @@ class Operation {
         virtual bool serialize(std::stringstream& buffer) const = 0;
 
         /**
-         *
          * Unserialize the operation from its internal packed format.
          *
          * \param buffer Where to place unserialized data.
@@ -52,7 +51,10 @@ class Operation {
          */
         virtual bool unserialize(const std::stringstream& buffer) = 0;
 
-        virtual void accept(OperationVisitor& visitor) = 0;
+        /**
+         * TODO Documentation
+         */
+        virtual void accept(OperationVisitor& visitor) const = 0;
 };
 
 

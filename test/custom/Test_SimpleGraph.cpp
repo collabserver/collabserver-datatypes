@@ -8,64 +8,63 @@
 namespace collab {
 
 
-class SimpleGraphObserver : virtual public OperationObserver {
+// /////////////////////////////////////////////////////////////////////////////
+// *****************************************************************************
+// Mock classes
+// *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
+
+class SimpleGraphEventsMock : virtual public SimpleGraph::OperationEvents {
     public:
-        void onOperation(const Operation& op) {
-            // TODO
+        SimpleGraphEventsMock() = default;
+        ~SimpleGraphEventsMock() = default;
+
+    public:
+        void onOperation(const SimpleGraph::VertexAddOperation& op) {
+        }
+        void onOperation(const SimpleGraph::VertexRemoveOperation& op) {
+        }
+        void onOperation(const SimpleGraph::EdgeAddOperation& op) {
+        }
+        void onOperation(const SimpleGraph::EdgeRemoveOperation& op) {
+        }
+        void onOperation(const SimpleGraph::AttributeAddOperation& op) {
+        }
+        void onOperation(const SimpleGraph::AttributeRemoveOperation& op) {
+        }
+        void onOperation(const SimpleGraph::AttributeSetOperation& op) {
         }
 };
 
+class SimpleGraphObserverMock : virtual public OperationObserver {
+    private:
+        SimpleGraphEventsMock _event;
+    public:
+        void onOperation(const Operation& op) {
+            op.accept(_event);
+        }
+};
+
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// *****************************************************************************
+// Tests
+// *****************************************************************************
+// /////////////////////////////////////////////////////////////////////////////
+
+
+// -----------------------------------------------------------------------------
+// constructor()
+// -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, constructorTest) {
     SimpleGraph v;
     // TODO
 }
 
-TEST(SimpleGraph, addVertexTest) {
-    SimpleGraph v;
-    v.addVertex("e1");
-    // TODO
-}
 
-TEST(SimpleGraph, removeVertexTest) {
-    SimpleGraph v;
-    v.addVertex("e1");
-    v.removeVertex("e1");
-    // TODO
-}
-
-TEST(SimpleGraph, addEdgeTest) {
-    SimpleGraph v;
-    v.addEdge("e1", "e2");
-    // TODO
-}
-
-TEST(SimpleGraph, removeEdgeTest) {
-    SimpleGraph v;
-    v.addEdge("e1", "e2");
-    v.removeEdge("e1", "e2");
-    // TODO
-}
-
-TEST(SimpleGraph, addAttributeTest) {
-    SimpleGraph v;
-    v.addAttribute("e1", "attr1", "Hi coco!");
-    // TODO
-}
-
-TEST(SimpleGraph, removeAttributeTest) {
-    SimpleGraph v;
-    v.addAttribute("e1", "attr1", "Hi coco!");
-    v.removeAttribute("e1", "attr1");
-    // TODO
-}
-
-TEST(SimpleGraph, setAttributeTest) {
-    SimpleGraph v;
-    v.addAttribute("e1", "attr1", "Hi coco!");
-    v.setAttribute("e1", "attr1", "The new coco!");
-    // TODO
-}
+// TODO
 
 
 } // End namespace

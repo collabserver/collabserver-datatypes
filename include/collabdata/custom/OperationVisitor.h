@@ -10,10 +10,6 @@ class OperationVisitor {
         OperationVisitor() = default;
         OperationVisitor(const OperationVisitor& other) = default;
         OperationVisitor& operator=(const OperationVisitor& other) = default;
-
-    public:
-        virtual void visit(const Operation& op) = 0;
-
 };
 
 
