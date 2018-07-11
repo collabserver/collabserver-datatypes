@@ -11,7 +11,10 @@ SimpleGraph::VertexAddOperation::VertexAddOperation(
         const std::string& id,
         const Timestamp& time)
         : _vertexID(id), _timestamp(time) {
-    _type = static_cast<int>(OperationsType::VERTEX_ADD);
+}
+
+int SimpleGraph::VertexAddOperation::getType() const {
+    return OPERATION_VERTEX_ADD;
 }
 
 bool SimpleGraph::VertexAddOperation::serialize(std::stringstream& buffer) const {
@@ -41,7 +44,10 @@ SimpleGraph::VertexRemoveOperation::VertexRemoveOperation(
         const std::string& id,
         const Timestamp& time)
         : _vertexID(id), _timestamp(time) {
-    _type = static_cast<int>(OperationsType::VERTEX_REMOVE);
+}
+
+int SimpleGraph::VertexRemoveOperation::getType() const {
+    return OPERATION_VERTEX_REMOVE;
 }
 
 bool SimpleGraph::VertexRemoveOperation::serialize(std::stringstream& buffer) const {
@@ -74,7 +80,10 @@ SimpleGraph::EdgeAddOperation::EdgeAddOperation(
         : _fromID(fromID),
           _toID(toID),
           _timestamp(time) {
-    _type = static_cast<int>(OperationsType::EDGE_ADD);
+}
+
+int SimpleGraph::EdgeAddOperation::getType() const {
+    return OPERATION_EDGE_ADD;
 }
 
 bool SimpleGraph::EdgeAddOperation::serialize(std::stringstream& buffer) const {
@@ -109,7 +118,10 @@ SimpleGraph::EdgeRemoveOperation::EdgeRemoveOperation(
         const UUID& toID,
         const Timestamp& time)
         : _fromID(fromID), _toID(toID), _timestamp(time) {
-    _type = static_cast<int>(OperationsType::EDGE_REMOVE);
+}
+
+int SimpleGraph::EdgeRemoveOperation::getType() const {
+    return OPERATION_EDGE_REMOVE;
 }
 
 bool SimpleGraph::EdgeRemoveOperation::serialize(std::stringstream& buffer) const {
@@ -147,7 +159,10 @@ SimpleGraph::AttributeAddOperation::AttributeAddOperation(
           _timestamp(time),
           _attributeName(name),
           _attributeValue(value) {
-    _type = static_cast<int>(OperationsType::ATTRIBUTE_ADD);
+}
+
+int SimpleGraph::AttributeAddOperation::getType() const {
+    return OPERATION_ATTRIBUTE_ADD;
 }
 
 bool SimpleGraph::AttributeAddOperation::serialize(std::stringstream& buffer) const {
@@ -188,7 +203,10 @@ SimpleGraph::AttributeRemoveOperation::AttributeRemoveOperation(
         : _vertexID(id),
           _timestamp(time),
           _attributeName(name) {
-    _type = static_cast<int>(OperationsType::ATTRIBUTE_REMOVE);
+}
+
+int SimpleGraph::AttributeRemoveOperation::getType() const {
+    return OPERATION_ATTRIBUTE_REMOVE;
 }
 
 bool SimpleGraph::AttributeRemoveOperation::serialize(std::stringstream& buffer) const {
@@ -228,7 +246,10 @@ SimpleGraph::AttributeSetOperation::AttributeSetOperation(
           _timestamp(time),
           _attributeName(name),
           _newValue(nVal) {
-    _type = static_cast<int>(OperationsType::ATTRIBUTE_SET);
+}
+
+int SimpleGraph::AttributeSetOperation::getType() const {
+    return OPERATION_ATTRIBUTE_SET;
 }
 
 bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) const {

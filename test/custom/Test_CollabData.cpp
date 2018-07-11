@@ -26,15 +26,15 @@ class MockOperationObserver : public OperationObserver {
         MockOperationObserver() = default;
 
     public:
-        void notifyOperation(const Operation& op) override {
+        void onOperation(const Operation& op) override {
             nbNotified++;
         }
 };
 
 class MockOperation : public Operation {
     public:
-        MockOperation() {
-            _type = 1;
+        int getType() const override {
+            return 1;
         }
         bool serialize(std::stringstream& buffer) const override {
             return false;

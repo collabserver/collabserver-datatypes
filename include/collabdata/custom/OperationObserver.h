@@ -30,11 +30,11 @@ class OperationObserver {
     public:
 
         /**
-         * Notify observers that an operation was just applied.
+         * Receives an operation.
          *
          * \param op Reference to the operation.
          */
-        virtual void notifyOperation(const Operation& op) = 0;
+        virtual void onOperation(const Operation& op) = 0;
 };
 
 

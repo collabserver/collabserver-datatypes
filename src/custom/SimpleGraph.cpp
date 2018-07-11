@@ -204,12 +204,12 @@ void SimpleGraph::applyOperation(const AttributeSetOperation& op) {
 // -----------------------------------------------------------------------------
 
 bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
-    // TODO get type from buffer. We know type is always the first integer!
+    // TODO get type from buffer. We know type is always the first integer
     // TODO TMP HARDCODED TYPE
     const int type = -1;
 
     switch(type) {
-        case static_cast<int>(OperationsType::VERTEX_ADD): {
+        case OPERATION_VERTEX_ADD: {
                 VertexAddOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -218,7 +218,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::VERTEX_REMOVE): {
+        case OPERATION_VERTEX_REMOVE: {
                 VertexRemoveOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -227,7 +227,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::EDGE_ADD): {
+        case OPERATION_EDGE_ADD: {
                 EdgeAddOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -236,7 +236,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::EDGE_REMOVE): {
+        case OPERATION_EDGE_REMOVE: {
                 EdgeRemoveOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -245,7 +245,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::ATTRIBUTE_ADD): {
+        case OPERATION_ATTRIBUTE_ADD: {
                 AttributeAddOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -254,7 +254,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::ATTRIBUTE_REMOVE): {
+        case OPERATION_ATTRIBUTE_REMOVE: {
                 AttributeRemoveOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
@@ -263,7 +263,7 @@ bool SimpleGraph::applyExternOperation(const std::stringstream& buffer) {
             }
             break;
 
-        case static_cast<int>(OperationsType::ATTRIBUTE_SET): {
+        case OPERATION_ATTRIBUTE_SET: {
                 AttributeSetOperation op;
                 if(!op.unserialize(buffer)) {
                     return false;
