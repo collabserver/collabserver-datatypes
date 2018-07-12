@@ -53,11 +53,12 @@ class Operation {
         virtual bool unserialize(const std::stringstream& buffer) = 0;
 
         /**
-         * Handle this operation using a specific handler.
+         * Apply an handler on this operation.
+         * This is based on visitor pattern.
          *
          * \param handler The famous concrete handler to use.
          */
-        virtual void handle(OperationHandler& handler) const = 0;
+        virtual void accept(OperationHandler& handler) const = 0;
 };
 
 
