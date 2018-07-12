@@ -14,37 +14,32 @@ namespace collab {
 // *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
 
-class SimpleGraphEventsMock : virtual public SimpleGraph::OperationEvents {
+class HandlerMock : public SimpleGraph::OpHandler {
     public:
-        SimpleGraphEventsMock() = default;
-        ~SimpleGraphEventsMock() = default;
-
-    public:
-        void onOperation(const SimpleGraph::VertexAddOperation& op) {
+        void handleOperation(const SimpleGraph::VertexAddOperation& op) {
         }
-        void onOperation(const SimpleGraph::VertexRemoveOperation& op) {
+        void handleOperation(const SimpleGraph::VertexRemoveOperation& op) {
         }
-        void onOperation(const SimpleGraph::EdgeAddOperation& op) {
+        void handleOperation(const SimpleGraph::EdgeAddOperation& op) {
         }
-        void onOperation(const SimpleGraph::EdgeRemoveOperation& op) {
+        void handleOperation(const SimpleGraph::EdgeRemoveOperation& op) {
         }
-        void onOperation(const SimpleGraph::AttributeAddOperation& op) {
+        void handleOperation(const SimpleGraph::AttributeAddOperation& op) {
         }
-        void onOperation(const SimpleGraph::AttributeRemoveOperation& op) {
+        void handleOperation(const SimpleGraph::AttributeRemoveOperation& op) {
         }
-        void onOperation(const SimpleGraph::AttributeSetOperation& op) {
+        void handleOperation(const SimpleGraph::AttributeSetOperation& op) {
         }
 };
 
-class SimpleGraphObserverMock : virtual public OperationObserver {
+class ObserverMock : public OperationObserver {
     private:
-        SimpleGraphEventsMock _event;
+        HandlerMock _handler;
     public:
         void onOperation(const Operation& op) {
-            op.accept(_event);
+            op.handle(_handler);
         }
 };
-
 
 
 // /////////////////////////////////////////////////////////////////////////////

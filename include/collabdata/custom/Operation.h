@@ -2,19 +2,20 @@
 
 #include <sstream>
 
-#include "OperationVisitor.h"
+#include "OperationHandler.h"
 
 namespace collab {
 
 
 /**
  * \brief
- * Interface that represents any operations on CollabData.
+ * Interface of any operation applicable on a CollabData.
  *
  * Each operation on a CollabData has a unique ID for this data.
  *
- * \see OperationObserver
  * \see CollabData
+ * \see OperationObserver
+ * \see OperationHandler
  */
 class Operation {
     protected:
@@ -52,9 +53,11 @@ class Operation {
         virtual bool unserialize(const std::stringstream& buffer) = 0;
 
         /**
-         * TODO Documentation
+         * Handle this operation using a specific handler.
+         *
+         * \param handler The famous concrete handler to use.
          */
-        virtual void accept(OperationVisitor& visitor) const = 0;
+        virtual void handle(OperationHandler& handler) const = 0;
 };
 
 

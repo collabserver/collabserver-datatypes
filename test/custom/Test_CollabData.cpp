@@ -4,7 +4,7 @@
 
 #include "collabdata/custom/Operation.h"
 #include "collabdata/custom/OperationObserver.h"
-#include "collabdata/custom/OperationVisitor.h"
+#include "collabdata/custom/OperationHandler.h"
 
 namespace collab {
 
@@ -46,7 +46,7 @@ class MockOperation : public Operation {
         bool unserialize(const std::stringstream& buffer) override {
             return false;
         }
-        void accept(OperationVisitor& visitor) const override {
+        void handle(OperationHandler& visitor) const override {
         }
 };
 

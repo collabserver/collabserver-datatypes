@@ -27,8 +27,8 @@ bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffe
     return false;
 }
 
-void SimpleGraph::VertexAddOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::VertexAddOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::VertexAddOperation::vertexID() const {
@@ -64,8 +64,8 @@ bool SimpleGraph::VertexRemoveOperation::unserialize(const std::stringstream& bu
     return false;
 }
 
-void SimpleGraph::VertexRemoveOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::VertexRemoveOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::VertexRemoveOperation::vertexID() const {
@@ -104,8 +104,8 @@ bool SimpleGraph::EdgeAddOperation::unserialize(const std::stringstream& buffer)
     return false;
 }
 
-void SimpleGraph::EdgeAddOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::EdgeAddOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::EdgeAddOperation::fromID() const {
@@ -145,8 +145,8 @@ bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buff
     return false;
 }
 
-void SimpleGraph::EdgeRemoveOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::EdgeRemoveOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::EdgeRemoveOperation::fromID() const {
@@ -191,8 +191,8 @@ bool SimpleGraph::AttributeAddOperation::unserialize(const std::stringstream& bu
     return false;
 }
 
-void SimpleGraph::AttributeAddOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::AttributeAddOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::AttributeAddOperation::vertexID() const {
@@ -239,8 +239,8 @@ bool SimpleGraph::AttributeRemoveOperation::unserialize(const std::stringstream&
     return false;
 }
 
-void SimpleGraph::AttributeRemoveOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::AttributeRemoveOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::AttributeRemoveOperation::vertexID() const {
@@ -285,8 +285,8 @@ bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& bu
     return false;
 }
 
-void SimpleGraph::AttributeSetOperation::accept(OperationVisitor& visitor) const {
-    static_cast<SimpleGraph::OperationEvents&>(visitor).onOperation(*this);
+void SimpleGraph::AttributeSetOperation::handle(OperationHandler& handler) const {
+    static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
 const SimpleGraph::UUID& SimpleGraph::AttributeSetOperation::vertexID() const {
