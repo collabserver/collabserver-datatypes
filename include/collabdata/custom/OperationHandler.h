@@ -32,7 +32,7 @@ class Operation;
  *     private:
  *         HandlerExample _handler;
  *     public:
- *         void onOperation(const Operation& op) {
+ *         void onOperation(const Operation& op) override {
  *             op.handle(_handler);
  *         }
  * };

@@ -63,7 +63,7 @@ class ObserverMock : public OperationObserver {
     private:
         HandlerMock _handler;
     public:
-        void onOperation(const Operation& op) {
+        void onOperation(const Operation& op) override {
             op.handle(_handler);
         }
 };
