@@ -33,7 +33,7 @@ class Operation;
  *         HandlerExample _handler;
  *     public:
  *         void onOperation(const Operation& op) override {
- *             op.handle(_handler);
+ *             op.accept(_handler);
  *         }
  * };
  *
