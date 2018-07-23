@@ -53,10 +53,11 @@ void SimpleGraph_example() {
 
     data0.addVertex("v1");
     data0.addVertex("v2");
+    data0.addVertex("v3");
     data0.addEdge("v1", "v2");
 
     // Setup v1
-    std::cout << "--- Setup v1 ---\n";
+    std::cout << "- Setup v1\n";
 
     data0.addAttribute("v1", "name", "Sylvanas");
     data0.addAttribute("v1", "game", "Wow");
@@ -66,11 +67,21 @@ void SimpleGraph_example() {
     data0.removeAttribute("v1", "food");
 
     // Setup v2
-    std::cout << "--- Setup v2 ---\n";
+    std::cout << "- Setup v2\n";
     data0.addAttribute("v2", "name", "Tracer");
     data0.setAttribute("v2", "friend", "widow");
     data0.setAttribute("v2", "friend", "Winston");
     data0.addAttribute("v2", "enemy", "widow");
+
+
+    // Display the graph using iterator
+    // TODO
+    std::cout << "- Iterate on graph\n";
+    SimpleGraph::VertexIterator it = data0.vertices();
+    do {
+        SimpleGraph::VertexDescriptor current = it.current();
+        std::cout << current.id() << "\n";
+    } while(it.moveNext());
 }
 
 

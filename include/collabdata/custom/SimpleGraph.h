@@ -40,11 +40,16 @@ class SimpleGraph : public CollabData {
     public:
         typedef std::string UUID;
     private:
-        typedef CmRDT::LWWRegister<std::string, Timestamp>        attribute;
-        typedef CmRDT::LWWMap<std::string, attribute, Timestamp>  attributesMap;
+        typedef CmRDT::LWWRegister<std::string, Timestamp>        _Attribute;
+        typedef CmRDT::LWWMap<std::string, _Attribute, Timestamp> _AttributeMap;
+        typedef CmRDT::LWWGraph<UUID, _AttributeMap, Timestamp>   _Graph;
+
+    public:
+        class VertexIterator;
+        class VertexDescriptor;
 
     private:
-        CmRDT::LWWGraph<UUID, attributesMap, Timestamp> _graph;
+        _Graph _graph;
 
 
     // -------------------------------------------------------------------------
@@ -105,6 +110,20 @@ class SimpleGraph : public CollabData {
          * \return Number of edges in the graph.
          */
         size_t nbEdges() const noexcept;
+
+
+    // -------------------------------------------------------------------------
+    // Query methods
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Get an iterator over the whole set of vertices.
+         *
+         * \return Iterator of vertex.
+         */
+        VertexIterator vertices();
 
 
     // -------------------------------------------------------------------------
@@ -216,9 +235,70 @@ class SimpleGraph : public CollabData {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// *****************************************************************************
+// Nested classes (DESCRIPTORS)
+// /////////////////////////////////////////////////////////////////////////////
+
+class SimpleGraph::VertexDescriptor {
+    private:
+        friend SimpleGraph::VertexIterator;
+        const UUID&             _id;
+        const _AttributeMap&    _content;
+
+        VertexDescriptor(const UUID& id, const _AttributeMap& attributes)
+                : _id(id), _content(attributes) {
+        }
+
+    public:
+        const UUID& id() const { return _id; }
+        //AttributeIterator attributes();
+        // TODO
+};
+
+
+// /////////////////////////////////////////////////////////////////////////////
+// Nested classes (Iterators)
+// /////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Iterator over graph vertices.
+ */
+class SimpleGraph::VertexIterator {
+    private:
+        friend SimpleGraph;
+        _Graph&                _data;
+        _Graph::const_iterator _it;
+
+    private:
+        VertexIterator(_Graph& graph) : _data(graph), _it(graph.cbegin()) {}
+
+    public:
+
+        /**
+         * Return the current element in iterator.
+         * This has undefined behavior if moveNext already returned false.
+         *
+         * \return Current VertexDescriptor.
+         */
+        VertexDescriptor current() const {
+            auto& current = *_it;
+            return {current.first, current.second.content()};
+        }
+
+        /**
+         * Move iterator to the next element.
+         * Returns false if current was the last element.
+         *
+         * \return True if successfully moved to next element.
+         */
+        bool moveNext() {
+            ++_it;
+            return _it != _data.cend();
+        }
+};
+
+
+// /////////////////////////////////////////////////////////////////////////////
 // Nested classes (OPERATIONS HANDLER)
-// *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
 
 class SimpleGraph::OpHandler : public OperationHandler {
@@ -238,16 +318,12 @@ class SimpleGraph::OpHandler : public OperationHandler {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// *****************************************************************************
 // Nested classes (OPERATIONS)
-// *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
-
 
 // -----------------------------------------------------------------------------
 class SimpleGraph::VertexAddOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _vertexID;
         Timestamp   _timestamp = {0};
 
@@ -266,7 +342,6 @@ class SimpleGraph::VertexAddOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::VertexRemoveOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _vertexID;
         Timestamp   _timestamp = {0};
 
@@ -285,7 +360,6 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::EdgeAddOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _fromID;
         UUID        _toID;
         Timestamp   _timestamp = {0};
@@ -307,7 +381,6 @@ class SimpleGraph::EdgeAddOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::EdgeRemoveOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _fromID;
         UUID        _toID;
         Timestamp   _timestamp = {0};
@@ -329,7 +402,6 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::AttributeAddOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _vertexID;
         Timestamp   _timestamp = {0};
         std::string _attributeName;
@@ -353,7 +425,6 @@ class SimpleGraph::AttributeAddOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::AttributeRemoveOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _vertexID;
         Timestamp   _timestamp = {0};
         std::string _attributeName;
@@ -375,7 +446,6 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
 // -----------------------------------------------------------------------------
 class SimpleGraph::AttributeSetOperation : public Operation {
     private:
-        friend SimpleGraph;
         UUID        _vertexID;
         Timestamp   _timestamp = {0};
         std::string _attributeName;
