@@ -75,12 +75,20 @@ void SimpleGraph_example() {
 
 
     // Display the graph using iterator
-    // TODO
     std::cout << "- Iterate on graph\n";
     SimpleGraph::VertexIterator it = data0.vertices();
     do {
         SimpleGraph::VertexDescriptor current = it.current();
-        std::cout << current.id() << "\n";
+        std::cout << current.id() << " -> ";
+        SimpleGraph::EdgeIterator it_edges = current.edges();
+        /*
+        // TODO
+        do {
+            SimpleGraph::UUID edge = it_edges.current();
+            std::cout << edge << " ";
+        } while(it_edges.moveNext());
+        */
+        std::cout << "\n";
     } while(it.moveNext());
 }
 

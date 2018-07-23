@@ -430,6 +430,22 @@ class LWWSet {
         }
 
         /**
+         * \copydoc LWWSet::begin
+         */
+        const_iterator cbegin() const noexcept {
+            return const_iterator(*this);
+        }
+
+        /**
+         * \copydoc LWWSet::end
+         */
+        const_iterator cend() const noexcept {
+            const_iterator it(*this);
+            it._it = _map.end();
+            return it;
+        }
+
+        /**
          * Returns a constant crdt iterator to the beginning.
          *
          * \see LWWSet::crdt_iterator

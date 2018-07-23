@@ -4,6 +4,7 @@
 
 #include "collabdata/CmRDT/LWWMap.h"
 #include "collabdata/CmRDT/LWWGraph.h"
+#include "collabdata/CmRDT/LWWSet.h"
 #include "collabdata/CmRDT/LWWRegister.h"
 #include "Timestamp.h"
 #include "CollabData.h"
@@ -40,12 +41,14 @@ class SimpleGraph : public CollabData {
     public:
         typedef std::string UUID;
     private:
+        typedef CmRDT::LWWSet<UUID, Timestamp>                    _EdgeSet;
         typedef CmRDT::LWWRegister<std::string, Timestamp>        _Attribute;
         typedef CmRDT::LWWMap<std::string, _Attribute, Timestamp> _AttributeMap;
         typedef CmRDT::LWWGraph<UUID, _AttributeMap, Timestamp>   _Graph;
 
     public:
         class VertexIterator;
+        class EdgeIterator;
         class VertexDescriptor;
 
     private:
@@ -235,40 +238,87 @@ class SimpleGraph : public CollabData {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// Nested classes (DESCRIPTORS)
+// Nested classes (Descriptors - Iterators)
 // /////////////////////////////////////////////////////////////////////////////
 
+/**
+ * Iterator over edges of a vertex.
+ * Read only access.
+ */
+class SimpleGraph::EdgeIterator {
+    private:
+        const _EdgeSet&             _data;
+        _EdgeSet::const_iterator    _it;
+
+    private:
+        friend SimpleGraph;
+        EdgeIterator(const _EdgeSet& set) : _data(set), _it(set.cbegin()) {}
+
+    public:
+
+        /**
+         * Return the current edge id.
+         * This has undefined behavior if moveNext already returned false.
+         *
+         * \return Current VertexDescriptor.
+         */
+        const UUID& current() const {
+            return *_it;
+        }
+
+        /**
+         * Move iterator to the next element.
+         * Returns false if current was the last element.
+         *
+         * \return True if successfully moved to next element.
+         */
+        bool moveNext() {
+            ++_it;
+            return _it != _data.cend();
+        }
+};
+
+
+/**
+ * TODO
+ */
 class SimpleGraph::VertexDescriptor {
     private:
-        friend SimpleGraph::VertexIterator;
         const UUID&             _id;
         const _AttributeMap&    _content;
+        const _EdgeSet&         _edges;
 
-        VertexDescriptor(const UUID& id, const _AttributeMap& attributes)
-                : _id(id), _content(attributes) {
+    private:
+        friend SimpleGraph;
+        VertexDescriptor(const UUID& id,
+                         const _AttributeMap& attributes,
+                         const _EdgeSet& edges)
+                : _id(id), _content(attributes), _edges(edges) {
         }
 
     public:
         const UUID& id() const { return _id; }
+        EdgeIterator edges() { return EdgeIterator(_edges); }
+
         //AttributeIterator attributes();
         // TODO
 };
 
 
-// /////////////////////////////////////////////////////////////////////////////
-// Nested classes (Iterators)
-// /////////////////////////////////////////////////////////////////////////////
-
 /**
  * Iterator over graph vertices.
+ *
+ * Because of the internal CRDT properties of SimpleGraph, iterator allows
+ * only read-only access.
+ * To update the content of SimpleGraph, use the appropriate methods.
  */
 class SimpleGraph::VertexIterator {
     private:
-        friend SimpleGraph;
-        _Graph&                _data;
-        _Graph::const_iterator _it;
+        const _Graph&           _data;
+        _Graph::const_iterator  _it;
 
     private:
+        friend SimpleGraph;
         VertexIterator(_Graph& graph) : _data(graph), _it(graph.cbegin()) {}
 
     public:
@@ -281,7 +331,9 @@ class SimpleGraph::VertexIterator {
          */
         VertexDescriptor current() const {
             auto& current = *_it;
-            return {current.first, current.second.content()};
+            return {current.first,
+                    current.second.content(),
+                    current.second.edges()};
         }
 
         /**
@@ -298,7 +350,7 @@ class SimpleGraph::VertexIterator {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// Nested classes (OPERATIONS HANDLER)
+// Nested classes (Operations Handler)
 // /////////////////////////////////////////////////////////////////////////////
 
 class SimpleGraph::OpHandler : public OperationHandler {
@@ -318,7 +370,7 @@ class SimpleGraph::OpHandler : public OperationHandler {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// Nested classes (OPERATIONS)
+// Nested classes (Operations)
 // /////////////////////////////////////////////////////////////////////////////
 
 // -----------------------------------------------------------------------------
