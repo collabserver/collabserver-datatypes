@@ -17,11 +17,28 @@ size_t SimpleGraph::nbEdges() const noexcept {
 
 
 // -----------------------------------------------------------------------------
-// Query methods
+// Lookup methods
 // -----------------------------------------------------------------------------
 
-SimpleGraph::VertexIterator SimpleGraph::vertices() {
+SimpleGraph::VertexIterator SimpleGraph::vertices() const {
     return VertexIterator(_graph);
+}
+
+SimpleGraph::VertexDescriptor SimpleGraph::at(const SimpleGraph::UUID& id) const {
+    auto it = _graph.find_vertex(id);
+    if(it == _graph.end()) {
+        throw std::out_of_range("No vertex exists for this id");
+    }
+    return {it->first, it->second.content(), it->second.edges()};
+}
+
+bool SimpleGraph::hasVertex(const SimpleGraph::UUID& id) const {
+    return _graph.has_vertex(id);
+}
+
+bool SimpleGraph::hasEdge(const SimpleGraph::UUID& from,
+                          const SimpleGraph::UUID& to) const {
+    return _graph.has_edge(from, to);
 }
 
 

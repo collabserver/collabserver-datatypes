@@ -8,12 +8,12 @@
 namespace collab {
 
 
-// /////////////////////////////////////////////////////////////////////////////
-// *****************************************************************************
-// Mock classes
-// *****************************************************************************
-// /////////////////////////////////////////////////////////////////////////////
+static int nbCatch = 0;
 
+
+// /////////////////////////////////////////////////////////////////////////////
+// Mock classes
+// /////////////////////////////////////////////////////////////////////////////
 
 static int nbOpVertexAdd = 0;
 static int nbOpVertexRemove = 0;
@@ -70,9 +70,7 @@ class ObserverMock : public OperationObserver {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// *****************************************************************************
 // Tests
-// *****************************************************************************
 // /////////////////////////////////////////////////////////////////////////////
 
 
@@ -84,6 +82,132 @@ TEST(SimpleGraph, constructorTest) {
     SimpleGraph v;
     // TODO
 }
+
+
+// -----------------------------------------------------------------------------
+// at()
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, atTest_ThrowException) {
+    SimpleGraph data0;
+    nbCatch = 0;
+
+    try { data0.at("v1"); } catch(...) { nbCatch++; }
+    try { data0.at("v2"); } catch(...) { nbCatch++; }
+    try { data0.at("v3"); } catch(...) { nbCatch++; }
+    try { data0.at("v4"); } catch(...) { nbCatch++; }
+
+    EXPECT_EQ(nbCatch, 4);
+
+    nbCatch = 0;
+    data0.addVertex("v1");
+    data0.addVertex("v2");
+
+    try { data0.at("v1"); } catch(...) { nbCatch++; }
+    try { data0.at("v2"); } catch(...) { nbCatch++; }
+    try { data0.at("v3"); } catch(...) { nbCatch++; }
+    try { data0.at("v4"); } catch(...) { nbCatch++; }
+    EXPECT_EQ(nbCatch, 2);
+}
+
+TEST(SimpleGraph, atTest_ReturnValue) {
+    SimpleGraph data0;
+
+    data0.addVertex("v1");
+    data0.addVertex("v2");
+    data0.addVertex("v3");
+    data0.addEdge("v1", "v1");
+    data0.addEdge("v1", "v2");
+    data0.addEdge("v1", "v3");
+    data0.addEdge("v2", "v1");
+
+    data0.setAttribute("v1", "name", "Gnu");
+    data0.setAttribute("v2", "name", "Panda");
+    data0.setAttribute("v3", "name", "Corbeau");
+
+    SimpleGraph::VertexDescriptor v1 = data0.at("v1");
+    SimpleGraph::VertexDescriptor v2 = data0.at("v2");
+    SimpleGraph::VertexDescriptor v3 = data0.at("v3");
+
+    auto it_v1_attr = v1.attributes();
+    it_v1_attr.moveNext();
+    auto& current1 = it_v1_attr.current();
+    EXPECT_EQ(current1.name(), "name");
+    EXPECT_EQ(current1.value(), "Gnu");
+
+    auto it_v2_attr = v2.attributes();
+    it_v2_attr.moveNext();
+    auto& current2 = it_v2_attr.current();
+    EXPECT_EQ(current2.name(), "name");
+    EXPECT_EQ(current2.value(), "Panda");
+
+    auto it_v3_attr = v3.attributes();
+    it_v3_attr.moveNext();
+    auto& current3 = it_v3_attr.current();
+    EXPECT_EQ(current3.name(), "name");
+    EXPECT_EQ(current3.value(), "Corbeau");
+}
+
+
+// -----------------------------------------------------------------------------
+// hasVertex()
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, hasVertexTest) {
+    SimpleGraph v;
+    EXPECT_FALSE(v.hasVertex("v1"));
+    EXPECT_FALSE(v.hasVertex("v2"));
+    EXPECT_FALSE(v.hasVertex("v3"));
+
+    v.addVertex("v1");
+    v.addVertex("v2");
+    EXPECT_TRUE(v.hasVertex("v1"));
+    EXPECT_TRUE(v.hasVertex("v2"));
+    EXPECT_FALSE(v.hasVertex("v3"));
+
+    v.removeVertex("v1");
+    EXPECT_FALSE(v.hasVertex("v1"));
+    EXPECT_TRUE(v.hasVertex("v2"));
+    EXPECT_FALSE(v.hasVertex("v3"));
+
+    v.removeVertex("v2");
+    EXPECT_FALSE(v.hasVertex("v1"));
+    EXPECT_FALSE(v.hasVertex("v2"));
+    EXPECT_FALSE(v.hasVertex("v3"));
+}
+
+
+// -----------------------------------------------------------------------------
+// hasEdge()
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, hasEdgeTest) {
+    SimpleGraph v;
+    EXPECT_FALSE(v.hasEdge("v1", "v1"));
+    EXPECT_FALSE(v.hasEdge("v1", "v2"));
+    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+
+    v.addEdge("v1", "v1");
+    v.addEdge("v1", "v2");
+    EXPECT_TRUE(v.hasEdge("v1", "v1"));
+    EXPECT_TRUE(v.hasEdge("v1", "v2"));
+    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+
+    v.removeEdge("v1", "v1");
+    EXPECT_FALSE(v.hasEdge("v1", "v1"));
+    EXPECT_TRUE(v.hasEdge("v1", "v2"));
+    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+
+    v.removeEdge("v1", "v2");
+    EXPECT_FALSE(v.hasEdge("v1", "v1"));
+    EXPECT_FALSE(v.hasEdge("v1", "v2"));
+    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+}
+
+
+// -----------------------------------------------------------------------------
+// OperationHandler
+// -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, operationHandlersTest) {
     SimpleGraph data0;

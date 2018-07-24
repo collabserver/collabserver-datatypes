@@ -124,7 +124,7 @@ class SimpleGraph : public CollabData {
 
 
     // -------------------------------------------------------------------------
-    // Query methods
+    // Lookup methods
     // -------------------------------------------------------------------------
 
     public:
@@ -134,7 +134,33 @@ class SimpleGraph : public CollabData {
          *
          * \return Iterator of vertex.
          */
-        VertexIterator vertices();
+        VertexIterator vertices() const;
+
+        /**
+         * Get the vertex descriptor for the given vertex ID.
+         * Throw exception std::out_of_range if no vertex for this id.
+         *
+         * \param id Vertex to look for.
+         * \return VertexDescriptor.
+         */
+        VertexDescriptor at(const UUID& id) const;
+
+        /**
+         * Check whether there is a vertex with this id.
+         *
+         * \param id Vertex id.
+         * \return True if has vertex with this id, otherwise, return false.
+         */
+        bool hasVertex(const UUID& id) const;
+
+        /**
+         * Check whether an edge exists.
+         *
+         * \param from  Origin vertex.
+         * \param to    Destination vertex.
+         * \return      True if exists, otherwise, return false.
+         */
+        bool hasEdge(const UUID& from, const UUID& to) const;
 
 
     // -------------------------------------------------------------------------
@@ -388,12 +414,12 @@ class SimpleGraph::VertexDescriptor {
         /**
          * Get the edges iterator for this vertex.
          */
-        EdgeIterator edges();
+        EdgeIterator edges() const;
 
         /**
          * Get the attributes iterator for this vertex.
          */
-        AttributeIterator attributes();
+        AttributeIterator attributes() const;
 };
 
 

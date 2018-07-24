@@ -76,11 +76,11 @@ const SimpleGraph::UUID& SimpleGraph::VertexDescriptor::id() const {
     return _id;
 }
 
-SimpleGraph::EdgeIterator SimpleGraph::VertexDescriptor::edges() {
+SimpleGraph::EdgeIterator SimpleGraph::VertexDescriptor::edges() const {
     return EdgeIterator(_edges);
 }
 
-SimpleGraph::AttributeIterator SimpleGraph::VertexDescriptor::attributes() {
+SimpleGraph::AttributeIterator SimpleGraph::VertexDescriptor::attributes() const {
     return AttributeIterator(_content);
 }
 
