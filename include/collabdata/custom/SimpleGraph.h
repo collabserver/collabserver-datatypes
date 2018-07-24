@@ -249,6 +249,7 @@ class SimpleGraph::EdgeIterator {
     private:
         const _EdgeSet&             _data;
         _EdgeSet::const_iterator    _it;
+        bool                        _reset = true;
 
     private:
         friend SimpleGraph;
@@ -273,6 +274,10 @@ class SimpleGraph::EdgeIterator {
          * \return True if successfully moved to next element.
          */
         bool moveNext() {
+            if(_reset) {
+                _reset = false;
+                return _it != _data.cend();
+            }
             ++_it;
             return _it != _data.cend();
         }
@@ -280,7 +285,7 @@ class SimpleGraph::EdgeIterator {
 
 
 /**
- * TODO
+ * Describe content of a vertex.
  */
 class SimpleGraph::VertexDescriptor {
     private:
@@ -297,11 +302,13 @@ class SimpleGraph::VertexDescriptor {
         }
 
     public:
-        const UUID& id() const { return _id; }
-        EdgeIterator edges() { return EdgeIterator(_edges); }
+        const UUID& id() const {
+            return _id;
+        }
 
-        //AttributeIterator attributes();
-        // TODO
+        EdgeIterator edges() {
+            return EdgeIterator(_edges);
+        }
 };
 
 
@@ -316,6 +323,7 @@ class SimpleGraph::VertexIterator {
     private:
         const _Graph&           _data;
         _Graph::const_iterator  _it;
+        bool                    _reset = true;
 
     private:
         friend SimpleGraph;
@@ -343,6 +351,10 @@ class SimpleGraph::VertexIterator {
          * \return True if successfully moved to next element.
          */
         bool moveNext() {
+            if(_reset) {
+                _reset = false;
+                return _it != _data.cend();
+            }
             ++_it;
             return _it != _data.cend();
         }

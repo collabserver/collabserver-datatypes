@@ -55,6 +55,8 @@ void SimpleGraph_example() {
     data0.addVertex("v2");
     data0.addVertex("v3");
     data0.addEdge("v1", "v2");
+    data0.addEdge("v1", "v3");
+    data0.addEdge("v2", "v1");
 
     // Setup v1
     std::cout << "- Setup v1\n";
@@ -77,19 +79,17 @@ void SimpleGraph_example() {
     // Display the graph using iterator
     std::cout << "- Iterate on graph\n";
     SimpleGraph::VertexIterator it = data0.vertices();
-    do {
+    while(it.moveNext()) {
         SimpleGraph::VertexDescriptor current = it.current();
         std::cout << current.id() << " -> ";
+
         SimpleGraph::EdgeIterator it_edges = current.edges();
-        /*
-        // TODO
-        do {
-            SimpleGraph::UUID edge = it_edges.current();
+        while(it_edges.moveNext()) {
+            const SimpleGraph::UUID& edge = it_edges.current();
             std::cout << edge << " ";
-        } while(it_edges.moveNext());
-        */
+        }
         std::cout << "\n";
-    } while(it.moveNext());
+    }
 }
 
 
