@@ -21,6 +21,10 @@ namespace collab {
  * Each vertex has a unique string identifier and a map of attributes.
  * Attributes name and value are both strings.
  *
+ * \par Concurrency
+ * SimpleGraph is a CollabData.
+ * All operations follow the CRDT features.
+ *
  * \par Operations
  * The SimpleGraph's operations are available as nested classes.
  *
@@ -32,6 +36,8 @@ namespace collab {
  * \see CollabData
  * \see Operation
  * \see OperationObserver
+ * \see OperationHandler
+ * \see Timestamp
  */
 class SimpleGraph : public CollabData {
     // -------------------------------------------------------------------------
@@ -240,12 +246,51 @@ class SimpleGraph : public CollabData {
 
 
 // /////////////////////////////////////////////////////////////////////////////
-// Nested classes (Descriptors - Iterators)
+// Nested classes (Iterators)
 // /////////////////////////////////////////////////////////////////////////////
 
+
 /**
- * Iterator over edges of a vertex.
- * Read only access.
+ * Iterator for graph's vertices.
+ *
+ * Because of the internal CRDT properties of SimpleGraph, iterator allows
+ * only read-only access.
+ * To update the content of SimpleGraph, use the appropriate methods.
+ */
+class SimpleGraph::VertexIterator {
+    private:
+        const _Graph&           _data;
+        _Graph::const_iterator  _it;
+        bool                    _reset = true;
+
+    private:
+        friend SimpleGraph;
+        VertexIterator(const _Graph& graph)
+            : _data(graph), _it(graph.cbegin()) {}
+
+    public:
+
+        /**
+         * Return the current element in iterator.
+         * This has undefined behavior if moveNext already returned false.
+         *
+         * \return Current element.
+         */
+        VertexDescriptor current() const;
+
+        /**
+         * Move iterator to the next element.
+         * Returns false if current was the last element.
+         *
+         * \return True if successfully moved to next element.
+         */
+        bool moveNext();
+};
+
+
+/**
+ * Iterator for vertex edges of a vertex.
+ * Read-only access.
  */
 class SimpleGraph::EdgeIterator {
     private:
@@ -259,56 +304,17 @@ class SimpleGraph::EdgeIterator {
 
     public:
 
-        /**
-         * Return the current edge id.
-         * This has undefined behavior if moveNext already returned false.
-         *
-         * \return Current element.
-         */
-        const UUID& current() const {
-            return *_it;
-        }
+        /** \copydoc SimpleGraph::VertexIterator::current */
+        const UUID& current() const;
 
-        /**
-         * Move iterator to the next element.
-         * Returns false if current was the last element.
-         *
-         * \return True if successfully moved to next element.
-         */
-        bool moveNext() {
-            if(_reset) {
-                _reset = false;
-                return _it != _data.cend();
-            }
-            ++_it;
-            return _it != _data.cend();
-        }
+        /** \copydoc SimpleGraph::VertexIterator::moveNext */
+        bool moveNext();
 };
 
 
 /**
- * TODO
- */
-class SimpleGraph::AttributeDescriptor {
-    private:
-        const std::string& _name;
-        const std::string& _value;
-    private:
-        friend SimpleGraph;
-        AttributeDescriptor(const std::string& name, const std::string& value)
-                : _name(name), _value(value) {}
-    public:
-        const std::string& name() const {
-            return _name;
-        }
-        const std::string& value() const {
-            return _value;
-        }
-};
-
-
-/**
- * TODO Documentation
+ * Iterator for vertex content attributes.
+ * Read-only access.
  */
 class SimpleGraph::AttributeIterator {
     private:
@@ -323,37 +329,40 @@ class SimpleGraph::AttributeIterator {
 
     public:
 
-        /**
-         * Return the current attribute data.
-         * This has undefined behavior if moveNext already returned false.
-         *
-         * \return Current attribute.
-         */
-        const AttributeDescriptor current() const {
-            auto& current = *_it;
-            return {current.first, current.second.query()};
-        }
+        /** \copydoc SimpleGraph::VertexIterator::current */
+        const AttributeDescriptor current() const;
 
-        /**
-         * Move iterator to the next element.
-         * Returns false if current was the last element.
-         *
-         * \return True if successfully moved to next element.
-         */
-        bool moveNext() {
-            if(_reset) {
-                _reset = false;
-                return _it != _data.cend();
-            }
-            ++_it;
-            return _it != _data.cend();
-        }
+        /** \copydoc SimpleGraph::VertexIterator::moveNext */
+        bool moveNext();
+};
 
+
+// /////////////////////////////////////////////////////////////////////////////
+// Nested classes (Descriptors)
+// /////////////////////////////////////////////////////////////////////////////
+
+
+/**
+ * Describe content of a vertex.
+ * Read-only access.
+ */
+class SimpleGraph::AttributeDescriptor {
+    private:
+        const std::string& _name;
+        const std::string& _value;
+    private:
+        friend SimpleGraph;
+        AttributeDescriptor(const std::string& name, const std::string& value)
+                : _name(name), _value(value) {}
+    public:
+        const std::string& name() const { return _name; }
+        const std::string& value() const { return _value; }
 };
 
 
 /**
  * Describe content of a vertex.
+ * Read-only access.
  */
 class SimpleGraph::VertexDescriptor {
     private:
@@ -365,9 +374,7 @@ class SimpleGraph::VertexDescriptor {
         friend SimpleGraph;
         VertexDescriptor(const UUID& id,
                          const _AttributeMap& attributes,
-                         const _EdgeSet& edges)
-                : _id(id), _content(attributes), _edges(edges) {
-        }
+                         const _EdgeSet& edges);
 
     public:
 
@@ -376,72 +383,17 @@ class SimpleGraph::VertexDescriptor {
          *
          * \return Vertex unique ID.
          */
-        const UUID& id() const {
-            return _id;
-        }
+        const UUID& id() const;
 
         /**
          * Get the edges iterator for this vertex.
          */
-        EdgeIterator edges() {
-            return EdgeIterator(_edges);
-        }
+        EdgeIterator edges();
 
         /**
          * Get the attributes iterator for this vertex.
          */
-        AttributeIterator attributes() {
-            return AttributeIterator(_content);
-        }
-};
-
-
-/**
- * Iterator over graph vertices.
- *
- * Because of the internal CRDT properties of SimpleGraph, iterator allows
- * only read-only access.
- * To update the content of SimpleGraph, use the appropriate methods.
- */
-class SimpleGraph::VertexIterator {
-    private:
-        const _Graph&           _data;
-        _Graph::const_iterator  _it;
-        bool                    _reset = true;
-
-    private:
-        friend SimpleGraph;
-        VertexIterator(_Graph& graph) : _data(graph), _it(graph.cbegin()) {}
-
-    public:
-
-        /**
-         * Return the current element in iterator.
-         * This has undefined behavior if moveNext already returned false.
-         *
-         * \return Current VertexDescriptor.
-         */
-        VertexDescriptor current() const {
-            auto& current = *_it;
-            return {current.first,
-                    current.second.content(),
-                    current.second.edges()};
-        }
-
-        /**
-         * Move iterator to the next element.
-         * Returns false if current was the last element.
-         *
-         * \return True if successfully moved to next element.
-         */
-        bool moveNext() {
-            if(_reset) {
-                _reset = false;
-                return _it != _data.cend();
-            }
-            ++_it;
-            return _it != _data.cend();
-        }
+        AttributeIterator attributes();
 };
 
 
