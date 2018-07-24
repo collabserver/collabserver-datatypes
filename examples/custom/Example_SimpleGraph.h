@@ -83,10 +83,18 @@ void SimpleGraph_example() {
         SimpleGraph::VertexDescriptor current = it.current();
         std::cout << current.id() << " -> ";
 
+        // Show edges
         SimpleGraph::EdgeIterator it_edges = current.edges();
         while(it_edges.moveNext()) {
             const SimpleGraph::UUID& edge = it_edges.current();
             std::cout << edge << " ";
+        }
+
+        // Show attributes
+        SimpleGraph::AttributeIterator it_attrs = current.attributes();
+        while(it_attrs.moveNext()) {
+            const SimpleGraph::AttributeDescriptor attr = it_attrs.current();
+            std::cout << "(" << attr.name() << "=" << attr.value() << ") ";
         }
         std::cout << "\n";
     }
