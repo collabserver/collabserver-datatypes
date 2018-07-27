@@ -1,5 +1,7 @@
 #include "collabdata/custom/SimpleGraph.h"
 
+#include <msgpack.hpp>
+
 namespace collab {
 
 

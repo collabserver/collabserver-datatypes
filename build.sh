@@ -13,6 +13,6 @@ cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       ..
 
 make
-make runAllTests
+make runTests
 
 

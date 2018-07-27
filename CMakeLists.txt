@@ -12,14 +12,15 @@ endif()
 set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
 
 include("CMake/AddCompilerFlags.cmake")
+include("CMake/AddDependencies.cmake")
 
 
 # ------------------------------------------------------------------------------
 # Build static lib for Custom data (SimpleGraph)
 # ------------------------------------------------------------------------------
 include_directories("${CMAKE_SOURCE_DIR}/include/")
-file(GLOB_RECURSE srcFilesCustom "${CMAKE_SOURCE_DIR}/src/*.cpp")
-add_library(collabdata STATIC ${srcFilesCustom})
+file(GLOB_RECURSE srcFiles "${CMAKE_SOURCE_DIR}/src/*.cpp")
+add_library(collabdata STATIC ${srcFiles})
 
 
 # ------------------------------------------------------------------------------

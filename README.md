@@ -57,6 +57,14 @@ CRDT directed graph to end-user application.
 - Tested only on Linux. Not support certified for Mac and Windows
 
 
+## Dependencies
+> Dependencies marked with *(CMake)* are automatically downloaded by CMake
+> script and placed in *dependencies* folder.
+> Others must be installed manually (Generally system-wide install).
+- [ZeroMQ](http://zeromq.org/) (CMake. Only required by Simple Graph)
+- [GoogleTest](https://github.com/google/googletest) (CMake. Only for tests)
+
+
 ## Build instructions
 
 ### Build types
@@ -67,9 +75,6 @@ CRDT directed graph to end-user application.
     - MinSizeRel
 
 ### Build and run tests with CMake
-- [GoogleTest](https://github.com/google/googletest)
-(Automatically downloaded and built by CMake and placed in project's root
-folder `dependencies`)
 - Tests naming rule: `MethodName+Test_StateUnderTest`
 
 ```bash

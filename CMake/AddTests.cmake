@@ -2,7 +2,7 @@ enable_testing()
 
 
 # ------------------------------------------------------------------------------
-# Download and build GoogleTests
+# Download and build GoogleTests (At cmake time)
 # ------------------------------------------------------------------------------
 # See: https://github.com/google/googletest/tree/master/googletest
 
@@ -51,6 +51,6 @@ file(GLOB_RECURSE srcFilesTests "${CMAKE_SOURCE_DIR}/test/*.cpp")
 add_executable(tests ${srcFilesTests})
 target_link_libraries(tests gtest collabdata)
 add_test(NAME googletests COMMAND tests)
-add_custom_target(runAllTests tests)
+add_custom_target(runTests tests)
 
 
