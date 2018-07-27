@@ -12,7 +12,9 @@ endif()
 set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
 
 include("CMake/AddCompilerFlags.cmake")
-include("CMake/AddDependencies.cmake")
+
+include("CMake/Dependencies/AddGoogleTest.cmake")
+include("CMake/Dependencies/AddMsgPack.cmake")
 
 
 # ------------------------------------------------------------------------------
