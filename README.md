@@ -10,35 +10,42 @@
 
 
 ## Description
-Defines a set of basic CRDTs that may be used to build your more complex data (on top of these structures).
+Defines a set of basic CRDTs that may be used to build your more complex data
+(on top of these structures).
 CRDTs stands for Conflict-free Replicated Data Structure.
 The letter C in CRDT may either stands for "Commutative" or "Convergent".
-Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent is the State based (CvRDT).
+Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent
+is the State based (CvRDT).
 To learn more about CRDTs, checkout the links at the end of this readme.
+
+Custom folder contains several end-user interface to build high level
+data on top of primitive CRDTs. SimpleGraph is a full example of
+CRDT directed graph to end-user application.
 
 
 ## Features
-- CmRDT (Operation-based)
-    - LWWGraph: Last-Write-Wins Graph
-    - LWWMap: Last-Write-Wins Map
-    - LWWRegister: Last-Write-Wins Register
-    - LWWSet: Last-Write-Wins Set
-- CvRDT (State-based. See warning)
-    - 2PSet: Add / Remove set (Two-phases Set)
-    - GCounter: Grow-only counter
-    - GGraph: Grow-only graph
-    - GMap: Grow-only map
-    - GSet: Grow-only set
-    - LWWRegister: Last-Write-Wins Register
-    - PNCounter: Increment / Decrement counter
-- custom
-    - CollabData: Example of SuperType for data built on tope of CRDTs.
-    - Operation: Interface to represents modification on data built on top of CRDTs.
-    - OperationObserver: Interface for Operation observer.
-    - Timestamp: Example of custom timestamp.
-    - SimpleGraph: Example of a directed graph with attributes.
+- **CmRDT** (Operation-based)
+    - *LWWGraph*: Last-Write-Wins Graph
+    - *LWWMap*: Last-Write-Wins Map
+    - *LWWRegister*: Last-Write-Wins Register
+    - *LWWSet*: Last-Write-Wins Set
+- **CvRDT** (State-based. See warning)
+    - *2PSet*: Add / Remove set (Two-phases Set)
+    - *GCounter*: Grow-only counter
+    - *GGraph*: Grow-only graph
+    - *GMap*: Grow-only map
+    - *GSet*: Grow-only set
+    - *LWWRegister*: Last-Write-Wins Register
+    - *PNCounter*: Increment / Decrement counter
+- **custom**
+    - *CollabData*: High level abstraction for data built on tope of CRDTs.
+    - *Operation*: Represents a modification on a CollabData.
+    - *OperationHandler*: Interface to handle operations received from observer.
+    - *OperationObserver*: Interface for Operation observer.
+    - *Timestamp*: Example of custom timestamp. (Used by SimpleGraph)
+    - *SimpleGraph*: Example of a CollabData: directed graph with attributes.
 
-> Warning: I wrote the CvRDTs as an example. They are not meant to be used.
+> **Warning**: I wrote the CvRDTs as an example. They are not meant to be used.
 > (At least, some changes may be required).
 
 
@@ -52,55 +59,49 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 
 ## Build instructions
 
+### Build types
+- CMake build types (ex: `-DCMAKE_BUILD_TYPE=Debug`):
+    - Debug
+    - Release
+    - RelWithDebInfo
+    - MinSizeRel
+
 ### Build and run tests with CMake
 - [GoogleTest](https://github.com/google/googletest)
 (Automatically downloaded and built by CMake and placed in project's root
 folder `dependencies`)
-- Tests naming rule: `MethodName_StateUnderTest`
-
+- Tests naming rule: `MethodName+Test_StateUnderTest`
 
 ```bash
-# Build and run manually
+# Manual instructions
 mkdir build
 cd build
 cmake -Dcollab_tests=ON ..
-make -j4
+make -j2
 make runTests
 
-# Build and run from shell script
+# Or use build script
 ./build.sh
 ```
-
 
 ### Build and run examples with CMake
 ```bash
 mkdir build
 cd build
 cmake -Dcollab_examples=ON ..
-make -j4
-make runExamplesCmRDT
-
-# Build and run from shell script
-./build.sh
-cd build
+make -j2
 make runExamplesCmRDT
 ```
 
 
-## Usage
-
-### Overview
-Todo: documentation in-coming.
-
-### Integrate in your project
-CRDTs are header only, you need to include the right header.
-Include the this project `include` folder in your project path, then include
-the data type your want to use.
-
-For instance, to use CmRDT::LWWSet: `#include "collabdata/CmRDT/LWWSet.h"`
+## Getting started
+CRDTs primitives are header only (CmRDT, CvRDT),
+you only need to include the header you need
+in order to build your concurrent data.
+For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
 
 
-### Generate documentation
+## Generate documentation
 - [Doxygen](https://www.stack.nl/~dimitri/doxygen/)
 
 Generate documentation with `doxygen Doxyfile`.
