@@ -20,12 +20,23 @@ int SimpleGraph::VertexAddOperation::getType() const {
 }
 
 bool SimpleGraph::VertexAddOperation::serialize(std::stringstream& buffer) const {
+    msgpack::pack(buffer, _vertexID);
+    //msgpack::pack(buffer, _timestamp);
     // TODO
     return false;
 }
 
 bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffer) {
+    const char* data    = buffer.str().data();
+    const size_t size   = buffer.str().size();
+    std::size_t off     = 0;
+
+    msgpack::unpacked result;
+
+    msgpack::unpack(result, data, size, off);
+    result.get().convert(_vertexID);
     // TODO
+
     return false;
 }
 
