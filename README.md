@@ -61,7 +61,7 @@ CRDT directed graph to end-user application.
 > Dependencies marked with *(CMake)* are automatically downloaded by CMake
 > script and placed in *dependencies* folder.
 > Others must be installed manually (Generally system-wide install).
-- [ZeroMQ](http://zeromq.org/) (CMake. Only required by Simple Graph)
+- [MessagePack](https://msgpack.org/) (CMake. Only required by Simple Graph)
 - [GoogleTest](https://github.com/google/googletest) (CMake. Only for tests)
 
 
