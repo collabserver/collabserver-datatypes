@@ -20,8 +20,12 @@ namespace collab {
  * current effectiveID.
  */
 class Timestamp {
+    public:
+        typedef std::chrono::steady_clock       Clock;
+        typedef std::chrono::time_point<Clock>  TimePoint;
+
     private:
-        std::chrono::steady_clock::time_point _time;
+        TimePoint _time;
         int _id = 0;
         static int _effectiveID;
 
@@ -34,6 +38,7 @@ class Timestamp {
 
         /**
          * Create a timestamp with the minimal possible value.
+         * Uses current effectiveID as timestamp id.
          *
          * \note
          * The parameters is only used to allow "Timestamp t = 0".
@@ -46,9 +51,16 @@ class Timestamp {
         Timestamp(const int value);
 
         /**
-         * Returns a timestamps that correspond to current time.
-         * This is the most common way to use timestamp class.
-         * Only call "Timestamp t = Timestamp::now();" whenever you need it.
+         * Create a timestamp with a specific time.
+         * Uses current effectiveID as timestamp id.
+         *
+         * \param time Time to set in this timestamp.
+         */
+        explicit Timestamp(const TimePoint time);
+
+        /**
+         * Creates a timestamps that correspond to current time.
+         * Uses current effectiveID as timestamp id.
          */
         static Timestamp now();
 
@@ -56,6 +68,8 @@ class Timestamp {
          * Set the current effective ID.
          * See the paragraph about effective ID (In Timestamp doc) to
          * understand its usage.
+         *
+         * \see Timestamp
          */
         static void effectiveID(const int id);
 
@@ -70,11 +84,27 @@ class Timestamp {
          * \copydoc Timestamp::Timestamp(const int)
          */
         Timestamp& operator=(const int value);
+        Timestamp& operator=(const Timestamp& other);
 
         friend bool operator==(const Timestamp& rhs, const Timestamp& lhs);
         friend bool operator!=(const Timestamp& rhs, const Timestamp& lhs);
         friend bool operator<(const Timestamp& rhs, const Timestamp& lhs);
         friend bool operator>(const Timestamp& rhs, const Timestamp& lhs);
+
+
+    // -------------------------------------------------------------------------
+    // Getter - Setters
+    // -------------------------------------------------------------------------
+
+    public:
+
+        const TimePoint& getTime() const {
+            return _time;
+        }
+
+        int getID() const {
+            return _id;
+        }
 };
 
 

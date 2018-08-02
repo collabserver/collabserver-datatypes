@@ -15,22 +15,22 @@ static int nbCatch = 0;
 // Mock classes
 // /////////////////////////////////////////////////////////////////////////////
 
-static int nbOpVertexAdd = 0;
+static int nbOpVertexAdd    = 0;
 static int nbOpVertexRemove = 0;
-static int nbOpEdgeAdd = 0;
-static int nbOpEdgeRemove = 0;
-static int nbOpAttrAdd = 0;
-static int nbOpAttrRemove = 0;
-static int nbOpAttrSet = 0;
+static int nbOpEdgeAdd      = 0;
+static int nbOpEdgeRemove   = 0;
+static int nbOpAttrAdd      = 0;
+static int nbOpAttrRemove   = 0;
+static int nbOpAttrSet      = 0;
 
 static void resetNbOpCounters() {
-    nbOpVertexAdd = 0;
-    nbOpVertexRemove = 0;
-    nbOpEdgeAdd = 0;
-    nbOpEdgeRemove = 0;
-    nbOpAttrAdd = 0;
-    nbOpAttrRemove = 0;
-    nbOpAttrSet = 0;
+    nbOpVertexAdd           = 0;
+    nbOpVertexRemove        = 0;
+    nbOpEdgeAdd             = 0;
+    nbOpEdgeRemove          = 0;
+    nbOpAttrAdd             = 0;
+    nbOpAttrRemove          = 0;
+    nbOpAttrSet             = 0;
 }
 
 
@@ -72,16 +72,6 @@ class ObserverMock : public OperationObserver {
 // /////////////////////////////////////////////////////////////////////////////
 // Tests
 // /////////////////////////////////////////////////////////////////////////////
-
-
-// -----------------------------------------------------------------------------
-// constructor()
-// -----------------------------------------------------------------------------
-
-TEST(SimpleGraph, constructorTest) {
-    SimpleGraph v;
-    // TODO
-}
 
 
 // -----------------------------------------------------------------------------
