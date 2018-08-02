@@ -12,4 +12,5 @@ ExternalProject_Add(msgpack
     BUILD_COMMAND       ""
     INSTALL_COMMAND     ""
     TEST_COMMAND        ""
+    CMAKE_ARGS          "-DMSGPACK_CXX11=ON"
 )

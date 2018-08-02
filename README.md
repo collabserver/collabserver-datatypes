@@ -37,13 +37,13 @@ CRDT directed graph to end-user application.
     - *GSet*: Grow-only set
     - *LWWRegister*: Last-Write-Wins Register
     - *PNCounter*: Increment / Decrement counter
-- **custom**
+- **custom** (Assets classes to implements data for CollabServer)
     - *CollabData*: High level abstraction for data built on tope of CRDTs.
     - *Operation*: Represents a modification on a CollabData.
     - *OperationHandler*: Interface to handle operations received from observer.
     - *OperationObserver*: Interface for Operation observer.
-    - *Timestamp*: Example of custom timestamp. (Used by SimpleGraph)
     - *SimpleGraph*: Example of a CollabData: directed graph with attributes.
+    - *Timestamp*: Example of custom timestamp. (Used by SimpleGraph)
 
 > **Warning**: I wrote the CvRDTs as an example. They are not meant to be used.
 > (At least, some changes may be required).

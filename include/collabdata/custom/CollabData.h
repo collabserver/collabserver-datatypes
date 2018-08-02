@@ -1,11 +1,11 @@
 #pragma once
 
-#include <vector>
 #include <cassert>
+#include <vector>
 #include <sstream>
 
-#include "OperationObserver.h"
 #include "Operation.h"
+#include "OperationObserver.h"
 
 namespace collab {
 
@@ -131,6 +131,8 @@ class CollabData {
          * operation just received. Operation is in its serialized form since
          * other components doesn't know anything about the concrete operations.
          * (Only concrete CollabData implementation knowns)
+         *
+         * The first serialized element in buffer must be the operation type.
          *
          * \param buffer Serialized version of the operation.
          * \return True if operation is valid, otherwise, return false.
