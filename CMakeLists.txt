@@ -13,7 +13,6 @@ set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
 
 include("CMake/AddCompilerFlags.cmake")
 
-include("CMake/Dependencies/AddGoogleTest.cmake")
 include("CMake/Dependencies/AddMsgPack.cmake")
 
 
@@ -42,6 +41,7 @@ endif()
 option(collab_tests "Build tests" OFF)
 
 if(collab_tests)
+    include("CMake/Dependencies/AddGoogleTest.cmake")
     message(STATUS "Build tests")
     include("CMake/AddTests.cmake")
 endif()
