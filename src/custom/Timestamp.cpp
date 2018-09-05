@@ -1,5 +1,7 @@
 #include "collabdata/custom/Timestamp.h"
 
+#include <cassert>
+
 namespace collab {
 
 
@@ -11,13 +13,13 @@ int Timestamp::_effectiveID = 0;
 // -----------------------------------------------------------------------------
 
 Timestamp::Timestamp(const int value) {
-    _id   = Timestamp::_effectiveID;
-    _time = std::chrono::time_point<std::chrono::steady_clock>::min();
+    _id     = Timestamp::_effectiveID;
+    _time   = std::chrono::time_point<std::chrono::steady_clock>::min();
 }
 
 Timestamp::Timestamp(const TimePoint time) {
-    _id   = Timestamp::_effectiveID;
-    _time = time;
+    _id     = Timestamp::_effectiveID;
+    _time   = time;
 }
 
 Timestamp Timestamp::now() {

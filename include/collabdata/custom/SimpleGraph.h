@@ -291,8 +291,8 @@ class SimpleGraph::VertexIterator {
 
     private:
         friend SimpleGraph;
-        VertexIterator(const _Graph& graph)
-            : _data(graph), _it(graph.cbegin()) {}
+        VertexIterator(const _Graph& graph) : _data(graph),
+                                              _it(graph.cbegin()) {}
 
     public:
 
@@ -456,12 +456,12 @@ class SimpleGraph::VertexAddOperation : public Operation {
     public:
         VertexAddOperation() = default;
         VertexAddOperation(const std::string& id, const Timestamp& time);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& vertexID() const;
-        const Timestamp& timestamp() const;
+        const UUID& vertexID() const { return _vertexID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        int getType() const override { return OPERATION_VERTEX_ADD; }
 };
 
 
@@ -474,12 +474,12 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
     public:
         VertexRemoveOperation() = default;
         VertexRemoveOperation(const std::string& id, const Timestamp& time);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& vertexID() const;
-        const Timestamp& timestamp() const;
+        const UUID& vertexID() const { return _vertexID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        int getType() const override { return OPERATION_VERTEX_REMOVE; }
 };
 
 
@@ -494,13 +494,13 @@ class SimpleGraph::EdgeAddOperation : public Operation {
         EdgeAddOperation() = default;
         EdgeAddOperation(const UUID& fromID, const UUID& toID,
                          const Timestamp& time);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& fromID() const;
-        const UUID& toID() const;
-        const Timestamp& timestamp() const;
+        const UUID& fromID() const { return _fromID; }
+        const UUID& toID() const { return _toID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        int getType() const override { return OPERATION_EDGE_ADD; }
 };
 
 
@@ -515,13 +515,13 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
         EdgeRemoveOperation() = default;
         EdgeRemoveOperation(const UUID& fromID, const UUID& toID,
                             const Timestamp& time);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& fromID() const;
-        const UUID& toID() const;
-        const Timestamp& timestamp() const;
+        const UUID& fromID() const { return _fromID; }
+        const UUID& toID() const { return _toID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        int getType() const override { return OPERATION_EDGE_REMOVE; }
 };
 
 
@@ -537,14 +537,14 @@ class SimpleGraph::AttributeAddOperation : public Operation {
         AttributeAddOperation() = default;
         AttributeAddOperation(const std::string& id, const Timestamp& time,
                               const std::string& name, const std::string& value);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& vertexID() const;
-        const Timestamp& timestamp() const;
-        const std::string& attributeName() const;
-        const std::string& attributeValue() const;
+        const UUID& vertexID() const { return _vertexID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        const std::string& attributeName() const { return _attributeName; }
+        const std::string& attributeValue() const { return _attributeValue; }
+        int getType() const override { return OPERATION_ATTRIBUTE_ADD; }
 };
 
 
@@ -559,13 +559,13 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
         AttributeRemoveOperation() = default;
         AttributeRemoveOperation(const std::string& id, const Timestamp& time,
                                  const std::string& name);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& vertexID() const;
-        const Timestamp& timestamp() const;
-        const std::string& attributeName() const;
+        const UUID& vertexID() const { return _vertexID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        const std::string& attributeName() const { return _attributeName; }
+        int getType() const override { return OPERATION_ATTRIBUTE_REMOVE; }
 };
 
 
@@ -582,14 +582,14 @@ class SimpleGraph::AttributeSetOperation : public Operation {
         AttributeSetOperation() = default;
         AttributeSetOperation(const std::string& id, const Timestamp& time,
                               const std::string& name, const std::string& nVal);
-        int getType() const override;
         bool serialize(std::stringstream& buffer) const override;
         bool unserialize(const std::stringstream& buffer) override;
         void accept(OperationHandler& handler) const override;
-        const UUID& vertexID() const;
-        const Timestamp& timestamp() const;
-        const std::string& attributeName() const;
-        const std::string& newValue() const;
+        const UUID& vertexID() const { return _vertexID; }
+        const Timestamp& timestamp() const { return _timestamp; }
+        const std::string& attributeName() const { return _attributeName; }
+        const std::string& newValue() const { return _newValue; }
+        int getType() const override { return OPERATION_ATTRIBUTE_SET; }
 };
 
 

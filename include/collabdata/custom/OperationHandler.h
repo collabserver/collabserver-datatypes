@@ -2,6 +2,7 @@
 
 namespace collab {
 
+
 class Operation;
 
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cassert>
 #include <chrono>
 
 namespace collab {
@@ -25,9 +24,9 @@ class Timestamp {
         typedef std::chrono::time_point<Clock>  TimePoint;
 
     private:
-        TimePoint _time;
-        int _id = 0;
-        static int _effectiveID;
+        TimePoint   _time;
+        int         _id = 0;
+        static int  _effectiveID;
 
 
     // -------------------------------------------------------------------------
@@ -98,13 +97,8 @@ class Timestamp {
 
     public:
 
-        const TimePoint& getTime() const {
-            return _time;
-        }
-
-        int getID() const {
-            return _id;
-        }
+        const TimePoint& getTime() const { return _time; }
+        int getID() const { return _id; }
 };
 
 
