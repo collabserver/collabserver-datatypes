@@ -267,7 +267,7 @@ class SimpleGraph : public CollabData {
     public:
 
         /** \copydoc CollabData::receiveOperation */
-        bool applyExternOperation(const std::stringstream& buffer) override;
+        bool applyExternOperation(int id, const std::string& buffer) override;
 };
 
 

@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include <vector>
-#include <sstream>
+#include <string>
 
 #include "Operation.h"
 #include "OperationObserver.h"
@@ -134,10 +134,12 @@ class CollabData {
          *
          * The first serialized element in buffer must be the operation type.
          *
+         *
+         * \param id Operation's ID.
          * \param buffer Serialized version of the operation.
          * \return True if operation is valid, otherwise, return false.
          */
-        virtual bool applyExternOperation(const std::stringstream& buffer) = 0;
+        virtual bool applyExternOperation(int id, const std::string& buffer) = 0;
 
 
     // -------------------------------------------------------------------------
