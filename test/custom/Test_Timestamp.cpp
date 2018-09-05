@@ -34,9 +34,9 @@ TEST(Timestamp, operatorEQ) {
 }
 
 TEST(Timestamp, operatorEQ_WithDiffEffectiveID) {
-    Timestamp::effectiveID(42);
+    Timestamp::setEffectiveID(42);
     Timestamp t1 = {0};
-    Timestamp::effectiveID(64);
+    Timestamp::setEffectiveID(64);
     Timestamp t2 = {0};
 
     ASSERT_TRUE(t1 == t1);
@@ -60,9 +60,9 @@ TEST(Timestamp, operatorInf) {
 }
 
 TEST(Timestamp, operatorInf_WithDiffEffectiveID) {
-    Timestamp::effectiveID(10);
+    Timestamp::setEffectiveID(10);
     Timestamp t1 = {0};
-    Timestamp::effectiveID(20);
+    Timestamp::setEffectiveID(20);
     Timestamp t2 = {0};
 
     ASSERT_TRUE(t1 < t2);
@@ -83,9 +83,9 @@ TEST(Timestamp, operatorSup) {
 }
 
 TEST(Timestamp, operatorSup_WithDiffEffectiveID) {
-    Timestamp::effectiveID(10);
+    Timestamp::setEffectiveID(10);
     Timestamp t1 = {0};
-    Timestamp::effectiveID(20);
+    Timestamp::setEffectiveID(20);
     Timestamp t2 = {0};
 
     ASSERT_TRUE(t2 > t1);

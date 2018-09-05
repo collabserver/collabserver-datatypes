@@ -12,11 +12,14 @@ namespace collab {
  * Timestamps should be strictly unique. This implementation mix time value
  * (chrono clock) with an integer value unique for each user.
  *
+ * \par unique IDs
+ * Each user must have a unique ID mixed with the timestamp (So that similar
+ * timestamp are resolved using the ID).
+ *
  * \par Effective ID
- * Each user must have a unique ID to mix with the chrono value so that,
- * two changes at the exact same time uses the ID to pick up a winner.
- * Whenever a timestamp is created, its 'user id' is set with the
- * current effectiveID.
+ * Whenever a timestamp is created, its 'user ID' is set with the current
+ * effectiveID.
+ *
  */
 class Timestamp {
     public:
@@ -24,9 +27,9 @@ class Timestamp {
         typedef std::chrono::time_point<Clock>  TimePoint;
 
     private:
-        TimePoint   _time;
-        int         _id = 0;
-        static int  _effectiveID;
+        TimePoint           _time;
+        unsigned int        _id = -1;
+        static unsigned int _effectiveID;
 
 
     // -------------------------------------------------------------------------
@@ -51,15 +54,17 @@ class Timestamp {
 
         /**
          * Create a timestamp with a specific time.
-         * Uses current effectiveID as timestamp id.
+         * Uses current effectiveID as ID.
          *
-         * \param time Time to set in this timestamp.
+         * \param time Time to set in this Timestamp.
          */
         explicit Timestamp(const TimePoint time);
 
         /**
          * Creates a timestamps that correspond to current time.
-         * Uses current effectiveID as timestamp id.
+         * Uses current effectiveID as ID.
+         *
+         * \return Timestamp corresponding to current time.
          */
         static Timestamp now();
 
@@ -68,9 +73,10 @@ class Timestamp {
          * See the paragraph about effective ID (In Timestamp doc) to
          * understand its usage.
          *
+         * \param id Current effective ID to use.
          * \see Timestamp
          */
-        static void effectiveID(const int id);
+        static void setEffectiveID(const unsigned int id);
 
 
     // -------------------------------------------------------------------------
@@ -98,6 +104,12 @@ class Timestamp {
     public:
 
         const TimePoint& getTime() const { return _time; }
+
+        /**
+         * Get the actual Timestamp's ID.
+         * This is not the effectiveID but the actual ID for this specific
+         * Timestamp instance.
+         */
         int getID() const { return _id; }
 };
 

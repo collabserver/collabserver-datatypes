@@ -9,6 +9,7 @@ namespace collab {
 
 
 static int nbCatch = 0;
+static int localUserID = 42; // See SimpleGraph constructor and Timestamp
 
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -79,7 +80,7 @@ class ObserverMock : public OperationObserver {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, atTest_ThrowException) {
-    SimpleGraph data0;
+    SimpleGraph data0(localUserID);
     nbCatch = 0;
 
     try { data0.at("v1"); } catch(...) { nbCatch++; }
@@ -101,7 +102,7 @@ TEST(SimpleGraph, atTest_ThrowException) {
 }
 
 TEST(SimpleGraph, atTest_ReturnValue) {
-    SimpleGraph data0;
+    SimpleGraph data0(localUserID);
 
     data0.addVertex("v1");
     data0.addVertex("v2");
@@ -144,7 +145,7 @@ TEST(SimpleGraph, atTest_ReturnValue) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, hasVertexTest) {
-    SimpleGraph v;
+    SimpleGraph v(localUserID);
     EXPECT_FALSE(v.hasVertex("v1"));
     EXPECT_FALSE(v.hasVertex("v2"));
     EXPECT_FALSE(v.hasVertex("v3"));
@@ -172,7 +173,7 @@ TEST(SimpleGraph, hasVertexTest) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, hasEdgeTest) {
-    SimpleGraph v;
+    SimpleGraph v(localUserID);
     EXPECT_FALSE(v.hasEdge("v1", "v1"));
     EXPECT_FALSE(v.hasEdge("v1", "v2"));
     EXPECT_FALSE(v.hasEdge("v1", "v3"));
@@ -200,7 +201,7 @@ TEST(SimpleGraph, hasEdgeTest) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, operationHandlersTest) {
-    SimpleGraph data0;
+    SimpleGraph data0(localUserID);
     ObserverMock obs;
     data0.addOperationObserver(obs);
 

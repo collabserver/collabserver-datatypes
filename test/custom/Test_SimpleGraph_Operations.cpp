@@ -7,8 +7,8 @@
 namespace collab {
 
 
-TEST(SimpleGraph, opEdgeAddOperation_serializeReadWrite) {
-    Timestamp::effectiveID(42);
+TEST(SimpleGraph, opEdgeAddOperation_serializeUnserialize) {
+    Timestamp::setEffectiveID(42);
     Timestamp time = Timestamp::now();
     SimpleGraph::EdgeAddOperation op = {"v1", "v2", time};
     std::stringstream buffer;

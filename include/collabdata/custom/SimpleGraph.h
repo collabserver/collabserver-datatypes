@@ -61,6 +61,22 @@ class SimpleGraph : public CollabData {
 
     private:
         _Graph _graph;
+        unsigned int _localID = -1; // Used for Timestamp userID
+
+
+    // -------------------------------------------------------------------------
+    // Constructors / Init
+    // -------------------------------------------------------------------------
+
+    public:
+
+        /**
+         * Create a new SimpleGraph. A unique userID is given to represents
+         * the local user ID. It is used by Timestamp.
+         * (ID may be set and returned by a collab-server for instance).
+         */
+        //SimpleGraph(unsigned int localID) { _localID = localID; }
+        SimpleGraph(unsigned int localID);
 
 
     // -------------------------------------------------------------------------

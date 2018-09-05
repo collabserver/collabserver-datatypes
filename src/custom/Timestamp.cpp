@@ -5,7 +5,7 @@
 namespace collab {
 
 
-int Timestamp::_effectiveID = 0;
+unsigned int Timestamp::_effectiveID = -1;
 
 
 // -----------------------------------------------------------------------------
@@ -18,18 +18,20 @@ Timestamp::Timestamp(const int value) {
 }
 
 Timestamp::Timestamp(const TimePoint time) {
+    assert(Timestamp::_effectiveID != -1);
     _id     = Timestamp::_effectiveID;
     _time   = time;
 }
 
 Timestamp Timestamp::now() {
+    assert(Timestamp::_effectiveID != -1);
     Timestamp t = {0}; // Dev note: See constructor doc to understand {0}
     t._id       = Timestamp::_effectiveID;
     t._time     = std::chrono::steady_clock::now();
     return t;
 }
 
-void Timestamp::effectiveID(const int id) {
+void Timestamp::setEffectiveID(const unsigned int id) {
     Timestamp::_effectiveID = id;
 }
 
@@ -40,6 +42,7 @@ void Timestamp::effectiveID(const int id) {
 
 Timestamp& Timestamp::operator=(const int value) {
     // Dev note: see constructor note
+    assert(Timestamp::_effectiveID != -1);
     _id   = Timestamp::_effectiveID;
     _time = std::chrono::time_point<std::chrono::steady_clock>::min();
     return *this;
