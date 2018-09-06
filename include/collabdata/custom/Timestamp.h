@@ -28,7 +28,7 @@ class Timestamp {
 
     private:
         TimePoint           _time;
-        unsigned int        _id = -1;
+        unsigned int        _id = 0;
         static unsigned int _effectiveID;
 
 

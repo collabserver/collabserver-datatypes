@@ -61,7 +61,7 @@ class SimpleGraph : public CollabData {
 
     private:
         _Graph _graph;
-        unsigned int _localID = -1; // Used for Timestamp userID
+        unsigned int _localID = 0; // Used for Timestamp userID
 
 
     // -------------------------------------------------------------------------
