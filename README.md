@@ -60,12 +60,13 @@ CRDT directed graph to end-user application.
 ## Dependencies
 > Dependencies marked with *(CMake)* are automatically downloaded by CMake
 > script and placed in *dependencies* folder.
-> Others must be installed manually (Generally system-wide install).
 - [MessagePack](https://msgpack.org/) (CMake. Only required by Simple Graph)
 - [GoogleTest](https://github.com/google/googletest) (CMake. Only for tests)
 
 
 ## Build instructions
+Primitive CRDTs are header only.
+The custom data (`SimpleGraph`) is optinal but built as static lib.
 
 ### Build types
 - CMake build types (ex: `-DCMAKE_BUILD_TYPE=Debug`):
@@ -100,7 +101,7 @@ make runExamplesCmRDT
 
 
 ## Getting started
-CRDTs primitives are header only (CmRDT, CvRDT),
+CRDTs primitives are header only (`CmRDT`, `CvRDT`),
 you only need to include the header you need
 in order to build your concurrent data.
 For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
