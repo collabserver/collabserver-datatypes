@@ -12,16 +12,20 @@ endif()
 set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
 
 include("CMake/AddCompilerFlags.cmake")
-
-include("CMake/Dependencies/AddMsgPack.cmake")
+include_directories("${CMAKE_SOURCE_DIR}/include/")
 
 
 # ------------------------------------------------------------------------------
 # Build static lib for Custom data (SimpleGraph)
 # ------------------------------------------------------------------------------
-include_directories("${CMAKE_SOURCE_DIR}/include/")
-file(GLOB_RECURSE srcFiles "${CMAKE_SOURCE_DIR}/src/*.cpp")
-add_library(collabdata STATIC ${srcFiles})
+option(collab_custom "Build custom static lib" ON)
+
+if(collab_custom)
+    message(STATUS "Build custom static lib")
+    include("CMake/Dependencies/AddMsgPack.cmake")
+    file(GLOB_RECURSE srcFiles "${CMAKE_SOURCE_DIR}/src/*.cpp")
+    add_library(collabdata STATIC ${srcFiles})
+endif()
 
 
 # ------------------------------------------------------------------------------
@@ -41,7 +45,6 @@ endif()
 option(collab_tests "Build tests" OFF)
 
 if(collab_tests)
-    include("CMake/Dependencies/AddGoogleTest.cmake")
     message(STATUS "Build tests")
     include("CMake/AddTests.cmake")
 endif()

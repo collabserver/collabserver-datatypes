@@ -4,6 +4,8 @@
 
 namespace collab {
 
+static const unsigned int localID = 42;
+
 
 // Example of end-user handler for each operation on SimpleGraph
 class SimpleGraphHandler : public SimpleGraph::OpHandler {
@@ -47,7 +49,7 @@ void SimpleGraph_example() {
     std::cout << "\n----- SimpleGraph Example ----------\n";
 
     // Init workflow
-    SimpleGraph data0;
+    SimpleGraph data0(localID);
     SimpleGraphObserver observer;
     data0.addOperationObserver(observer);
 
