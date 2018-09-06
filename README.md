@@ -75,6 +75,11 @@ The custom data (`SimpleGraph`) is optinal but built as static lib.
     - RelWithDebInfo
     - MinSizeRel
 
+### CMake options
+- `collab_custom` (ON/OFF): Build the custom static lib (SimpleGraph data)
+- `collab_examples` (ON/OFF): Build several examples
+- `collab_tests` (ON/OFF): Build unit tests (Requires colla_custom ON)
+
 ### Build and run tests with CMake
 - Tests naming rule: `MethodName+Test_StateUnderTest`
 
@@ -101,10 +106,11 @@ make runExamplesCmRDT
 
 
 ## Getting started
-CRDTs primitives are header only (`CmRDT`, `CvRDT`),
-you only need to include the header you need
-in order to build your concurrent data.
+CRDTs primitives are header only (`CmRDT`, `CvRDT`), you only need to include
+the headers you need in order to build your concurrent data.
 For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
+To use you data on a CollabServer, your data must implement `CollabData`
+interface.
 
 
 ## Generate documentation

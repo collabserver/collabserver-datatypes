@@ -9,6 +9,7 @@ cd build
 
 cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
       -Dcollab_tests=ON \
+      -Dcollab_custom=ON \
       -Dcollab_examples=OFF \
       ..
 

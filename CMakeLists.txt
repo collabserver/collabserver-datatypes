@@ -18,7 +18,7 @@ include_directories("${CMAKE_SOURCE_DIR}/include/")
 # ------------------------------------------------------------------------------
 # Build static lib for Custom data (SimpleGraph)
 # ------------------------------------------------------------------------------
-option(collab_custom "Build custom static lib" ON)
+option(collab_custom "Build custom static lib" OFF)
 
 if(collab_custom)
     message(STATUS "Build custom static lib")
