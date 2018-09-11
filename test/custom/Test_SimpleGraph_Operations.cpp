@@ -7,21 +7,165 @@
 namespace collab {
 
 
-TEST(SimpleGraph, opEdgeAddOperation_serializeUnserialize) {
+// -----------------------------------------------------------------------------
+// VertexAddOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, vertexAddOperation_serializeUnserialize) {
+    const char* vertexID = "Superlong vertex name of the year. Panda is hungry!";
     Timestamp::setEffectiveID(42);
     Timestamp time = Timestamp::now();
-    SimpleGraph::EdgeAddOperation op = {"vertexNumber1", "vertexNumber2", time};
+    SimpleGraph::VertexAddOperation op = {vertexID, time};
     std::stringstream buffer;
 
     Timestamp oldTime = op.timestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
-    ASSERT_EQ(op.fromID(), "vertexNumber1");
-    ASSERT_EQ(op.toID(), "vertexNumber2");
+
+    ASSERT_EQ(op.vertexID(), vertexID);
     ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
 }
 
+
+// -----------------------------------------------------------------------------
+// VertexRemoveOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, vertexRemoveOperation_serializeUnserialize) {
+    const char* vertexID = "Superlong vertex name of the year. Panda is hungry!";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::VertexRemoveOperation op = {vertexID, time};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.vertexID(), vertexID);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+}
+
+
+// -----------------------------------------------------------------------------
+// EdgeAddOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, edgeAddOperation_serializeUnserialize) {
+    const char* vertex1 = "The Vertex number one (fromID)";
+    const char* vertex2 = "The Vertex number two (toID)";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::EdgeAddOperation op = {vertex1, vertex2, time};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.fromID(), vertex1);
+    ASSERT_EQ(op.toID(), vertex2);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+}
+
+
+// -----------------------------------------------------------------------------
+// EdgeRemoveOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, edgeRemoveOperation_serializeUnserialize) {
+    const char* vertex1 = "The Vertex number one (fromID)";
+    const char* vertex2 = "The Vertex number two (toID)";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::EdgeRemoveOperation op = {vertex1, vertex2, time};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.fromID(), vertex1);
+    ASSERT_EQ(op.toID(), vertex2);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+}
+
+
+// -----------------------------------------------------------------------------
+// AttributeAddOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, attributeAddOperation_serializeUnserialize) {
+    const char* vertexID = "A vertex name here. This is a long one (For test)";
+    const char* attrName = "Name of the attribute. This is a long one";
+    const char* attrValue = "The attribute value. Blablabla Blablabla food!";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::AttributeAddOperation op = {vertexID, time, attrName, attrValue};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.vertexID(), vertexID);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.attributeName(), attrName);
+    ASSERT_EQ(op.attributeValue(), attrValue);
+}
+
+
+// -----------------------------------------------------------------------------
+// AttributeRemoveOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, attributeRemoveOperation_serializeUnserialize) {
+    const char* vertexID = "A vertex name here. This is a long one (For test)";
+    const char* attrName = "Name of the attribute. This is a long one";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::AttributeRemoveOperation op = {vertexID, time, attrName};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.vertexID(), vertexID);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.attributeName(), attrName);
+}
+
+
+// -----------------------------------------------------------------------------
+// AttributeSetOperation
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, attributeSetOperation_serializeUnserialize) {
+    const char* vertexID = "A vertex name here. This is a long one (For test)";
+    const char* attrName = "Name of the attribute. This is a long one";
+    const char* attrValue = "The attribute value. Blablabla Blablabla food!";
+    Timestamp::setEffectiveID(42);
+    Timestamp time = Timestamp::now();
+    SimpleGraph::AttributeSetOperation op = {vertexID, time, attrName, attrValue};
+    std::stringstream buffer;
+
+    Timestamp oldTime = op.timestamp();
+
+    EXPECT_TRUE(op.serialize(buffer));
+    EXPECT_TRUE(op.unserialize(buffer));
+
+    ASSERT_EQ(op.vertexID(), vertexID);
+    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.attributeName(), attrName);
+    ASSERT_EQ(op.newValue(), attrValue);
+}
 
 
 } // End namespace
