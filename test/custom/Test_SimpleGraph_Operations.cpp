@@ -10,15 +10,15 @@ namespace collab {
 TEST(SimpleGraph, opEdgeAddOperation_serializeUnserialize) {
     Timestamp::setEffectiveID(42);
     Timestamp time = Timestamp::now();
-    SimpleGraph::EdgeAddOperation op = {"v1", "v2", time};
+    SimpleGraph::EdgeAddOperation op = {"vertexNumber1", "vertexNumber2", time};
     std::stringstream buffer;
 
     Timestamp oldTime = op.timestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
-    ASSERT_EQ(op.fromID(), "v1");
-    ASSERT_EQ(op.toID(), "v2");
+    ASSERT_EQ(op.fromID(), "vertexNumber1");
+    ASSERT_EQ(op.toID(), "vertexNumber2");
     ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
 }
 

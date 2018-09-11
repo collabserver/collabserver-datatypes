@@ -1,5 +1,6 @@
 #include "collabdata/custom/SimpleGraph.h"
 
+#include <cassert>
 #include <msgpack.hpp>
 
 #include "collabdata/custom/Timestamp.h"
@@ -8,8 +9,7 @@ namespace collab {
 
 
 // TODO DEV NOTE
-// For now, the serialization process is really naive and insecure
-// True is always returned: I should add validation checking!
+// Serialization / unserialization may require more success checking.
 
 
 // -----------------------------------------------------------------------------
@@ -32,15 +32,11 @@ bool SimpleGraph::VertexAddOperation::serialize(std::stringstream& buffer) const
 }
 
 bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
     auto time = r2.get().as<Timestamp::Clock::rep>();
@@ -48,7 +44,8 @@ bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffe
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::VertexAddOperation::accept(OperationHandler& handler) const {
@@ -76,15 +73,11 @@ bool SimpleGraph::VertexRemoveOperation::serialize(std::stringstream& buffer) co
 }
 
 bool SimpleGraph::VertexRemoveOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
     auto time = r2.get().as<Timestamp::Clock::rep>();
@@ -92,7 +85,8 @@ bool SimpleGraph::VertexRemoveOperation::unserialize(const std::stringstream& bu
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::VertexRemoveOperation::accept(OperationHandler& handler) const {
@@ -108,9 +102,7 @@ SimpleGraph::EdgeAddOperation::EdgeAddOperation(
         const UUID& fromID,
         const UUID& toID,
         const Timestamp& time)
-        : _fromID(fromID),
-          _toID(toID),
-          _timestamp(time) {
+        : _fromID(fromID), _toID(toID), _timestamp(time) {
 }
 
 bool SimpleGraph::EdgeAddOperation::serialize(std::stringstream& buffer) const {
@@ -124,17 +116,12 @@ bool SimpleGraph::EdgeAddOperation::serialize(std::stringstream& buffer) const {
 }
 
 bool SimpleGraph::EdgeAddOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-    msgpack::unpacked r3;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
-    msgpack::unpack(r3, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_fromID);
     r2.get().convert(_toID);
@@ -143,7 +130,8 @@ bool SimpleGraph::EdgeAddOperation::unserialize(const std::stringstream& buffer)
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::EdgeAddOperation::accept(OperationHandler& handler) const {
@@ -172,17 +160,12 @@ bool SimpleGraph::EdgeRemoveOperation::serialize(std::stringstream& buffer) cons
     return true;
 }
 bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-    msgpack::unpacked r3;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
-    msgpack::unpack(r3, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_fromID);
     r2.get().convert(_toID);
@@ -191,7 +174,8 @@ bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buff
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::EdgeRemoveOperation::accept(OperationHandler& handler) const {
@@ -226,19 +210,13 @@ bool SimpleGraph::AttributeAddOperation::serialize(std::stringstream& buffer) co
 }
 
 bool SimpleGraph::AttributeAddOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-    msgpack::unpacked r3;
-    msgpack::unpacked r4;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
-    msgpack::unpack(r3, data, size, off);
-    msgpack::unpack(r4, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r4 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
     auto time = r2.get().as<Timestamp::Clock::rep>();
@@ -248,7 +226,8 @@ bool SimpleGraph::AttributeAddOperation::unserialize(const std::stringstream& bu
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::AttributeAddOperation::accept(OperationHandler& handler) const {
@@ -280,17 +259,12 @@ bool SimpleGraph::AttributeRemoveOperation::serialize(std::stringstream& buffer)
 }
 
 bool SimpleGraph::AttributeRemoveOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-    msgpack::unpacked r3;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
-    msgpack::unpack(r3, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
     auto time = r2.get().as<Timestamp::Clock::rep>();
@@ -299,7 +273,8 @@ bool SimpleGraph::AttributeRemoveOperation::unserialize(const std::stringstream&
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::AttributeRemoveOperation::accept(OperationHandler& handler) const {
@@ -333,19 +308,13 @@ bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) co
     return true;
 }
 bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& buffer) {
-    const char* data    = buffer.str().data();
-    const size_t size   = buffer.str().size();
-    std::size_t off     = 0;
+    std::string str(buffer.str());
+    std::size_t off = 0;
 
-    msgpack::unpacked r1;
-    msgpack::unpacked r2;
-    msgpack::unpacked r3;
-    msgpack::unpacked r4;
-
-    msgpack::unpack(r1, data, size, off);
-    msgpack::unpack(r2, data, size, off);
-    msgpack::unpack(r3, data, size, off);
-    msgpack::unpack(r4, data, size, off);
+    msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
+    msgpack::object_handle r4 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
     auto time = r2.get().as<Timestamp::Clock::rep>();
@@ -355,7 +324,8 @@ bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& bu
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
     _timestamp = Timestamp(Timestamp::TimePoint(ellie));
 
-    return true;
+    assert(off == str.size());
+    return off == str.size();
 }
 
 void SimpleGraph::AttributeSetOperation::accept(OperationHandler& handler) const {
