@@ -65,7 +65,6 @@ bool operator!=(const Timestamp& rhs, const Timestamp& lhs) {
 
 bool operator>(const Timestamp& rhs, const Timestamp& lhs) {
     if(rhs._time == lhs._time) {
-        assert(rhs._id != lhs._id);
         return rhs._id > lhs._id;
     }
     return rhs._time > lhs._time;
@@ -73,7 +72,6 @@ bool operator>(const Timestamp& rhs, const Timestamp& lhs) {
 
 bool operator<(const Timestamp& rhs, const Timestamp& lhs) {
     if(rhs._time == lhs._time) {
-        assert(rhs._id != lhs._id);
         return rhs._id < lhs._id;
     }
     return rhs._time < lhs._time;
