@@ -9,7 +9,7 @@ namespace collab {
 
 
 static int nbCatch = 0;
-static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
+static unsigned int localUserID = 42;
 
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -80,8 +80,7 @@ class ObserverMock : public OperationObserver {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, atTest_ThrowException) {
-    Timestamp::setEffectiveID(localUserID);
-    SimpleGraph data0(localUserID);
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
     nbCatch = 0;
 
     try { data0.at("v1"); } catch(...) { nbCatch++; }
@@ -103,8 +102,7 @@ TEST(SimpleGraph, atTest_ThrowException) {
 }
 
 TEST(SimpleGraph, atTest_ReturnValue) {
-    Timestamp::setEffectiveID(localUserID);
-    SimpleGraph data0(localUserID);
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
 
     data0.addVertex("v1");
     data0.addVertex("v2");
@@ -147,26 +145,27 @@ TEST(SimpleGraph, atTest_ReturnValue) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, hasVertexTest) {
-    SimpleGraph v(localUserID);
-    EXPECT_FALSE(v.hasVertex("v1"));
-    EXPECT_FALSE(v.hasVertex("v2"));
-    EXPECT_FALSE(v.hasVertex("v3"));
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
 
-    v.addVertex("v1");
-    v.addVertex("v2");
-    EXPECT_TRUE(v.hasVertex("v1"));
-    EXPECT_TRUE(v.hasVertex("v2"));
-    EXPECT_FALSE(v.hasVertex("v3"));
+    EXPECT_FALSE(data0.hasVertex("v1"));
+    EXPECT_FALSE(data0.hasVertex("v2"));
+    EXPECT_FALSE(data0.hasVertex("v3"));
 
-    v.removeVertex("v1");
-    EXPECT_FALSE(v.hasVertex("v1"));
-    EXPECT_TRUE(v.hasVertex("v2"));
-    EXPECT_FALSE(v.hasVertex("v3"));
+    data0.addVertex("v1");
+    data0.addVertex("v2");
+    EXPECT_TRUE(data0.hasVertex("v1"));
+    EXPECT_TRUE(data0.hasVertex("v2"));
+    EXPECT_FALSE(data0.hasVertex("v3"));
 
-    v.removeVertex("v2");
-    EXPECT_FALSE(v.hasVertex("v1"));
-    EXPECT_FALSE(v.hasVertex("v2"));
-    EXPECT_FALSE(v.hasVertex("v3"));
+    data0.removeVertex("v1");
+    EXPECT_FALSE(data0.hasVertex("v1"));
+    EXPECT_TRUE(data0.hasVertex("v2"));
+    EXPECT_FALSE(data0.hasVertex("v3"));
+
+    data0.removeVertex("v2");
+    EXPECT_FALSE(data0.hasVertex("v1"));
+    EXPECT_FALSE(data0.hasVertex("v2"));
+    EXPECT_FALSE(data0.hasVertex("v3"));
 }
 
 
@@ -175,26 +174,27 @@ TEST(SimpleGraph, hasVertexTest) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, hasEdgeTest) {
-    SimpleGraph v(localUserID);
-    EXPECT_FALSE(v.hasEdge("v1", "v1"));
-    EXPECT_FALSE(v.hasEdge("v1", "v2"));
-    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
 
-    v.addEdge("v1", "v1");
-    v.addEdge("v1", "v2");
-    EXPECT_TRUE(v.hasEdge("v1", "v1"));
-    EXPECT_TRUE(v.hasEdge("v1", "v2"));
-    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v1"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v2"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v3"));
 
-    v.removeEdge("v1", "v1");
-    EXPECT_FALSE(v.hasEdge("v1", "v1"));
-    EXPECT_TRUE(v.hasEdge("v1", "v2"));
-    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+    data0.addEdge("v1", "v1");
+    data0.addEdge("v1", "v2");
+    EXPECT_TRUE(data0.hasEdge("v1", "v1"));
+    EXPECT_TRUE(data0.hasEdge("v1", "v2"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v3"));
 
-    v.removeEdge("v1", "v2");
-    EXPECT_FALSE(v.hasEdge("v1", "v1"));
-    EXPECT_FALSE(v.hasEdge("v1", "v2"));
-    EXPECT_FALSE(v.hasEdge("v1", "v3"));
+    data0.removeEdge("v1", "v1");
+    EXPECT_FALSE(data0.hasEdge("v1", "v1"));
+    EXPECT_TRUE(data0.hasEdge("v1", "v2"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v3"));
+
+    data0.removeEdge("v1", "v2");
+    EXPECT_FALSE(data0.hasEdge("v1", "v1"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v2"));
+    EXPECT_FALSE(data0.hasEdge("v1", "v3"));
 }
 
 
@@ -203,8 +203,7 @@ TEST(SimpleGraph, hasEdgeTest) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, operationHandlersTest) {
-    Timestamp::setEffectiveID(localUserID);
-    SimpleGraph data0(localUserID);
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
     ObserverMock obs;
     data0.addOperationObserver(obs);
 

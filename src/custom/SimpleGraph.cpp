@@ -9,8 +9,15 @@ namespace collab {
 // Constructor / Init
 // -----------------------------------------------------------------------------
 
-SimpleGraph::SimpleGraph(unsigned int localID) {
-    _localID = localID;
+
+SimpleGraph SimpleGraph::build(unsigned int localID) {
+    Timestamp::setEffectiveID(localID);
+    return SimpleGraph(localID);
+}
+
+SimpleGraph* SimpleGraph::buildNew(unsigned int localID) {
+    Timestamp::setEffectiveID(localID);
+    return new SimpleGraph(localID);
 }
 
 
