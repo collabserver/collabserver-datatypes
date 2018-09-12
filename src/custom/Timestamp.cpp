@@ -18,9 +18,9 @@ Timestamp::Timestamp(const int value) {
     _time   = std::chrono::time_point<std::chrono::steady_clock>::min();
 }
 
-Timestamp::Timestamp(const TimePoint time) {
-    assert(Timestamp::_effectiveID != 0);
-    _id     = Timestamp::_effectiveID;
+Timestamp::Timestamp(const TimePoint time, const int id) {
+    assert(id != 0);
+    _id     = id;
     _time   = time;
 }
 

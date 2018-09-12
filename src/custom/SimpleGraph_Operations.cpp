@@ -5,6 +5,17 @@
 
 #include "collabdata/custom/Timestamp.h"
 
+
+// Unpack a Timestamp data (Using msgpack)
+#define MACRO_UNPACK_TIMESTAMP(data, size, off)                                 \
+    msgpack::object_handle _r1 = msgpack::unpack(data, size, off);              \
+    msgpack::object_handle _r2 = msgpack::unpack(data, size, off);              \
+    int userID = _r1.get().as<unsigned int>();                                  \
+    auto time = _r2.get().as<Timestamp::Clock::rep>();                          \
+    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);        \
+    _timestamp = Timestamp(Timestamp::TimePoint(ellie), userID)
+
+
 namespace collab {
 
 
@@ -26,6 +37,7 @@ bool SimpleGraph::VertexAddOperation::serialize(std::stringstream& buffer) const
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
 
     msgpack::pack(buffer, _vertexID);
+    msgpack::pack(buffer, _timestamp.getID());
     msgpack::pack(buffer, time.count());
 
     return true;
@@ -36,13 +48,10 @@ bool SimpleGraph::VertexAddOperation::unserialize(const std::stringstream& buffe
     std::size_t off = 0;
 
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
-    auto time = r2.get().as<Timestamp::Clock::rep>();
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();
@@ -67,6 +76,7 @@ bool SimpleGraph::VertexRemoveOperation::serialize(std::stringstream& buffer) co
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
 
     msgpack::pack(buffer, _vertexID);
+    msgpack::pack(buffer, _timestamp.getID());
     msgpack::pack(buffer, time.count());
 
     return true;
@@ -77,13 +87,10 @@ bool SimpleGraph::VertexRemoveOperation::unserialize(const std::stringstream& bu
     std::size_t off = 0;
 
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
-    auto time = r2.get().as<Timestamp::Clock::rep>();
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();
@@ -110,6 +117,7 @@ bool SimpleGraph::EdgeAddOperation::serialize(std::stringstream& buffer) const {
 
     msgpack::pack(buffer, _fromID);
     msgpack::pack(buffer, _toID);
+    msgpack::pack(buffer, _timestamp.getID());
     msgpack::pack(buffer, time.count());
 
     return true;
@@ -121,14 +129,11 @@ bool SimpleGraph::EdgeAddOperation::unserialize(const std::stringstream& buffer)
 
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_fromID);
     r2.get().convert(_toID);
-    auto time = r3.get().as<Timestamp::Clock::rep>();
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();
@@ -155,6 +160,7 @@ bool SimpleGraph::EdgeRemoveOperation::serialize(std::stringstream& buffer) cons
 
     msgpack::pack(buffer, _fromID);
     msgpack::pack(buffer, _toID);
+    msgpack::pack(buffer, _timestamp.getID());
     msgpack::pack(buffer, time.count());
 
     return true;
@@ -165,14 +171,12 @@ bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buff
 
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_fromID);
     r2.get().convert(_toID);
-    auto time = r3.get().as<Timestamp::Clock::rep>();
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
+
 
     assert(off == str.size());
     return off == str.size();
@@ -202,9 +206,10 @@ bool SimpleGraph::AttributeAddOperation::serialize(std::stringstream& buffer) co
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
 
     msgpack::pack(buffer, _vertexID);
-    msgpack::pack(buffer, time.count());
     msgpack::pack(buffer, _attributeName);
     msgpack::pack(buffer, _attributeValue);
+    msgpack::pack(buffer, _timestamp.getID());
+    msgpack::pack(buffer, time.count());
 
     return true;
 }
@@ -216,15 +221,12 @@ bool SimpleGraph::AttributeAddOperation::unserialize(const std::stringstream& bu
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r4 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
-    auto time = r2.get().as<Timestamp::Clock::rep>();
-    r3.get().convert(_attributeName);
-    r4.get().convert(_attributeValue);
+    r2.get().convert(_attributeName);
+    r3.get().convert(_attributeValue);
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();
@@ -252,8 +254,9 @@ bool SimpleGraph::AttributeRemoveOperation::serialize(std::stringstream& buffer)
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
 
     msgpack::pack(buffer, _vertexID);
-    msgpack::pack(buffer, time.count());
     msgpack::pack(buffer, _attributeName);
+    msgpack::pack(buffer, _timestamp.getID());
+    msgpack::pack(buffer, time.count());
 
     return true;
 }
@@ -264,14 +267,11 @@ bool SimpleGraph::AttributeRemoveOperation::unserialize(const std::stringstream&
 
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
-    auto time = r2.get().as<Timestamp::Clock::rep>();
-    r3.get().convert(_attributeName);
+    r2.get().convert(_attributeName);
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();
@@ -301,9 +301,10 @@ bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) co
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
 
     msgpack::pack(buffer, _vertexID);
-    msgpack::pack(buffer, time.count());
     msgpack::pack(buffer, _attributeName);
     msgpack::pack(buffer, _newValue);
+    msgpack::pack(buffer, _timestamp.getID());
+    msgpack::pack(buffer, time.count());
 
     return true;
 }
@@ -314,15 +315,12 @@ bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& bu
     msgpack::object_handle r1 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r2 = msgpack::unpack(str.data(), str.size(), off);
     msgpack::object_handle r3 = msgpack::unpack(str.data(), str.size(), off);
-    msgpack::object_handle r4 = msgpack::unpack(str.data(), str.size(), off);
 
     r1.get().convert(_vertexID);
-    auto time = r2.get().as<Timestamp::Clock::rep>();
-    r3.get().convert(_attributeName);
-    r4.get().convert(_newValue);
+    r2.get().convert(_attributeName);
+    r3.get().convert(_newValue);
 
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);
-    _timestamp = Timestamp(Timestamp::TimePoint(ellie));
+    MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
     assert(off == str.size());
     return off == str.size();

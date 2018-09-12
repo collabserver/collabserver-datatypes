@@ -53,12 +53,12 @@ class Timestamp {
         Timestamp(const int value);
 
         /**
-         * Create a timestamp with a specific time.
-         * Uses current effectiveID as ID.
+         * Create a timestamp with a specific time and id.
          *
          * \param time Time to set in this Timestamp.
+         * \param id User ID to set.
          */
-        explicit Timestamp(const TimePoint time);
+        explicit Timestamp(const TimePoint time, const int id);
 
         /**
          * Creates a timestamps that correspond to current time.
@@ -110,7 +110,7 @@ class Timestamp {
          * This is not the effectiveID but the actual ID for this specific
          * Timestamp instance.
          */
-        int getID() const { return _id; }
+        unsigned int getID() const { return _id; }
 };
 
 
