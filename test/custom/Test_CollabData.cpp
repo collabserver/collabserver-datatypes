@@ -18,7 +18,7 @@ static int nbNotified = 0; // Tracks nb of observer notified
 // -----------------------------------------------------------------------------
 class MockCollabData : public CollabData {
     public:
-        bool applyExternOperation(int id, const std::string& buffer) override {
+        bool applyExternOperation(unsigned int id, const std::string& buffer) override {
             return false;
         }
 };
@@ -37,7 +37,7 @@ class MockOperationObserver : public OperationObserver {
 // -----------------------------------------------------------------------------
 class MockOperation : public Operation {
     public:
-        int getType() const override {
+        unsigned int getType() const override {
             return 1;
         }
         bool serialize(std::stringstream& buffer) const override {

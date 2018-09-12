@@ -10,7 +10,6 @@ namespace collab {
 // -----------------------------------------------------------------------------
 
 SimpleGraph::SimpleGraph(unsigned int localID) {
-    Timestamp::setEffectiveID(localID);
     _localID = localID;
 }
 

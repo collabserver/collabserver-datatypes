@@ -7,13 +7,17 @@
 namespace collab {
 
 
+static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
+
+
 // -----------------------------------------------------------------------------
 // VertexAddOperation
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, vertexAddOperation_serializeUnserialize) {
     const char* vertexID = "Superlong vertex name of the year. Panda is hungry!";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::VertexAddOperation op = {vertexID, time};
     std::stringstream buffer;
@@ -34,7 +38,8 @@ TEST(SimpleGraph, vertexAddOperation_serializeUnserialize) {
 
 TEST(SimpleGraph, vertexRemoveOperation_serializeUnserialize) {
     const char* vertexID = "Superlong vertex name of the year. Panda is hungry!";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::VertexRemoveOperation op = {vertexID, time};
     std::stringstream buffer;
@@ -56,7 +61,8 @@ TEST(SimpleGraph, vertexRemoveOperation_serializeUnserialize) {
 TEST(SimpleGraph, edgeAddOperation_serializeUnserialize) {
     const char* vertex1 = "The Vertex number one (fromID)";
     const char* vertex2 = "The Vertex number two (toID)";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::EdgeAddOperation op = {vertex1, vertex2, time};
     std::stringstream buffer;
@@ -79,7 +85,8 @@ TEST(SimpleGraph, edgeAddOperation_serializeUnserialize) {
 TEST(SimpleGraph, edgeRemoveOperation_serializeUnserialize) {
     const char* vertex1 = "The Vertex number one (fromID)";
     const char* vertex2 = "The Vertex number two (toID)";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::EdgeRemoveOperation op = {vertex1, vertex2, time};
     std::stringstream buffer;
@@ -103,7 +110,8 @@ TEST(SimpleGraph, attributeAddOperation_serializeUnserialize) {
     const char* vertexID = "A vertex name here. This is a long one (For test)";
     const char* attrName = "Name of the attribute. This is a long one";
     const char* attrValue = "The attribute value. Blablabla Blablabla food!";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::AttributeAddOperation op = {vertexID, time, attrName, attrValue};
     std::stringstream buffer;
@@ -127,7 +135,8 @@ TEST(SimpleGraph, attributeAddOperation_serializeUnserialize) {
 TEST(SimpleGraph, attributeRemoveOperation_serializeUnserialize) {
     const char* vertexID = "A vertex name here. This is a long one (For test)";
     const char* attrName = "Name of the attribute. This is a long one";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::AttributeRemoveOperation op = {vertexID, time, attrName};
     std::stringstream buffer;
@@ -151,7 +160,8 @@ TEST(SimpleGraph, attributeSetOperation_serializeUnserialize) {
     const char* vertexID = "A vertex name here. This is a long one (For test)";
     const char* attrName = "Name of the attribute. This is a long one";
     const char* attrValue = "The attribute value. Blablabla Blablabla food!";
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp time = Timestamp::now();
     SimpleGraph::AttributeSetOperation op = {vertexID, time, attrName, attrValue};
     std::stringstream buffer;

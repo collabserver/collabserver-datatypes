@@ -9,7 +9,7 @@ namespace collab {
 
 
 static int nbCatch = 0;
-static int localUserID = 42; // See SimpleGraph constructor and Timestamp
+static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
 
 
 // /////////////////////////////////////////////////////////////////////////////
@@ -80,6 +80,7 @@ class ObserverMock : public OperationObserver {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, atTest_ThrowException) {
+    Timestamp::setEffectiveID(localUserID);
     SimpleGraph data0(localUserID);
     nbCatch = 0;
 
@@ -102,6 +103,7 @@ TEST(SimpleGraph, atTest_ThrowException) {
 }
 
 TEST(SimpleGraph, atTest_ReturnValue) {
+    Timestamp::setEffectiveID(localUserID);
     SimpleGraph data0(localUserID);
 
     data0.addVertex("v1");
@@ -201,6 +203,7 @@ TEST(SimpleGraph, hasEdgeTest) {
 // -----------------------------------------------------------------------------
 
 TEST(SimpleGraph, operationHandlersTest) {
+    Timestamp::setEffectiveID(localUserID);
     SimpleGraph data0(localUserID);
     ObserverMock obs;
     data0.addOperationObserver(obs);

@@ -4,12 +4,16 @@
 
 namespace collab {
 
+static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
+
 
 // -----------------------------------------------------------------------------
 // operators=()
 // -----------------------------------------------------------------------------
 
 TEST(Timestamp, operatorAssign) {
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp t1 = {0};
     Timestamp t2 = Timestamp::now();
 
@@ -23,6 +27,8 @@ TEST(Timestamp, operatorAssign) {
 // -----------------------------------------------------------------------------
 
 TEST(Timestamp, operatorEQ) {
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp t1 = {0};
     Timestamp t2 = Timestamp::now();
 
@@ -34,9 +40,9 @@ TEST(Timestamp, operatorEQ) {
 }
 
 TEST(Timestamp, operatorEQ_WithDiffEffectiveID) {
-    Timestamp::setEffectiveID(42);
+    Timestamp::setEffectiveID(localUserID);
     Timestamp t1 = {0};
-    Timestamp::setEffectiveID(64);
+    Timestamp::setEffectiveID(64); // ex: User2
     Timestamp t2 = {0};
 
     ASSERT_TRUE(t1 == t1);
@@ -52,6 +58,8 @@ TEST(Timestamp, operatorEQ_WithDiffEffectiveID) {
 // -----------------------------------------------------------------------------
 
 TEST(Timestamp, operatorInf) {
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp t1 = {0};
     Timestamp t2 = Timestamp::now();
 
@@ -75,6 +83,8 @@ TEST(Timestamp, operatorInf_WithDiffEffectiveID) {
 // -----------------------------------------------------------------------------
 
 TEST(Timestamp, operatorSup) {
+    Timestamp::setEffectiveID(localUserID);
+
     Timestamp t1 = {0};
     Timestamp t2 = Timestamp::now();
 

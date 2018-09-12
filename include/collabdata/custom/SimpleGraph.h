@@ -74,8 +74,15 @@ class SimpleGraph : public CollabData {
          * Create a new SimpleGraph. A unique userID is given to represents
          * the local user ID. It is used by Timestamp.
          * (ID may be set and returned by a collab-server for instance).
+         *
+         * \bug
+         * Because of initialization of base classes, you must call
+         * Timestamp::setEffectiveID(localID) before creating your SimpleGraph.
+         * This is due to the default timestamp created by LWWSet and LWWMap
+         * for the 'reset' feature.
+         *
+         * \param localID ID of the user.
          */
-        //SimpleGraph(unsigned int localID) { _localID = localID; }
         SimpleGraph(unsigned int localID);
 
 
