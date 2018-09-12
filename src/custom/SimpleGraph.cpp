@@ -248,13 +248,14 @@ void SimpleGraph::applyOperation(const AttributeSetOperation& op) {
 // OperationObserver
 // -----------------------------------------------------------------------------
 
-bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
+bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffer) {
     std::stringstream opBuffer(buffer);
 
     switch(id) {
         case OPERATION_VERTEX_ADD: {
                 VertexAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -263,6 +264,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_VERTEX_REMOVE: {
                 VertexRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -271,6 +273,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_EDGE_ADD: {
                 EdgeAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -279,6 +282,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_EDGE_REMOVE: {
                 EdgeRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -287,6 +291,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_ATTRIBUTE_ADD: {
                 AttributeAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -295,6 +300,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_ATTRIBUTE_REMOVE: {
                 AttributeRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -303,6 +309,7 @@ bool SimpleGraph::applyExternOperation(int id, const std::string& buffer) {
         case OPERATION_ATTRIBUTE_SET: {
                 AttributeSetOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
+                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }

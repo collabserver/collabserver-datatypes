@@ -34,7 +34,7 @@ class Operation {
          *
          * \return ID of the operation's type.
          */
-        virtual int getType() const = 0;
+        virtual unsigned int getType() const = 0;
 
         /**
          * Serialize the operation data in internal packed format.

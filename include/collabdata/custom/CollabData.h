@@ -124,22 +124,20 @@ class CollabData {
         /**
          * Apply an operation received from external component.
          * Operation is received in its serialized form.
-         * This doesn't notify the broadcaster but only the Operation Observers.
          * Do nothing if unable to unserialize and return false.
+         * This doesn't notify the broadcaster but only the Operation Observers.
          *
          * This may for instance be used by a network component to apply an
          * operation just received. Operation is in its serialized form since
          * other components doesn't know anything about the concrete operations.
          * (Only concrete CollabData implementation knowns)
          *
-         * The first serialized element in buffer must be the operation type.
-         *
-         *
          * \param id Operation's ID.
          * \param buffer Serialized version of the operation.
          * \return True if operation is valid, otherwise, return false.
          */
-        virtual bool applyExternOperation(int id, const std::string& buffer) = 0;
+        virtual bool applyExternOperation(unsigned int id,
+                                          const std::string& buffer) = 0;
 
 
     // -------------------------------------------------------------------------

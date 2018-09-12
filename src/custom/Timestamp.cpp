@@ -13,6 +13,7 @@ unsigned int Timestamp::_effectiveID = 0;
 // -----------------------------------------------------------------------------
 
 Timestamp::Timestamp(const int value) {
+    assert(Timestamp::_effectiveID != 0);
     _id     = Timestamp::_effectiveID;
     _time   = std::chrono::time_point<std::chrono::steady_clock>::min();
 }

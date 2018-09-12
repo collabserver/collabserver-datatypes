@@ -91,8 +91,8 @@ class SimpleGraph : public CollabData {
          * List all possible Operation on this data.
          * Each enum element is the Operation's unique ID for this data.
          */
-        enum Operations : int {
-            OPERATION_VERTEX_ADD = 1,
+        enum Operations : unsigned int {
+            OPERATION_VERTEX_ADD = 1, // Important, first is NOT 0
             OPERATION_VERTEX_REMOVE,
             OPERATION_EDGE_ADD,
             OPERATION_EDGE_REMOVE,
@@ -283,7 +283,8 @@ class SimpleGraph : public CollabData {
     public:
 
         /** \copydoc CollabData::receiveOperation */
-        bool applyExternOperation(int id, const std::string& buffer) override;
+        bool applyExternOperation(unsigned int id,
+                                  const std::string& buffer) override;
 };
 
 
@@ -477,7 +478,7 @@ class SimpleGraph::VertexAddOperation : public Operation {
         void accept(OperationHandler& handler) const override;
         const UUID& vertexID() const { return _vertexID; }
         const Timestamp& timestamp() const { return _timestamp; }
-        int getType() const override { return OPERATION_VERTEX_ADD; }
+        unsigned int getType() const override { return OPERATION_VERTEX_ADD; }
 };
 
 
@@ -495,7 +496,7 @@ class SimpleGraph::VertexRemoveOperation : public Operation {
         void accept(OperationHandler& handler) const override;
         const UUID& vertexID() const { return _vertexID; }
         const Timestamp& timestamp() const { return _timestamp; }
-        int getType() const override { return OPERATION_VERTEX_REMOVE; }
+        unsigned int getType() const override { return OPERATION_VERTEX_REMOVE; }
 };
 
 
@@ -516,7 +517,7 @@ class SimpleGraph::EdgeAddOperation : public Operation {
         const UUID& fromID() const { return _fromID; }
         const UUID& toID() const { return _toID; }
         const Timestamp& timestamp() const { return _timestamp; }
-        int getType() const override { return OPERATION_EDGE_ADD; }
+        unsigned int getType() const override { return OPERATION_EDGE_ADD; }
 };
 
 
@@ -537,7 +538,7 @@ class SimpleGraph::EdgeRemoveOperation : public Operation {
         const UUID& fromID() const { return _fromID; }
         const UUID& toID() const { return _toID; }
         const Timestamp& timestamp() const { return _timestamp; }
-        int getType() const override { return OPERATION_EDGE_REMOVE; }
+        unsigned int getType() const override { return OPERATION_EDGE_REMOVE; }
 };
 
 
@@ -560,7 +561,7 @@ class SimpleGraph::AttributeAddOperation : public Operation {
         const Timestamp& timestamp() const { return _timestamp; }
         const std::string& attributeName() const { return _attributeName; }
         const std::string& attributeValue() const { return _attributeValue; }
-        int getType() const override { return OPERATION_ATTRIBUTE_ADD; }
+        unsigned int getType() const override { return OPERATION_ATTRIBUTE_ADD; }
 };
 
 
@@ -581,7 +582,7 @@ class SimpleGraph::AttributeRemoveOperation : public Operation {
         const UUID& vertexID() const { return _vertexID; }
         const Timestamp& timestamp() const { return _timestamp; }
         const std::string& attributeName() const { return _attributeName; }
-        int getType() const override { return OPERATION_ATTRIBUTE_REMOVE; }
+        unsigned int getType() const override { return OPERATION_ATTRIBUTE_REMOVE; }
 };
 
 
@@ -605,7 +606,7 @@ class SimpleGraph::AttributeSetOperation : public Operation {
         const Timestamp& timestamp() const { return _timestamp; }
         const std::string& attributeName() const { return _attributeName; }
         const std::string& newValue() const { return _newValue; }
-        int getType() const override { return OPERATION_ATTRIBUTE_SET; }
+        unsigned int getType() const override { return OPERATION_ATTRIBUTE_SET; }
 };
 
 
