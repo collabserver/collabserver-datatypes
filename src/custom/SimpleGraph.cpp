@@ -1,8 +1,12 @@
 #include "collabdata/custom/SimpleGraph.h"
 
+#include <mutex>
 #include <sstream>
 
 namespace collab {
+
+
+static std::mutex l_opMutex; // Only one operation at the time
 
 
 // -----------------------------------------------------------------------------
@@ -121,6 +125,7 @@ void SimpleGraph::setAttribute(const UUID& id, const std::string& name,
 // -----------------------------------------------------------------------------
 
 void SimpleGraph::applyOperation(const VertexAddOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& id        = op.vertexID();
     bool isAdded    = _graph.add_vertex(id, tnow);
@@ -130,6 +135,7 @@ void SimpleGraph::applyOperation(const VertexAddOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const VertexRemoveOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& id        = op.vertexID();
     bool isRemoved  = _graph.remove_vertex(id, tnow);
@@ -139,6 +145,7 @@ void SimpleGraph::applyOperation(const VertexRemoveOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const EdgeAddOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& from      = op.fromID();
     auto& to        = op.toID();
@@ -157,6 +164,7 @@ void SimpleGraph::applyOperation(const EdgeAddOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const EdgeRemoveOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& from      = op.fromID();
     auto& to        = op.toID();
@@ -167,6 +175,7 @@ void SimpleGraph::applyOperation(const EdgeRemoveOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const AttributeAddOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& id        = op.vertexID();
     auto& attrName  = op.attributeName();
@@ -194,6 +203,7 @@ void SimpleGraph::applyOperation(const AttributeAddOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const AttributeRemoveOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& id        = op.vertexID();
     auto& attrName  = op.attributeName();
@@ -216,6 +226,7 @@ void SimpleGraph::applyOperation(const AttributeRemoveOperation& op) {
 }
 
 void SimpleGraph::applyOperation(const AttributeSetOperation& op) {
+    std::lock_guard<std::mutex> lock(l_opMutex);
     auto& tnow      = op.timestamp();
     auto& id        = op.vertexID();
     auto& newValue  = op.newValue();
@@ -261,7 +272,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_VERTEX_ADD: {
                 VertexAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -270,7 +280,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_VERTEX_REMOVE: {
                 VertexRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -279,7 +288,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_EDGE_ADD: {
                 EdgeAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -288,7 +296,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_EDGE_REMOVE: {
                 EdgeRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -297,7 +304,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_ATTRIBUTE_ADD: {
                 AttributeAddOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -306,7 +312,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_ATTRIBUTE_REMOVE: {
                 AttributeRemoveOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }
@@ -315,7 +320,6 @@ bool SimpleGraph::applyExternOperation(unsigned int id, const std::string& buffe
         case OPERATION_ATTRIBUTE_SET: {
                 AttributeSetOperation op;
                 if(!op.unserialize(opBuffer)) { return false; }
-                assert(op.timestamp().getID() != _localID);
                 Timestamp::setEffectiveID(op.timestamp().getID());
                 applyOperation(op);
             }

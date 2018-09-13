@@ -32,6 +32,12 @@ namespace collab {
  * You may read the documentation from CollabData to understand about
  * Operation, OperationObserver and broadcaster.
  *
+ * \par Thread-Safe
+ * All operations are thread safe.
+ * Note that thread-safe and collaboration are not the same.
+ * Collaboration allows several users to apply operations that are logically
+ * concurrent. Thread safe allows operations to be applied from several threads.
+ *
  *
  * \see CollabData
  * \see Operation
