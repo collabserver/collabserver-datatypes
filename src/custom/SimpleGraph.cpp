@@ -29,6 +29,10 @@ SimpleGraph* SimpleGraph::buildNew(unsigned int localID) {
 // Capacity
 // -----------------------------------------------------------------------------
 
+bool SimpleGraph::empty() const noexcept {
+    return _graph.empty();
+}
+
 size_t SimpleGraph::nbVertices() const noexcept {
     return _graph.size_vertex();
 }

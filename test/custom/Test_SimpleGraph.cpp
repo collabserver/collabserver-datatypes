@@ -76,6 +76,22 @@ class ObserverMock : public OperationObserver {
 
 
 // -----------------------------------------------------------------------------
+// empty()
+// -----------------------------------------------------------------------------
+
+TEST(SimpleGraph, emptyTest) {
+    SimpleGraph data0 = SimpleGraph::build(localUserID);
+    ASSERT_TRUE(data0.empty());
+
+    data0.addVertex("v1");
+    ASSERT_FALSE(data0.empty());
+
+    data0.removeVertex("v1");
+    ASSERT_TRUE(data0.empty());
+}
+
+
+// -----------------------------------------------------------------------------
 // at()
 // -----------------------------------------------------------------------------
 
