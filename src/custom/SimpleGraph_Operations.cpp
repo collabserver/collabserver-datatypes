@@ -10,7 +10,7 @@
 #define MACRO_UNPACK_TIMESTAMP(data, size, off)                                 \
     msgpack::object_handle _r1 = msgpack::unpack(data, size, off);              \
     msgpack::object_handle _r2 = msgpack::unpack(data, size, off);              \
-    int userID = _r1.get().as<unsigned int>();                                  \
+    unsigned int userID = _r1.get().as<unsigned int>();                                  \
     auto time = _r2.get().as<Timestamp::Clock::rep>();                          \
     Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);        \
     _timestamp = Timestamp(Timestamp::TimePoint(ellie), userID)
@@ -294,7 +294,7 @@ SimpleGraph::AttributeSetOperation::AttributeSetOperation(
         : _vertexID(id),
           _timestamp(time),
           _attributeName(name),
-          _newValue(nVal) {
+          _attributeValue(nVal) {
 }
 
 bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) const {
@@ -302,7 +302,7 @@ bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) co
 
     msgpack::pack(buffer, _vertexID);
     msgpack::pack(buffer, _attributeName);
-    msgpack::pack(buffer, _newValue);
+    msgpack::pack(buffer, _attributeValue);
     msgpack::pack(buffer, _timestamp.getID());
     msgpack::pack(buffer, time.count());
 
@@ -318,7 +318,7 @@ bool SimpleGraph::AttributeSetOperation::unserialize(const std::stringstream& bu
 
     r1.get().convert(_vertexID);
     r2.get().convert(_attributeName);
-    r3.get().convert(_newValue);
+    r3.get().convert(_attributeValue);
 
     MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 

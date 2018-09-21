@@ -22,13 +22,13 @@ TEST(SimpleGraph, vertexAddOperation_serializeUnserialize) {
     SimpleGraph::VertexAddOperation op = {vertexID, time};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.vertexID(), vertexID);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getVertexID(), vertexID);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
 
@@ -44,13 +44,13 @@ TEST(SimpleGraph, vertexRemoveOperation_serializeUnserialize) {
     SimpleGraph::VertexRemoveOperation op = {vertexID, time};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.vertexID(), vertexID);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getVertexID(), vertexID);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
 
@@ -67,14 +67,14 @@ TEST(SimpleGraph, edgeAddOperation_serializeUnserialize) {
     SimpleGraph::EdgeAddOperation op = {vertex1, vertex2, time};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.fromID(), vertex1);
-    ASSERT_EQ(op.toID(), vertex2);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getFromID(), vertex1);
+    ASSERT_EQ(op.getToID(), vertex2);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
 
@@ -91,14 +91,14 @@ TEST(SimpleGraph, edgeRemoveOperation_serializeUnserialize) {
     SimpleGraph::EdgeRemoveOperation op = {vertex1, vertex2, time};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.fromID(), vertex1);
-    ASSERT_EQ(op.toID(), vertex2);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getFromID(), vertex1);
+    ASSERT_EQ(op.getToID(), vertex2);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
 
@@ -116,15 +116,15 @@ TEST(SimpleGraph, attributeAddOperation_serializeUnserialize) {
     SimpleGraph::AttributeAddOperation op = {vertexID, time, attrName, attrValue};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.vertexID(), vertexID);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
-    ASSERT_EQ(op.attributeName(), attrName);
-    ASSERT_EQ(op.attributeValue(), attrValue);
+    ASSERT_EQ(op.getVertexID(), vertexID);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getAttributeName(), attrName);
+    ASSERT_EQ(op.getAttributeValue(), attrValue);
 }
 
 
@@ -141,14 +141,14 @@ TEST(SimpleGraph, attributeRemoveOperation_serializeUnserialize) {
     SimpleGraph::AttributeRemoveOperation op = {vertexID, time, attrName};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.vertexID(), vertexID);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
-    ASSERT_EQ(op.attributeName(), attrName);
+    ASSERT_EQ(op.getVertexID(), vertexID);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getAttributeName(), attrName);
 }
 
 
@@ -166,15 +166,15 @@ TEST(SimpleGraph, attributeSetOperation_serializeUnserialize) {
     SimpleGraph::AttributeSetOperation op = {vertexID, time, attrName, attrValue};
     std::stringstream buffer;
 
-    Timestamp oldTime = op.timestamp();
+    Timestamp oldTime = op.getTimestamp();
 
     EXPECT_TRUE(op.serialize(buffer));
     EXPECT_TRUE(op.unserialize(buffer));
 
-    ASSERT_EQ(op.vertexID(), vertexID);
-    ASSERT_EQ(op.timestamp().getTime(), oldTime.getTime());
-    ASSERT_EQ(op.attributeName(), attrName);
-    ASSERT_EQ(op.newValue(), attrValue);
+    ASSERT_EQ(op.getVertexID(), vertexID);
+    ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
+    ASSERT_EQ(op.getAttributeName(), attrName);
+    ASSERT_EQ(op.getAttributeValue(), attrValue);
 }
 
 

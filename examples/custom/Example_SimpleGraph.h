@@ -4,7 +4,14 @@
 
 namespace collab {
 
+
 static const unsigned int localID = 42;
+
+
+
+// -----------------------------------------------------------------------------
+// End user SimpleGraph Handler / Observer
+// -----------------------------------------------------------------------------
 
 
 // Example of end-user handler for each operation on SimpleGraph
@@ -45,11 +52,15 @@ class SimpleGraphObserver : public OperationObserver {
 };
 
 
+// -----------------------------------------------------------------------------
+// Example
+// -----------------------------------------------------------------------------
+
 void SimpleGraph_example() {
     std::cout << "\n----- SimpleGraph Example ----------\n";
 
     // Init workflow
-    SimpleGraph data0(localID);
+    SimpleGraph data0 = SimpleGraph::build(localID);
     SimpleGraphObserver observer;
     data0.addOperationObserver(observer);
 
@@ -73,9 +84,9 @@ void SimpleGraph_example() {
     // Setup v2
     std::cout << "- Setup v2\n";
     data0.addAttribute("v2", "name", "Tracer");
-    data0.setAttribute("v2", "friend", "widow");
+    data0.setAttribute("v2", "friend", "Widow");
     data0.setAttribute("v2", "friend", "Winston");
-    data0.addAttribute("v2", "enemy", "widow");
+    data0.addAttribute("v2", "enemy", "Widow");
 
 
     // Display the graph using iterator

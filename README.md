@@ -78,16 +78,16 @@ The custom data (`SimpleGraph`) is optinal but built as static lib.
 ### CMake options
 - `collab_custom` (ON/OFF): Build the custom static lib (SimpleGraph data)
 - `collab_examples` (ON/OFF): Build several examples
-- `collab_tests` (ON/OFF): Build unit tests (Requires colla_custom ON)
+- `collab_tests` (ON/OFF): Build unit tests (**Requires colla_custom ON**)
 
 ### Build and run tests with CMake
-- Tests naming rule: `MethodName+Test_StateUnderTest`
+- Tests naming rule: `MethodNameTest_StateUnderTest`
 
 ```bash
 # Manual instructions
 mkdir build
 cd build
-cmake -Dcollab_tests=ON ..
+cmake -Dcollab_tests=ON -Dcollab_custom=ON ..
 make -j2
 make runTests
 
@@ -99,7 +99,7 @@ make runTests
 ```bash
 mkdir build
 cd build
-cmake -Dcollab_examples=ON ..
+cmake -Dcollab_examples=ON -Dcollab_custom=ON ..
 make -j2
 make runExamplesCmRDT
 ```
