@@ -63,6 +63,11 @@ The custom data (`SimpleGraph`) is optinal but built as static lib.
 ### Dependencies
 All dependencies are automatically downloaded by CMake and placed in a folder named `dependencies`.
 You may move this folder in another place later and request CMake not to download dependencies anymore (See CMake options).
+
+If you are using a custom permanent location for your dependencies, a convinient solution is to set the environment variable
+`COLLAB_DEPENDENCIES_DIR` with this path.
+CMake will use this one as the default location (except if a custom path is given as CMake parameter).
+
 - [MessagePack](https://msgpack.org/) (Only required by Simple Graph)
 - [GoogleTest](https://github.com/google/googletest) (Only required for tests)
 
