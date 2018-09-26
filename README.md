@@ -49,45 +49,40 @@ CRDT directed graph to end-user application.
 > (At least, some changes may be required).
 
 
-## Requirements
+## Build instructions (CMake)
+Primitive CRDTs are header only.
+The custom data (`SimpleGraph`) is optinal but built as static lib.
+
+### Requirements
 - C++11
 - `pragma once` support
 - Tested with gcc 4.8.4
 - Tested with clang 5.0.0
-- Tested only on Linux. Not support certified for Mac and Windows
+- Tested only on Linux. No support certified for Mac and Windows
 
-
-## Dependencies
-> Dependencies marked with *(CMake)* are automatically downloaded by CMake
-> script and placed in *dependencies* folder.
-- [MessagePack](https://msgpack.org/) (CMake. Only required by Simple Graph)
-- [GoogleTest](https://github.com/google/googletest) (CMake. Only for tests)
-
-
-## Build instructions
-Primitive CRDTs are header only.
-The custom data (`SimpleGraph`) is optinal but built as static lib.
-
-### Build types
-- CMake build types (ex: `-DCMAKE_BUILD_TYPE=Debug`):
-    - Debug
-    - Release
-    - RelWithDebInfo
-    - MinSizeRel
+### Dependencies
+All dependencies are automatically downloaded by CMake and placed in a folder named `dependencies`.
+You may move this folder in another place later and request CMake not to download dependencies anymore (See CMake options).
+- [MessagePack](https://msgpack.org/) (Only required by Simple Graph)
+- [GoogleTest](https://github.com/google/googletest) (Only required for tests)
 
 ### CMake options
-- `collab_custom` (ON/OFF): Build the custom static lib (SimpleGraph data)
-- `collab_examples` (ON/OFF): Build several examples
-- `collab_tests` (ON/OFF): Build unit tests (**Requires colla_custom ON**)
+| Name | Description |
+| --- | --- |
+| COLLAB_DEPENDENCIES_DIR | (STRING) Path to a directory where to find all dependencies (By default, uses current cmake build) |
+| COLLAB_DEPENDENCIES_DOWNLOAD | (ON/OFF) Set ON to also download dependencies at cmake time. This is usefull the first time you setup the project. Dependencies are placed in COLLAB_DEPENDENCIES_DIR. (By default: ON).|
+| COLLAB_TESTS | (ON/OFF) Set ON to build unit tests |
+| COLLAB_EXAMPLES | (ON/OFF) Set ON to build examples |
+| CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
 
 ### Build and run tests with CMake
-- Tests naming rule: `MethodNameTest_StateUnderTest`
+> Tests naming rule: `MethodNameTest_StateUnderTest`
 
 ```bash
 # Manual instructions
 mkdir build
 cd build
-cmake -Dcollab_tests=ON -Dcollab_custom=ON ..
+cmake -DCOLLAB_TESTS=ON ..
 make -j2
 make runTests
 
@@ -99,7 +94,7 @@ make runTests
 ```bash
 mkdir build
 cd build
-cmake -Dcollab_examples=ON -Dcollab_custom=ON ..
+cmake -DCOLLAB_EXAMPLES=ON ..
 make -j2
 make runExamplesCmRDT
 ```
@@ -111,6 +106,8 @@ the headers you need in order to build your concurrent data.
 For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
 To use you data on a CollabServer, your data must implement `CollabData`
 interface.
+The custom data (`SimpleGraph`) is built as static lib, to use it in your
+project, you must include the header and link the library.
 
 
 ## Generate documentation
@@ -156,14 +153,16 @@ All operations are commutative.
 
 ### Papers and web articles
 - Conflict-free Replicated Data Types \
-(https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf)
+  (https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf)
 - A comprehensive study of Convergent and Commutative Replicated Data Types \
-(https://pages.lip6.fr/Marc.Shapiro/papers/Comprehensive-CRDTs-RR7506-2011-01.pdf)
+  (https://pages.lip6.fr/Marc.Shapiro/papers/Comprehensive-CRDTs-RR7506-2011-01.pdf)
 - A Look at Conflict-Free Replicated Data Types (CRDT) \
-(https://medium.com/@istanbul_techie/a-look-at-conflict-free-replicated-data-types-crdt-221a5f629e7e)
+  (https://medium.com/@istanbul_techie/a-look-at-conflict-free-replicated-data-types-crdt-221a5f629e7e)
 - CRDT for collaborative editing by Irisate \
-(https://irisate.com/crdt-for-real-time-collaborative-apps/)
+  (https://irisate.com/crdt-for-real-time-collaborative-apps/)
 
 
 ## Author
 - Constantin Masson ([constantinmasson.com](http://constantinmasson.com/))
+
+
