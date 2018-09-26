@@ -8,9 +8,9 @@ mkdir build || true
 cd build
 
 cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE} \
-      -Dcollab_tests=ON \
-      -Dcollab_custom=ON \
-      -Dcollab_examples=OFF \
+      -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON \
+      -DCOLLAB_TESTS=ON \
+      -DCOLLAB_EXAMPLES=OFF \
       ..
 
 make

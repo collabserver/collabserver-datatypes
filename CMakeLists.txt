@@ -9,31 +9,24 @@ endif()
 # ------------------------------------------------------------------------------
 # Dependencies and Misc
 # ------------------------------------------------------------------------------
-set(collab_dependency_dir "${CMAKE_SOURCE_DIR}/dependencies/")
-
+message(STATUS "Dependencies")
 include("CMake/AddCompilerFlags.cmake")
-include_directories("${CMAKE_SOURCE_DIR}/include/")
+include("CMake/AddDependencies.cmake")
 
 
 # ------------------------------------------------------------------------------
-# Build static lib for Custom data (SimpleGraph)
+# Build custom static lib (SimpleGraph)
 # ------------------------------------------------------------------------------
-option(collab_custom "Build custom static lib" OFF)
-
-if(collab_custom)
-    message(STATUS "Build custom static lib")
-    include("CMake/Dependencies/AddMsgPack.cmake")
-    file(GLOB_RECURSE srcFiles "${CMAKE_SOURCE_DIR}/src/*.cpp")
-    add_library(collabdata STATIC ${srcFiles})
-endif()
+message(STATUS "Build custom static lib")
+include("CMake/AddCustom.cmake")
 
 
 # ------------------------------------------------------------------------------
 # Examples
 # ------------------------------------------------------------------------------
-option(collab_examples "Build examples" OFF)
+option(COLLAB_EXAMPLES "Build examples" OFF)
 
-if(collab_examples)
+if(COLLAB_EXAMPLES)
     message(STATUS "Build examples")
     include("CMake/AddExamples.cmake")
 endif()
@@ -42,9 +35,9 @@ endif()
 # ------------------------------------------------------------------------------
 # Tests
 # ------------------------------------------------------------------------------
-option(collab_tests "Build tests" OFF)
+option(COLLAB_TESTS "Build tests" OFF)
 
-if(collab_tests)
+if(COLLAB_TESTS)
     message(STATUS "Build tests")
     include("CMake/AddTests.cmake")
 endif()
