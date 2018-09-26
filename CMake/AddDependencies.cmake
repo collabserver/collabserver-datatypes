@@ -1,4 +1,4 @@
-option(COLLAB_DEPENDENCIES_DOWNLOAD "Download dependencies" ON)
+option(COLLAB_DEPENDENCIES_DOWNLOAD "Download dependencies" OFF)
 
 
 # ------------------------------------------------------------------------------

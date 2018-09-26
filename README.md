@@ -62,9 +62,9 @@ The custom data (`SimpleGraph`) is optinal but built as static lib.
 
 ### Dependencies
 All dependencies are automatically downloaded by CMake and placed in a folder named `dependencies`.
-You may move this folder in another place later and request CMake not to download dependencies anymore (See CMake options).
+You may move this folder in another place later and request CMake not to download dependencies anymore (**See CMake options**).
 
-If you are using a custom permanent location for your dependencies, a convinient solution is to set the environment variable
+If you are using a custom permanent location for your dependencies, a convenient solution is to set the environment variable
 `COLLAB_DEPENDENCIES_DIR` with this path.
 CMake will use this one as the default location (except if a custom path is given as CMake parameter).
 
@@ -75,7 +75,7 @@ CMake will use this one as the default location (except if a custom path is give
 | Name | Description |
 | --- | --- |
 | COLLAB_DEPENDENCIES_DIR | (STRING) Path to a directory where to find all dependencies (By default, uses current cmake build) |
-| COLLAB_DEPENDENCIES_DOWNLOAD | (ON/OFF) Set ON to also download dependencies at cmake time. This is usefull the first time you setup the project. Dependencies are placed in COLLAB_DEPENDENCIES_DIR. (By default: ON).|
+| COLLAB_DEPENDENCIES_DOWNLOAD | (ON/OFF) Set ON to also download dependencies at cmake time. This is useful the first time you setup the project. Dependencies are placed in COLLAB_DEPENDENCIES_DIR. (By default: OFF).|
 | COLLAB_TESTS | (ON/OFF) Set ON to build unit tests |
 | COLLAB_EXAMPLES | (ON/OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
