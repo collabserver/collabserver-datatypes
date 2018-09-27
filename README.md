@@ -87,7 +87,7 @@ CMake will use this one as the default location (except if a custom path is give
 # Manual instructions
 mkdir build
 cd build
-cmake -DCOLLAB_TESTS=ON ..
+cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_TESTS=ON ..
 make -j2
 make runTests
 
@@ -99,7 +99,7 @@ make runTests
 ```bash
 mkdir build
 cd build
-cmake -DCOLLAB_EXAMPLES=ON ..
+cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_EXAMPLES=ON ..
 make -j2
 make runExamplesCmRDT
 ```

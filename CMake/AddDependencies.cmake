@@ -9,13 +9,16 @@ option(COLLAB_DEPENDENCIES_DOWNLOAD "Download dependencies" OFF)
 if(DEFINED COLLAB_DEPENDENCIES_DIR)
     set(COLLAB_DEPENDENCIES_DIR ${COLLAB_DEPENDENCIES_DIR}
         CACHE PATH "Path to the dependencies folder")
+
 elseif(IS_DIRECTORY $ENV{COLLAB_DEPENDENCIES_DIR})
     set(COLLAB_DEPENDENCIES_DIR $ENV{COLLAB_DEPENDENCIES_DIR}
         CACHE PATH "Path to the dependencies folder")
+
 else()
     set(COLLAB_DEPENDENCIES_DIR "${CMAKE_BINARY_DIR}/dependencies"
         CACHE PATH "Path to the dependencies folder")
     file(MAKE_DIRECTORY "${CMAKE_BINARY_DIR}/dependencies")
+
 endif()
 
 message(STATUS "Dependencies path: ${COLLAB_DEPENDENCIES_DIR}")

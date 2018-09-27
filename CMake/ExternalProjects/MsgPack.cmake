@@ -6,8 +6,8 @@ include(ExternalProject)
 ExternalProject_Add(msgpack
     GIT_REPOSITORY      "https://github.com/msgpack/msgpack-c.git"
     GIT_TAG             "master"
-    SOURCE_DIR          "${COLLAB_DEP_MSGPACK}/sources"
-    BINARY_DIR          "${COLLAB_DEP_MSGPACK}/build"
+    SOURCE_DIR          "${COLLAB_MSGPACK_SOURCES}"
+    BINARY_DIR          "${COLLAB_MSGPACK_BUILD}"
     CONFIGURE_COMMAND   ""
     BUILD_COMMAND       ""
     INSTALL_COMMAND     ""
