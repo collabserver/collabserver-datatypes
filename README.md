@@ -1,15 +1,14 @@
-# Conflict-free Replicated Data Types (CRDTs)
+# CollabServer - Conflict-free Replicated DataTypes (CRDTs)
 
-[![release-version](https://img.shields.io/badge/release-beta--version-red.svg)]()
-[![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
 [![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
+[![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
 
 | master | dev |
 | :-----: | :----: |
 | [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts) | [![build-status-dev](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=dev)](https://travis-ci.org/CollabServer/collab-data-crdts) |
 
 
-## Description
+# Overview
 Defines a set of basic CRDTs that may be used to build your more complex data
 (on top of these structures).
 CRDTs stands for Conflict-free Replicated Data Structure.
@@ -23,7 +22,20 @@ data on top of primitive CRDTs. SimpleGraph is a full example of
 CRDT directed graph to end-user application.
 
 
-## Features
+# Quick Start
+- CRDTs primitive are header only (LWWGraph, LWWMap...)
+- Custom data (Optional) is a static lib (SimpleGraph, Timestamp...)
+
+CRDTs primitives are header only (`CmRDT`, `CvRDT`), you only need to include
+the headers you need in order to build your concurrent data.
+For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
+To use you data on a CollabServer, your data must implement `CollabData`
+interface.
+The custom data (`SimpleGraph`) is built as static lib, to use it in your
+project, you must include the header and link the library.
+
+
+# Features
 - **CmRDT** (Operation-based)
     - *LWWGraph*: Last-Write-Wins Graph
     - *LWWMap*: Last-Write-Wins Map
@@ -49,30 +61,31 @@ CRDT directed graph to end-user application.
 > (At least, some changes may be required).
 
 
-## Build instructions (CMake)
-Primitive CRDTs are header only.
-The custom data (`SimpleGraph`) is optinal but built as static lib.
+# Build on Linux (CMake)
+**Build tests**
+```bash
+mkdir build
+cd build
+cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_TESTS=ON ..
+make
+make runTests
 
-### Requirements
-- C++11
-- `pragma once` support
-- Tested with gcc 4.8.4
-- Tested with clang 5.0.0
-- Tested only on Linux. No support certified for Mac and Windows
+# Or use build script
+./build.sh
+```
 
-### Dependencies
-All dependencies are automatically downloaded by CMake and placed in a folder named `dependencies`.
-You may move this folder in another place later and request CMake not to download dependencies anymore (**See CMake options**).
+**Build examples**
+```bash
+mkdir build
+cd build
+cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_EXAMPLES=ON ..
+make
+make runExamplesCmRDT
+```
 
-If you are using a custom permanent location for your dependencies, a convenient solution is to set the environment variable
-`COLLAB_DEPENDENCIES_DIR` with this path.
-CMake will use this one as the default location (except if a custom path is given as CMake parameter).
+**CMake options**
 
-- [MessagePack](https://msgpack.org/) (Only required by Simple Graph)
-- [GoogleTest](https://github.com/google/googletest) (Only required for tests)
-
-### CMake options
-| Name | Description |
+| CMake option name | Description |
 | --- | --- |
 | COLLAB_DEPENDENCIES_DIR | (STRING) Path to a directory where to find all dependencies (By default, uses current cmake build) |
 | COLLAB_DEPENDENCIES_DOWNLOAD | (ON/OFF) Set ON to also download dependencies at cmake time. This is useful the first time you setup the project. Dependencies are placed in COLLAB_DEPENDENCIES_DIR. (By default: OFF).|
@@ -80,52 +93,33 @@ CMake will use this one as the default location (except if a custom path is give
 | COLLAB_EXAMPLES | (ON/OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
 
-### Build and run tests with CMake
-> Tests naming rule: `MethodNameTest_StateUnderTest`
 
-```bash
-# Manual instructions
-mkdir build
-cd build
-cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_TESTS=ON ..
-make -j2
-make runTests
-
-# Or use build script
-./build.sh
-```
-
-### Build and run examples with CMake
-```bash
-mkdir build
-cd build
-cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_EXAMPLES=ON ..
-make -j2
-make runExamplesCmRDT
-```
+# Requirements
+- C++11
+- `pragma once` support
+- Tested with gcc 4.8.4
+- Tested with clang 5.0.0
+- Tested only on Linux. No support certified for Mac and Windows
 
 
-## Getting started
-CRDTs primitives are header only (`CmRDT`, `CvRDT`), you only need to include
-the headers you need in order to build your concurrent data.
-For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
-To use you data on a CollabServer, your data must implement `CollabData`
-interface.
-The custom data (`SimpleGraph`) is built as static lib, to use it in your
-project, you must include the header and link the library.
+# Dependencies
+- Automatically downloaded and built by CMake
+    - [MessagePack](https://msgpack.org/) (Release 3.1.1)
+    - [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
+
+**Option: save dependencies for offline use**
+> Dependencies downloaded by CMake are placed in the current CMake build folder
+> (in `dependencies` folder).
+> This is useful the firs time.
+> To speedup the cmake process, you may keep these downloaded and built dependencies
+> in a safe place and change the CMake dependencies path (See CMake options).
+
+**Option: use environment variable for dependencies path**
+> If `COLLAB_DEPENDENCIES_DIR` environment variable is set, CMake will use
+> it as the current dependencies path.
 
 
-## Generate documentation
-- [Doxygen](https://www.stack.nl/~dimitri/doxygen/)
-
-Generate documentation with `doxygen Doxyfile`.
-Generated files are places in `doc` folder.
-
-
-## Resources
-
-### CRDTs theoretical description
-
+# CRDTs theoretical description
 - **State-based object (CvRDT)** \
 CvRDT stands for Convergent Replicated Data Types.
 Updates are applied locally, then the whole data state is sent to others.
@@ -156,7 +150,7 @@ All operations are commutative.
 ```
 
 
-### Papers and web articles
+# Papers and Resources
 - Conflict-free Replicated Data Types \
   (https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf)
 - A comprehensive study of Convergent and Commutative Replicated Data Types \
@@ -167,7 +161,22 @@ All operations are commutative.
   (https://irisate.com/crdt-for-real-time-collaborative-apps/)
 
 
-## Author
+# Generate Documentation
+1. Install [Doxygen](https://www.stack.nl/~dimitri/doxygen/)
+1. `doxygen Doxyfile`
+1. Files are placed in `doc` folder
+
+
+# Contribution
+Feel free to ask me any question, share your ideas or open an issue.
+I created this project during my master thesis at University of Montreal.
+I generally try to follow the [Google C++ Coding Style](https://google.github.io/styleguide/cppguide.html)
+with some exceptions (For instance, I use 4 space indentation).
+
+Uses C++11
+
+
+# Author
 - Constantin Masson ([constantinmasson.com](http://constantinmasson.com/))
 
 
