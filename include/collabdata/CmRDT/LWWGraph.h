@@ -499,12 +499,10 @@ class LWWGraph {
         bool remove_vertex(const Key& key, const U& stamp) {
             bool isVertexRemoved = _adj.remove(key, stamp);
 
-            // Remove all vertex's edges
+            // Remove all edges of this vertex
             auto from_it = _adj.crdt_find(key);
             auto& edges = from_it->second.value()._edges;
-            for(auto it = edges.crdt_begin(); it != edges.crdt_end(); ++it) {
-                edges.remove(it->first, stamp);
-            }
+            edges.clear(stamp);
 
             // Remove all edge to this vertex (On others vertex)
             for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
@@ -547,7 +545,7 @@ class LWWGraph {
 
             auto from_it = _adj.crdt_find(from);
             Vertex& vertex = from_it->second.value();
-            bool isAdded = vertex._edges.add(to, stamp);
+            info.isEdgeAdded = vertex._edges.add(to, stamp);
 
             // If edge added, check whether vertex from or to are not removed.
             // If one of them is removed, this newly created edge must be
@@ -572,7 +570,6 @@ class LWWGraph {
                     return info;
                 }
             }
-            info.isEdgeAdded = isAdded;
             return info;
         }
 

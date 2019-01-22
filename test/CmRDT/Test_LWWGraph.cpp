@@ -1728,6 +1728,24 @@ TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReaddedReturnType) {
 }
 
 
+TEST(LWWGraph, removeVertexTest_AddEdgeConcurrentWithFromDeletedLater) {
+    LWWGraph<std::string, int, int> data0;
+
+    // Init v1, v2, then remove v1, then receive older add_edge
+    data0.add_vertex("v1", 1);
+    data0.add_vertex("v2", 1);
+    data0.remove_vertex("v1", 3);
+    data0.add_edge("v1", "v2", 2);
+
+    // Check internal state
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v1"), "v1", true, 3, data0);
+    _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v2"), "v2", false, 2, data0);
+
+    ASSERT_FALSE(data0.has_edge("v1", "v2"));
+    ASSERT_TRUE(data0.crdt_has_edge("v1", "v2"));
+}
+
+
 // -----------------------------------------------------------------------------
 // crdt_size()
 // -----------------------------------------------------------------------------
