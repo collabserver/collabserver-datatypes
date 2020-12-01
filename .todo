@@ -2,8 +2,11 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ✔ Remove the deprecated code such as CmRDTs @done(20-12-01 03:55)
-    ✔ Remove SimpleGraph (and place it in collab-poc) @done(20-12-01 03:53)
+    ☐ Rename `CmRDT` to `LWW` (because the conflict resolution technique is what matters)
+    ☐ Remove the `custom` folder (place directly in `collabdata`)
+    ☐ Rename the namespace `collab` to `collabserver`
+    ☐ Rename `include/collabdata` to `include collabserver`
+    ☐ Remove examples as the tests are doing exactly the same things
 Build:
     ☐ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder
     ☐ Place dependencies in the folder `extern` (add it in the gitignore)
@@ -14,4 +17,6 @@ Readme:
     ☐ Update README with a custom logo
 
 Archive:
+  ✔ Remove the deprecated code such as CmRDTs @done(20-12-01 03:55) @project(Cleanup)
+  ✔ Remove SimpleGraph (and place it in collab-poc) @done(20-12-01 03:53) @project(Cleanup)
   ✔ Add autoformat with `clang-format` @done(20-12-01 03:03) @project(Cleanup)
