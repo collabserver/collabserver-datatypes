@@ -26,7 +26,7 @@ CRDT directed graph to end-user application.
 - CRDTs primitive are header only (LWWGraph, LWWMap...)
 - Custom data (Optional) is a static lib (SimpleGraph, Timestamp...)
 
-CRDTs primitives are header only (`CmRDT`, `CvRDT`), you only need to include
+CRDTs primitives are header only, you only need to include
 the headers you need in order to build your concurrent data.
 For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
 To use you data on a CollabServer, your data must implement `CollabData`
@@ -41,14 +41,6 @@ project, you must include the header and link the library.
     - *LWWMap*: Last-Write-Wins Map
     - *LWWRegister*: Last-Write-Wins Register
     - *LWWSet*: Last-Write-Wins Set
-- **CvRDT** (State-based. See warning)
-    - *2PSet*: Add / Remove set (Two-phases Set)
-    - *GCounter*: Grow-only counter
-    - *GGraph*: Grow-only graph
-    - *GMap*: Grow-only map
-    - *GSet*: Grow-only set
-    - *LWWRegister*: Last-Write-Wins Register
-    - *PNCounter*: Increment / Decrement counter
 - **custom** (Assets classes to implements data for CollabServer)
     - *CollabData*: High level abstraction for data built on tope of CRDTs.
     - *Operation*: Represents a modification on a CollabData.
@@ -56,9 +48,6 @@ project, you must include the header and link the library.
     - *OperationObserver*: Interface for Operation observer.
     - *SimpleGraph*: Example of a CollabData: directed graph with attributes.
     - *Timestamp*: Example of custom timestamp. (Used by SimpleGraph)
-
-> **Warning**: I wrote the CvRDTs as an example. They are not meant to be used.
-> (At least, some changes may be required).
 
 
 # Build on Linux (CMake)
