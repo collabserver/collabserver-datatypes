@@ -1,12 +1,11 @@
 #pragma once
 
-#include "collabdata/CvRDT/GCounter.h"
-
 #include <iostream>
+
+#include "collabdata/CvRDT/GCounter.h"
 
 namespace collab {
 namespace CvRDT {
-
 
 void GCounter_example() {
     std::cout << "\n----- CvRDT GCounter Example ----------\n";
@@ -14,17 +13,14 @@ void GCounter_example() {
     GCounter<int, std::string> data0("user1");
     GCounter<int, std::string> data1("user2");
 
-
     // --- Replicate 0 (data0) ---
     data0.increment();
     data0.increment();
     data0.increment();
 
-
     // --- Replicate 1 (data1) ---
     data1.increment();
     data1.increment();
-
 
     // --- Final ---
     std::cout << "data0 before merge: " << data0 << "\n";
@@ -41,4 +37,5 @@ void GCounter_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-}} // End namespaces
+}  // namespace CvRDT
+}  // namespace collab

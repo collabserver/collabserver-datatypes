@@ -1,19 +1,16 @@
-#include "collabdata/CmRDT/LWWSet.h"
-
 #include <gtest/gtest.h>
 
+#include "collabdata/CmRDT/LWWSet.h"
 
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it_, key_, is_removed_, stamp_, data_) \
-    ASSERT_TRUE(elt_it_ != data_.crdt_end()); \
-    EXPECT_EQ(elt_it_->first, key_); \
-    EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_); \
+    ASSERT_TRUE(elt_it_ != data_.crdt_end());                     \
+    EXPECT_EQ(elt_it_->first, key_);                              \
+    EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_);          \
     EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
-
 
 namespace collab {
 namespace CmRDT {
-
 
 // -----------------------------------------------------------------------------
 // empty()
@@ -35,7 +32,6 @@ TEST(LWWSet, emptyTest) {
     ASSERT_FALSE(data0.empty());
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_empty()
 // -----------------------------------------------------------------------------
@@ -55,7 +51,6 @@ TEST(LWWSet, crdtEmptyTest) {
     data0.add(2, 30);
     ASSERT_FALSE(data0.crdt_empty());
 }
-
 
 // -----------------------------------------------------------------------------
 // size()
@@ -140,7 +135,7 @@ TEST(LWWSet, sizeTest_WithRemoveFirst) {
     data0.remove(1, 29);
     data0.remove(1, 25);
     data0.remove(1, 21);
-    ASSERT_EQ(data0.size(), 0); // 0, not -5 or shit
+    ASSERT_EQ(data0.size(), 0);  // 0, not -5 or shit
 
     data0.add(1, 10);
     ASSERT_EQ(data0.size(), 0);
@@ -165,9 +160,8 @@ TEST(LWWSet, sizeTest_WithOlderRemoveAfterAdd) {
     data0.remove(1, 11);
     data0.remove(1, 12);
     data0.remove(1, 18);
-    ASSERT_EQ(data0.size(), 1); // Not removed (See timestamps)
+    ASSERT_EQ(data0.size(), 1);  // Not removed (See timestamps)
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_size()
@@ -193,7 +187,6 @@ TEST(LWWSet, crdtSizeTest) {
     data0.remove(3, 300);
     ASSERT_EQ(data0.crdt_size(), 3);
 }
-
 
 // -----------------------------------------------------------------------------
 // count()
@@ -225,7 +218,6 @@ TEST(LWWSet, countTest_AfterRemove) {
     data0.remove(42, 20);
     ASSERT_EQ(data0.count(42), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_count()
@@ -261,20 +253,18 @@ TEST(LWWSet, crdtCountTest_AfterRemove) {
     ASSERT_EQ(data0.crdt_count(42), 1);
 }
 
-
 // -----------------------------------------------------------------------------
 // max_size()
 // -----------------------------------------------------------------------------
 
 TEST(LWWSet, maxSizeTest) {
     // Well, this is not really a test, my goal here is just to call max_size
-    // (So that I'm sure it's compiling). But max_size itself is just a 
+    // (So that I'm sure it's compiling). But max_size itself is just a
     // 'foward' of unordered_map::max_size. See code.
     LWWSet<int, int> data0;
-    LWWSet<int,int>::size_type t = data0.max_size();
+    LWWSet<int, int>::size_type t = data0.max_size();
     ASSERT_TRUE(t > 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_find()
@@ -301,7 +291,6 @@ TEST(LWWSet, crdtFindTest) {
     coco = data0.crdt_find("xxx");
     EXPECT_TRUE(coco == data0.crdt_end());
 }
-
 
 // -----------------------------------------------------------------------------
 // find()
@@ -332,7 +321,6 @@ TEST(LWWSet, findTest_RemovedElement) {
     auto e1 = data0.find("e1");
     EXPECT_EQ(e1, data0.end());
 }
-
 
 // -----------------------------------------------------------------------------
 // clear()
@@ -413,7 +401,6 @@ TEST(LWWSet, clearTest_Indenpotent) {
     EXPECT_EQ(data0.size(), 5);
     EXPECT_EQ(data0.crdt_size(), 5);
 
-
     // Newer clear called first
     data0.clear(30);
     data0.clear(30);
@@ -471,12 +458,12 @@ TEST(LWWSet, clearTest_ReturnType) {
     data0.add("e2", 12);
     data0.add("e3", 13);
     EXPECT_TRUE(data0.clear(10));
-    EXPECT_EQ(data0.size(), 3); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 3);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 
     // Duplicate clear later (Is applied)
     EXPECT_TRUE(data0.clear(20));
-    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 0);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 
     // Duplicate calls (Earlier. Not applied)
@@ -485,7 +472,7 @@ TEST(LWWSet, clearTest_ReturnType) {
     EXPECT_FALSE(data0.clear(13));
     EXPECT_FALSE(data0.clear(14));
 
-    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 0);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
@@ -515,7 +502,6 @@ TEST(LWWSet, clearTest_ThenAddAfterOlderClear) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-
 // -----------------------------------------------------------------------------
 // add()
 // -----------------------------------------------------------------------------
@@ -528,7 +514,7 @@ TEST(LWWSet, addTest) {
     data0.add(1, 10);
     data0.add(2, 10);
     data0.add(3, 10);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 10, data0);
     }
@@ -538,7 +524,7 @@ TEST(LWWSet, addTest) {
     data0.add(1, 20);
     data0.add(2, 20);
     data0.add(3, 20);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 20, data0);
     }
@@ -547,7 +533,7 @@ TEST(LWWSet, addTest) {
 TEST(LWWSet, addTest_DuplicateCalls) {
     LWWSet<int, int> data0;
 
-    // Test duplicate add, keep max timestamps 
+    // Test duplicate add, keep max timestamps
     data0.add(42, 15);
     data0.add(42, 14);
     data0.add(42, 18);
@@ -557,7 +543,7 @@ TEST(LWWSet, addTest_DuplicateCalls) {
     auto carrot = data0.crdt_find(42);
     _ASSERT_ELT_EQ(carrot, 42, false, 19, data0);
 
-    // Test duplicate add, keep max timestamps 
+    // Test duplicate add, keep max timestamps
     data0.add(64, 28);
     data0.add(64, 29);
     data0.add(64, 21);
@@ -638,7 +624,6 @@ TEST(LWWSet, addTest_IdempotentReturnType) {
     _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 }
 
-
 // -----------------------------------------------------------------------------
 // remove()
 // -----------------------------------------------------------------------------
@@ -655,7 +640,7 @@ TEST(LWWSet, removeTest) {
     data0.remove(1, 20);
     data0.remove(2, 20);
     data0.remove(3, 20);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto res = data0.crdt_find(k);
         _ASSERT_ELT_EQ(res, k, true, 20, data0);
     }
@@ -754,7 +739,6 @@ TEST(LWWSet, removeTest_IdempotentReturnType) {
     _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 }
 
-
 // -----------------------------------------------------------------------------
 // add() + remove()
 // -----------------------------------------------------------------------------
@@ -827,7 +811,6 @@ TEST(LWWSet, addTest_ConcurrentRemoveUseCase) {
     EXPECT_TRUE(data0.crdt_equal(data1));
 }
 
-
 // -----------------------------------------------------------------------------
 // reserve()
 // -----------------------------------------------------------------------------
@@ -839,7 +822,6 @@ TEST(LWWSet, reserveTest) {
     // For now, just do a call to be sure it compiles.
     data0.reserve(10);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_equal()
@@ -1016,7 +998,6 @@ TEST(LWWSet, crdtEqualTest_EmptyVsAdd) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-
 // -----------------------------------------------------------------------------
 // iterator
 // -----------------------------------------------------------------------------
@@ -1030,7 +1011,7 @@ TEST(LWWSet, iteratorTest_AddRemove) {
     data0.add(2, 12);
     data0.add(3, 13);
     int k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         // Dev note: I'm not sure order is predictable.
         // I use number of iteration instead.
         ++k;
@@ -1041,7 +1022,7 @@ TEST(LWWSet, iteratorTest_AddRemove) {
     data0.remove(0, 20);
     data0.remove(1, 21);
     k = 0;
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         ++k;
     }
     EXPECT_EQ(k, 2);
@@ -1052,7 +1033,7 @@ TEST(LWWSet, iteratorTest_AddRemove) {
     data0.add(6, 32);
     data0.add(7, 33);
     k = 0;
-    for(const auto& elt : data0) { // Just to test 'const' iterator style
+    for (const auto& elt : data0) {  // Just to test 'const' iterator style
         ++k;
     }
     EXPECT_EQ(k, 6);
@@ -1062,7 +1043,7 @@ TEST(LWWSet, iteratorTest_EmptySet) {
     LWWSet<int, int> data0;
 
     // Iterate empty set should be ok (No elt)
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         EXPECT_TRUE(false) << "Iterator should be empty but found " << elt;
     }
 
@@ -1077,7 +1058,7 @@ TEST(LWWSet, iteratorTest_EmptySet) {
     data0.remove(2, 22);
     data0.remove(3, 23);
     data0.remove(4, 24);
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         // data0 should be empty from iterator point of view
         ASSERT_TRUE(false) << "Iterator should be empty but found " << elt;
     }
@@ -1085,7 +1066,7 @@ TEST(LWWSet, iteratorTest_EmptySet) {
     // Add more and remove
     data0.add(5, 30);
     data0.remove(5, 31);
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         // Should be Still empty
         ASSERT_TRUE(false) << "Iterator should be empty but found " << elt;
     }
@@ -1099,7 +1080,7 @@ TEST(LWWSet, iteratorTest_EmptySet) {
     data0.remove(7, 45);
     data0.remove(8, 46);
     data0.remove(9, 47);
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         // Should be Still empty
         ASSERT_TRUE(false) << "Iterator should be empty but found " << elt;
     }
@@ -1114,7 +1095,6 @@ TEST(LWWSet, iteratorTest_Reference) {
     EXPECT_EQ(*it, 1);
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt iterator
 // -----------------------------------------------------------------------------
@@ -1128,7 +1108,7 @@ TEST(LWWSet, crdtIteratorTest_AddRemove) {
     data0.add(2, 10);
     data0.add(3, 10);
     int k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         // Dev note: I'm not sure order is predictable.
         // I use number of iterations instead.
         ++k;
@@ -1141,7 +1121,7 @@ TEST(LWWSet, crdtIteratorTest_AddRemove) {
     data0.remove(0, 20);
     data0.remove(1, 21);
     k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 4);
@@ -1154,7 +1134,7 @@ TEST(LWWSet, crdtIteratorTest_AddRemove) {
     data0.remove(4, 34);
     data0.remove(5, 35);
     k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 8);
@@ -1163,8 +1143,9 @@ TEST(LWWSet, crdtIteratorTest_AddRemove) {
 TEST(LWWSet, crdtIteratorTest_Empty) {
     LWWSet<int, int> data0;
 
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
-        ASSERT_TRUE(false) << "crdt Iterator should be empty";;
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+        ASSERT_TRUE(false) << "crdt Iterator should be empty";
+        ;
     }
 }
 
@@ -1178,7 +1159,7 @@ TEST(LWWSet, crdtIteratorTest_Removed) {
     data0.remove(4, 10);
     data0.remove(5, 10);
     int k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 10);
@@ -1192,7 +1173,7 @@ TEST(LWWSet, crdtIteratorTest_Removed) {
     data0.add(4, 20);
     data0.add(5, 20);
     k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_FALSE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 20);
@@ -1206,7 +1187,7 @@ TEST(LWWSet, crdtIteratorTest_Removed) {
     data0.remove(4, 30);
     data0.remove(5, 30);
     k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 30);
@@ -1233,7 +1214,7 @@ TEST(LWWSet, crdtIteratorTest_Reference) {
     data0.add(3, 30);
     data0.add(4, 30);
     data0.add(5, 30);
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         EXPECT_FALSE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 30);
     }
@@ -1244,12 +1225,11 @@ TEST(LWWSet, crdtIteratorTest_Reference) {
     data0.remove(3, 40);
     data0.remove(4, 40);
     data0.remove(5, 40);
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         EXPECT_TRUE(it->second.isRemoved());
         EXPECT_EQ(it->second.timestamp(), 40);
     }
 }
-
 
 // -----------------------------------------------------------------------------
 // Operator==
@@ -1301,7 +1281,5 @@ TEST(LWWSet, operatorEQTest_DifferentTimestamp) {
     ASSERT_FALSE(data0 != data1);
 }
 
-
-}} // End namespaces
-
-
+}  // namespace CmRDT
+}  // namespace collab

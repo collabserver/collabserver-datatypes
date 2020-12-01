@@ -7,7 +7,6 @@
 namespace collab {
 namespace CvRDT {
 
-
 /**
  * \deprecated
  * I originally made this class as an example and is not fully tested.
@@ -29,116 +28,97 @@ namespace CvRDT {
  */
 template <typename T = int, typename Key = std::string>
 class PNCounter {
-    private:
-        GCounter<T, Key> _positive; // Positive counter
-        GCounter<T, Key> _negative; // Negative counter
+   private:
+    GCounter<T, Key> _positive;  // Positive counter
+    GCounter<T, Key> _negative;  // Negative counter
 
-    public:
-        PNCounter(const Key id) : _positive(id), _negative(id) {}
-
+   public:
+    PNCounter(const Key id) : _positive(id), _negative(id) {}
 
     // -------------------------------------------------------------------------
     // Methods
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Query a copy of the counter value.
+     */
+    T query() const { return _positive.query() - _negative.query(); }
 
-        /**
-         * Query a copy of the counter value.
-         */
-        T query() const {
-            return _positive.query() - _negative.query();
-        }
+    /**
+     * Increment counter by one.
+     */
+    void increment() { _positive.increment(); }
 
-        /**
-         * Increment counter by one.
-         */
-        void increment() {
-            _positive.increment();
-        }
+    /**
+     * Increment counter by specific amount.
+     *
+     * \warning
+     * Positive number expected.
+     * See GSet doc for further information.
+     *
+     * \see GSet::increment(const T& value)
+     */
+    void increment(const T& value) { _positive.increment(value); }
 
-        /**
-         * Increment counter by specific amount.
-         *
-         * \warning
-         * Positive number expected.
-         * See GSet doc for further information.
-         *
-         * \see GSet::increment(const T& value)
-         */
-        void increment(const T& value) {
-            _positive.increment(value);
-        }
+    /**
+     * Decrement counter by one.
+     */
+    void decrement() { _negative.increment(); }
 
-        /**
-         * Decrement counter by one.
-         */
-        void decrement() {
-            _negative.increment();
-        }
+    /**
+     * Increment counter by specific amount.
+     *
+     * \warning
+     * Positive number expected.
+     * See GSet doc for further information.
+     *
+     * \see GSet::increment(const T& value)
+     */
+    void decrement(const T& value) { _negative.increment(value); }
 
-        /**
-         * Increment counter by specific amount.
-         *
-         * \warning
-         * Positive number expected.
-         * See GSet doc for further information.
-         *
-         * \see GSet::increment(const T& value)
-         */
-        void decrement(const T& value) {
-            _negative.increment(value);
-        }
-
-        /**
-         * Merge with another counter.
-         */
-        void merge(const PNCounter& other) {
-            _positive.merge(other._positive);
-            _negative.merge(other._negative);
-        }
-
+    /**
+     * Merge with another counter.
+     */
+    void merge(const PNCounter& other) {
+        _positive.merge(other._positive);
+        _negative.merge(other._negative);
+    }
 
     // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Check if lhs and rhs are equals.
+     * Two PNCounter are equal if their internal state are equals.
+     * (Positive Set and Negative Set equal).
+     *
+     * \return True if strictly equal, otherwise, return false.
+     */
+    friend bool operator==(const PNCounter& lhs, const PNCounter& rhs) {
+        return (lhs._positive == rhs._positive) && (lhs._negative == rhs._negative);
+    }
 
-        /**
-         * Check if lhs and rhs are equals.
-         * Two PNCounter are equal if their internal state are equals.
-         * (Positive Set and Negative Set equal).
-         *
-         * \return True if strictly equal, otherwise, return false.
-         */
-        friend bool operator==(const PNCounter& lhs, const PNCounter& rhs) {
-            return (lhs._positive == rhs._positive)
-                && (lhs._negative == rhs._negative);
-        }
+    /**
+     * Check if lhs and rhs are not equals.
+     * See operator == for further information about equality meaning.
+     *
+     * \return True if strictly not equal, otherwise, return false.
+     */
+    friend bool operator!=(const PNCounter& lhs, const PNCounter& rhs) { return !(lhs == rhs); }
 
-        /**
-         * Check if lhs and rhs are not equals.
-         * See operator == for further information about equality meaning.
-         *
-         * \return True if strictly not equal, otherwise, return false.
-         */
-        friend bool operator!=(const PNCounter& lhs, const PNCounter& rhs) {
-            return !(lhs == rhs);
-        }
-
-        /**
-         * Display internal content.
-         * This is mainly for debug print purpose.
-         */
-        friend std::ostream& operator<<(std::ostream& out, const PNCounter& o) {
-            out << "PNCounter = " << o.query();
-            out << " (" << o._positive << "), (" << o._negative << ")";
-            return out;
-        }
+    /**
+     * Display internal content.
+     * This is mainly for debug print purpose.
+     */
+    friend std::ostream& operator<<(std::ostream& out, const PNCounter& o) {
+        out << "PNCounter = " << o.query();
+        out << " (" << o._positive << "), (" << o._negative << ")";
+        return out;
+    }
 };
 
-
-}} // End namespaces
-
-
+}  // namespace CvRDT
+}  // namespace collab

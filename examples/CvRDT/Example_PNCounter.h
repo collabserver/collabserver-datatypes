@@ -1,19 +1,17 @@
 #pragma once
 
-#include "collabdata/CvRDT/PNCounter.h"
-
 #include <iostream>
+
+#include "collabdata/CvRDT/PNCounter.h"
 
 namespace collab {
 namespace CvRDT {
-
 
 void PNCounter_example() {
     std::cout << "\n----- CvRDT PNCounter Example ----------\n";
 
     PNCounter<int, std::string> data0("user1");
     PNCounter<int, std::string> data1("user2");
-
 
     // --- Replicate 0 (data0) ---
     data0.increment();
@@ -24,7 +22,6 @@ void PNCounter_example() {
     data0.decrement(4);
     // = 2
 
-
     // --- Replicate 1 (data1) ---
     data1.increment();
     data1.increment();
@@ -32,7 +29,6 @@ void PNCounter_example() {
     data1.decrement();
     data1.decrement();
     // = -1
-
 
     // --- Final ---
     std::cout << "data0 before merge: " << data0 << "\n";
@@ -49,5 +45,5 @@ void PNCounter_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespaces
+}  // namespace CvRDT
+}  // namespace collab

@@ -1,20 +1,18 @@
 #pragma once
 
-#include "collabdata/CmRDT/LWWGraph.h"
-
 #include <iostream>
 #include <string>
 
+#include "collabdata/CmRDT/LWWGraph.h"
+
 namespace collab {
 namespace CmRDT {
-
 
 void LWWGraph_example() {
     std::cout << "\n----- CmRDT LWWGraph Example ----------\n";
 
     LWWGraph<std::string, int, int> data0;
     LWWGraph<std::string, int, int> data1;
-
 
     // User 0 creates 2 vertex and link v2 -> v1
     data0.add_vertex("v1", 110);
@@ -26,7 +24,6 @@ void LWWGraph_example() {
     data1.add_vertex("v2", 121);
     data1.add_edge("v1", "v2", 131);
 
-
     // Broadcast changes from 0 to 1
     data1.add_vertex("v1", 110);
     data1.add_vertex("v2", 120);
@@ -37,9 +34,7 @@ void LWWGraph_example() {
     data0.add_vertex("v2", 121);
     data0.add_edge("v1", "v2", 131);
 
-
     // At this point, user0 and user1 have actually the same graph.
-
 
     // User0 add vertex v3 + edge v1 -> v3
     data0.add_edge("v1", "v3", 140);
@@ -47,15 +42,12 @@ void LWWGraph_example() {
     // User1 remove vertex v1
     data1.remove_vertex("v1", 151);
 
-
     // Broadcast changes
     data1.add_edge("v1", "v3", 140);
     data0.remove_vertex("v1", 151);
 
-
     // At this point, user0 and user1 have the same graph.
     // remove_vertex was later, so all edges with v2 are removed.
-
 
     // Final state
     std::cout << "data0 (at the end): " << data0 << "\n";
@@ -66,7 +58,5 @@ void LWWGraph_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespace
-
-
+}  // namespace CmRDT
+}  // namespace collab

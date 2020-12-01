@@ -2,9 +2,7 @@
 
 namespace collab {
 
-
 class Operation;
-
 
 /**
  * \brief
@@ -47,13 +45,10 @@ class Operation;
  * \see OperationObserver
  */
 class OperationHandler {
-    protected:
-        OperationHandler() = default;
-        OperationHandler(const OperationHandler& other) = default;
-        OperationHandler& operator=(const OperationHandler& other) = default;
+   protected:
+    OperationHandler() = default;
+    OperationHandler(const OperationHandler& other) = default;
+    OperationHandler& operator=(const OperationHandler& other) = default;
 };
 
-
-} // End namespace
-
-
+}  // namespace collab

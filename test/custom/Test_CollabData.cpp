@@ -1,55 +1,41 @@
-#include "collabdata/custom/CollabData.h"
-
 #include <gtest/gtest.h>
 
+#include "collabdata/custom/CollabData.h"
 #include "collabdata/custom/Operation.h"
-#include "collabdata/custom/OperationObserver.h"
 #include "collabdata/custom/OperationHandler.h"
+#include "collabdata/custom/OperationObserver.h"
 
 namespace collab {
-
 
 // -----------------------------------------------------------------------------
 // Mock classes
 // -----------------------------------------------------------------------------
 
-static int nbNotified = 0; // Tracks nb of observer notified
+static int nbNotified = 0;  // Tracks nb of observer notified
 
 // -----------------------------------------------------------------------------
 class MockCollabData : public CollabData {
-    public:
-        bool applyExternOperation(unsigned int id, const std::string& buffer) override {
-            return false;
-        }
+   public:
+    bool applyExternOperation(unsigned int id, const std::string& buffer) override { return false; }
 };
 
 // -----------------------------------------------------------------------------
 class MockOperationObserver : public OperationObserver {
-    public:
-        MockOperationObserver() = default;
+   public:
+    MockOperationObserver() = default;
 
-    public:
-        void onOperation(const Operation& op) override {
-            nbNotified++;
-        }
+   public:
+    void onOperation(const Operation& op) override { nbNotified++; }
 };
 
 // -----------------------------------------------------------------------------
 class MockOperation : public Operation {
-    public:
-        unsigned int getType() const override {
-            return 1;
-        }
-        bool serialize(std::stringstream& buffer) const override {
-            return false;
-        }
-        bool unserialize(const std::stringstream& buffer) override {
-            return false;
-        }
-        void accept(OperationHandler& visitor) const override {
-        }
+   public:
+    unsigned int getType() const override { return 1; }
+    bool serialize(std::stringstream& buffer) const override { return false; }
+    bool unserialize(const std::stringstream& buffer) override { return false; }
+    void accept(OperationHandler& visitor) const override {}
 };
-
 
 // -----------------------------------------------------------------------------
 // addOperationObserver()
@@ -108,7 +94,6 @@ TEST(CollabData, addOperationObserverTest_ReturnType) {
     ASSERT_FALSE(data.addOperationObserver(obs3));
 }
 
-
 // -----------------------------------------------------------------------------
 // clearOperationObserver()
 // -----------------------------------------------------------------------------
@@ -129,7 +114,6 @@ TEST(CollabData, clearOperationObserverTest) {
     data.clearOperationObservers();
     ASSERT_EQ(data.sizeOperationObserver(), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // notifyOperationObserver()
@@ -188,7 +172,6 @@ TEST(CollabData, notifyOperationObserversTest_WithAddAndClear) {
     ASSERT_EQ(nbNotified, 1);
 }
 
-
 // -----------------------------------------------------------------------------
 // setOperationBroadcaster()
 // -----------------------------------------------------------------------------
@@ -222,7 +205,4 @@ TEST(CollabData, notifyOperationBroadcasterTest) {
     ASSERT_EQ(nbNotified, 1);
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

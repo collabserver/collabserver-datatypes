@@ -1,37 +1,29 @@
-#include "collabdata/custom/SimpleGraph.h"
-
 #include <cassert>
 #include <msgpack.hpp>
 
+#include "collabdata/custom/SimpleGraph.h"
 #include "collabdata/custom/Timestamp.h"
 
-
 // Unpack a Timestamp data (Using msgpack)
-#define MACRO_UNPACK_TIMESTAMP(data, size, off)                                 \
-    msgpack::object_handle _r1 = msgpack::unpack(data, size, off);              \
-    msgpack::object_handle _r2 = msgpack::unpack(data, size, off);              \
-    unsigned int userID = _r1.get().as<unsigned int>();                                  \
-    auto time = _r2.get().as<Timestamp::Clock::rep>();                          \
-    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time);        \
+#define MACRO_UNPACK_TIMESTAMP(data, size, off)                          \
+    msgpack::object_handle _r1 = msgpack::unpack(data, size, off);       \
+    msgpack::object_handle _r2 = msgpack::unpack(data, size, off);       \
+    unsigned int userID = _r1.get().as<unsigned int>();                  \
+    auto time = _r2.get().as<Timestamp::Clock::rep>();                   \
+    Timestamp::Clock::duration ellie = Timestamp::Clock::duration(time); \
     _timestamp = Timestamp(Timestamp::TimePoint(ellie), userID)
-
 
 namespace collab {
 
-
 // TODO DEV NOTE
 // Serialization / unserialization may require more success checking.
-
 
 // -----------------------------------------------------------------------------
 // VertexAddOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::VertexAddOperation::VertexAddOperation(
-        const std::string& id,
-        const Timestamp& time)
-        : _vertexID(id), _timestamp(time) {
-}
+SimpleGraph::VertexAddOperation::VertexAddOperation(const std::string& id, const Timestamp& time)
+    : _vertexID(id), _timestamp(time) {}
 
 bool SimpleGraph::VertexAddOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -61,16 +53,12 @@ void SimpleGraph::VertexAddOperation::accept(OperationHandler& handler) const {
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // VertexRemoveOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::VertexRemoveOperation::VertexRemoveOperation(
-        const std::string& id,
-        const Timestamp& time)
-        : _vertexID(id), _timestamp(time) {
-}
+SimpleGraph::VertexRemoveOperation::VertexRemoveOperation(const std::string& id, const Timestamp& time)
+    : _vertexID(id), _timestamp(time) {}
 
 bool SimpleGraph::VertexRemoveOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -100,17 +88,12 @@ void SimpleGraph::VertexRemoveOperation::accept(OperationHandler& handler) const
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // EdgeAddOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::EdgeAddOperation::EdgeAddOperation(
-        const UUID& fromID,
-        const UUID& toID,
-        const Timestamp& time)
-        : _fromID(fromID), _toID(toID), _timestamp(time) {
-}
+SimpleGraph::EdgeAddOperation::EdgeAddOperation(const UUID& fromID, const UUID& toID, const Timestamp& time)
+    : _fromID(fromID), _toID(toID), _timestamp(time) {}
 
 bool SimpleGraph::EdgeAddOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -143,17 +126,12 @@ void SimpleGraph::EdgeAddOperation::accept(OperationHandler& handler) const {
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // EdgeRemoveOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::EdgeRemoveOperation::EdgeRemoveOperation(
-        const UUID& fromID,
-        const UUID& toID,
-        const Timestamp& time)
-        : _fromID(fromID), _toID(toID), _timestamp(time) {
-}
+SimpleGraph::EdgeRemoveOperation::EdgeRemoveOperation(const UUID& fromID, const UUID& toID, const Timestamp& time)
+    : _fromID(fromID), _toID(toID), _timestamp(time) {}
 
 bool SimpleGraph::EdgeRemoveOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -177,7 +155,6 @@ bool SimpleGraph::EdgeRemoveOperation::unserialize(const std::stringstream& buff
 
     MACRO_UNPACK_TIMESTAMP(str.data(), str.size(), off);
 
-
     assert(off == str.size());
     return off == str.size();
 }
@@ -186,21 +163,13 @@ void SimpleGraph::EdgeRemoveOperation::accept(OperationHandler& handler) const {
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // AttributeAddOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::AttributeAddOperation::AttributeAddOperation(
-        const std::string& id,
-        const Timestamp& time,
-        const std::string& name,
-        const std::string& value)
-        : _vertexID(id),
-          _timestamp(time),
-          _attributeName(name),
-          _attributeValue(value) {
-}
+SimpleGraph::AttributeAddOperation::AttributeAddOperation(const std::string& id, const Timestamp& time,
+                                                          const std::string& name, const std::string& value)
+    : _vertexID(id), _timestamp(time), _attributeName(name), _attributeValue(value) {}
 
 bool SimpleGraph::AttributeAddOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -236,19 +205,13 @@ void SimpleGraph::AttributeAddOperation::accept(OperationHandler& handler) const
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // AttributeRemoveOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::AttributeRemoveOperation::AttributeRemoveOperation(
-        const std::string& id,
-        const Timestamp& time,
-        const std::string& name)
-        : _vertexID(id),
-          _timestamp(time),
-          _attributeName(name) {
-}
+SimpleGraph::AttributeRemoveOperation::AttributeRemoveOperation(const std::string& id, const Timestamp& time,
+                                                                const std::string& name)
+    : _vertexID(id), _timestamp(time), _attributeName(name) {}
 
 bool SimpleGraph::AttributeRemoveOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -281,21 +244,13 @@ void SimpleGraph::AttributeRemoveOperation::accept(OperationHandler& handler) co
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
 // -----------------------------------------------------------------------------
 // AttributeSetOperation
 // -----------------------------------------------------------------------------
 
-SimpleGraph::AttributeSetOperation::AttributeSetOperation(
-        const std::string& id,
-        const Timestamp& time,
-        const std::string& name,
-        const std::string& nVal)
-        : _vertexID(id),
-          _timestamp(time),
-          _attributeName(name),
-          _attributeValue(nVal) {
-}
+SimpleGraph::AttributeSetOperation::AttributeSetOperation(const std::string& id, const Timestamp& time,
+                                                          const std::string& name, const std::string& nVal)
+    : _vertexID(id), _timestamp(time), _attributeName(name), _attributeValue(nVal) {}
 
 bool SimpleGraph::AttributeSetOperation::serialize(std::stringstream& buffer) const {
     Timestamp::Clock::duration time = _timestamp.getTime().time_since_epoch();
@@ -330,7 +285,4 @@ void SimpleGraph::AttributeSetOperation::accept(OperationHandler& handler) const
     static_cast<SimpleGraph::OpHandler&>(handler).handleOperation(*this);
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

@@ -1,19 +1,17 @@
 #pragma once
 
-#include "collabdata/CvRDT/2PSet.h"
-
 #include <iostream>
+
+#include "collabdata/CvRDT/2PSet.h"
 
 namespace collab {
 namespace CvRDT {
 
-
 void TwoPSet_example() {
     std::cout << "\n----- CvRDT 2PSet Example ----------\n";
 
-    TwoPSet<int> data0; // Ex: data at replicate 0
-    TwoPSet<int> data1; // Ex: data at replicate 1
-
+    TwoPSet<int> data0;  // Ex: data at replicate 0
+    TwoPSet<int> data1;  // Ex: data at replicate 1
 
     // --- Replicate 0 (data0) ---
 
@@ -44,7 +42,6 @@ void TwoPSet_example() {
     data0.insert(3);
     // data0 = {2}
 
-
     // --- Replicate 1 (data1) ---
     data1.insert(0);
     data1.clear();
@@ -62,7 +59,6 @@ void TwoPSet_example() {
     data1.erase(4);
     // data1 = {2,5,6,11,12,13}
 
-
     // --- Final ---
     // Merge result = {0,1,2,3,4,5}
     std::cout << "data0 before merge: " << data0 << "\n";
@@ -79,5 +75,5 @@ void TwoPSet_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespaces
+}  // namespace CvRDT
+}  // namespace collab

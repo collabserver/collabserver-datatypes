@@ -1,14 +1,13 @@
 #pragma once
 
 #include <cassert>
-#include <vector>
 #include <string>
+#include <vector>
 
 #include "Operation.h"
 #include "OperationObserver.h"
 
 namespace collab {
-
 
 /**
  * \brief
@@ -98,152 +97,132 @@ namespace collab {
  * \see SimpleGraph (Full example of CollabData implementation)
  */
 class CollabData {
-    private:
-        std::vector<OperationObserver*> _operationObservers;
-        OperationObserver* _broadcaster = nullptr;
-
+   private:
+    std::vector<OperationObserver*> _operationObservers;
+    OperationObserver* _broadcaster = nullptr;
 
     // -------------------------------------------------------------------------
     // Initialization
     // -------------------------------------------------------------------------
 
-    protected:
-        CollabData() = default;
-        CollabData(const CollabData& other) = default;
-        CollabData& operator=(const CollabData& other) = default;
-    public:
-        virtual ~CollabData() = default; // For polymorphism
+   protected:
+    CollabData() = default;
+    CollabData(const CollabData& other) = default;
+    CollabData& operator=(const CollabData& other) = default;
 
+   public:
+    virtual ~CollabData() = default;  // For polymorphism
 
     // -------------------------------------------------------------------------
     // Operation Methods
     // -------------------------------------------------------------------------
 
-    public:
-
-        /**
-         * Apply an operation received from external component.
-         * Operation is received in its serialized form.
-         * Do nothing if unable to unserialize and return false.
-         * This doesn't notify the broadcaster but only the Operation Observers.
-         *
-         * This may for instance be used by a network component to apply an
-         * operation just received. Operation is in its serialized form since
-         * other components doesn't know anything about the concrete operations.
-         * (Only concrete CollabData implementation knowns)
-         *
-         * \param id Operation's ID.
-         * \param buffer Serialized version of the operation.
-         * \return True if operation is valid, otherwise, return false.
-         */
-        virtual bool applyExternOperation(unsigned int id,
-                                          const std::string& buffer) = 0;
-
+   public:
+    /**
+     * Apply an operation received from external component.
+     * Operation is received in its serialized form.
+     * Do nothing if unable to unserialize and return false.
+     * This doesn't notify the broadcaster but only the Operation Observers.
+     *
+     * This may for instance be used by a network component to apply an
+     * operation just received. Operation is in its serialized form since
+     * other components doesn't know anything about the concrete operations.
+     * (Only concrete CollabData implementation knowns)
+     *
+     * \param id Operation's ID.
+     * \param buffer Serialized version of the operation.
+     * \return True if operation is valid, otherwise, return false.
+     */
+    virtual bool applyExternOperation(unsigned int id, const std::string& buffer) = 0;
 
     // -------------------------------------------------------------------------
     // OperationObservers Methods
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Send a local operation to all OperationObservers.
+     *
+     * Method that modifies data creates an operations that describes this
+     * modification. Several components may request to know about these
+     * operations, for instance a UI display.
+     *
+     * \param Reference to the operation.
+     */
+    void notifyOperationObservers(const Operation& op) const {
+        assert(op.getType() != 0);  // If 0, you probably forgot to set type
 
-        /**
-         * Send a local operation to all OperationObservers.
-         *
-         * Method that modifies data creates an operations that describes this
-         * modification. Several components may request to know about these
-         * operations, for instance a UI display.
-         *
-         * \param Reference to the operation.
-         */
-        void notifyOperationObservers(const Operation& op) const {
-            assert(op.getType() != 0); // If 0, you probably forgot to set type
+        for (OperationObserver* superman : _operationObservers) {
+            assert(superman != nullptr);
+            superman->onOperation(op);
+        }
+    }
 
-            for(OperationObserver* superman : _operationObservers) {
-                assert(superman != nullptr);
-                superman->onOperation(op);
+    /**
+     * Registers a OperationObserver in this data.
+     * Does nothing if this observer is already registered (Returns false).
+     * Does nothing if nullptr is given (Returns false).
+     *
+     * \param observer The observer to add.
+     * \return True if added, otherwise, return false.
+     */
+    bool addOperationObserver(OperationObserver& observer) {
+        for (OperationObserver* const obs : _operationObservers) {
+            if (obs == &observer) {
+                return false;
             }
         }
+        _operationObservers.push_back(&observer);
+        return true;
+    }
 
-        /**
-         * Registers a OperationObserver in this data.
-         * Does nothing if this observer is already registered (Returns false).
-         * Does nothing if nullptr is given (Returns false).
-         *
-         * \param observer The observer to add.
-         * \return True if added, otherwise, return false.
-         */
-        bool addOperationObserver(OperationObserver& observer) {
-            for(OperationObserver* const obs : _operationObservers) {
-                if(obs == &observer) {
-                    return false;
-                }
-            }
-            _operationObservers.push_back(&observer);
-            return true;
-        }
+    /**
+     * Removes all current operation observers.
+     */
+    void clearOperationObservers() { _operationObservers.clear(); }
 
-        /**
-         * Removes all current operation observers.
-         */
-        void clearOperationObservers() {
-            _operationObservers.clear();
-        }
-
-        /**
-         * Returns the number of operation observer registered in this data.
-         *
-         * \return Number of registered OperationObserver.
-         */
-        std::vector<OperationObserver>::size_type sizeOperationObserver() const {
-            return _operationObservers.size();
-        }
-
+    /**
+     * Returns the number of operation observer registered in this data.
+     *
+     * \return Number of registered OperationObserver.
+     */
+    std::vector<OperationObserver>::size_type sizeOperationObserver() const { return _operationObservers.size(); }
 
     // -------------------------------------------------------------------------
     // Broadcaster Methods
     // -------------------------------------------------------------------------
 
-    public:
-
-        /**
-         * Notify the broadcaster that an operation took place.
-         * Do nothing if no broadcaster set.
-         *
-         * \param Reference to the operation to broadcast.
-         */
-        void notifyOperationBroadcaster(const Operation& op) const {
-            if(_broadcaster != nullptr) {
-                _broadcaster->onOperation(op);
-            }
+   public:
+    /**
+     * Notify the broadcaster that an operation took place.
+     * Do nothing if no broadcaster set.
+     *
+     * \param Reference to the operation to broadcast.
+     */
+    void notifyOperationBroadcaster(const Operation& op) const {
+        if (_broadcaster != nullptr) {
+            _broadcaster->onOperation(op);
         }
+    }
 
-        /**
-         * Associate a broadcaster for this data.
-         * If data already has a broadcaster, it is updated with this one.
-         */
-        void setOperationBroadcaster(OperationObserver& observer) {
-            _broadcaster = &observer;
-        }
+    /**
+     * Associate a broadcaster for this data.
+     * If data already has a broadcaster, it is updated with this one.
+     */
+    void setOperationBroadcaster(OperationObserver& observer) { _broadcaster = &observer; }
 
-        /**
-         * Removes broadcaster for this data.
-         */
-        void removeOperationBroadcaster() {
-            _broadcaster = nullptr;
-        }
+    /**
+     * Removes broadcaster for this data.
+     */
+    void removeOperationBroadcaster() { _broadcaster = nullptr; }
 
-        /**
-         * Check whether a broadcaster is set.
-         * Data without a broadcaster means its a local data only.
-         *
-         * \return True if broadcaster set, otherwise, return false.
-         */
-        bool hasBroadcaster() const {
-            return _broadcaster != nullptr;
-        }
+    /**
+     * Check whether a broadcaster is set.
+     * Data without a broadcaster means its a local data only.
+     *
+     * \return True if broadcaster set, otherwise, return false.
+     */
+    bool hasBroadcaster() const { return _broadcaster != nullptr; }
 };
 
-
-} // End namespace
-
-
+}  // namespace collab

@@ -1,20 +1,18 @@
 #pragma once
 
-#include "collabdata/CvRDT/GMap.h"
-
 #include <iostream>
 #include <string>
+
+#include "collabdata/CvRDT/GMap.h"
 
 namespace collab {
 namespace CvRDT {
 
-
 void GMap_example() {
     std::cout << "\n----- CvRDT GMap Example ----------\n";
 
-    GMap<std::string, int> data0; // Data at replicate 0
-    GMap<std::string, int> data1; // Data at replicate 1
-
+    GMap<std::string, int> data0;  // Data at replicate 0
+    GMap<std::string, int> data1;  // Data at replicate 1
 
     // --- Replicate 0 (data0) ---
     // [ (v1=100), (v2=20), (v3=300), (v4=400), (v9=900) ]
@@ -22,10 +20,9 @@ void GMap_example() {
     data0.insert({"v2", 20});
     data0.insert({"v3", 300});
     data0.insert({"v4", 4444});
-    data0["v4"] = 400; // Replace old value
+    data0["v4"] = 400;  // Replace old value
     data0["v9"] = 900;
-    data0.insert({"v9", 9999}); // No nothing because already in map
-
+    data0.insert({"v9", 9999});  // No nothing because already in map
 
     // --- Replicate 1 (data1) ---
     // [ (v1=0), (v2=200), (v3=30), (v5=500), (v6=600) ]
@@ -34,7 +31,6 @@ void GMap_example() {
     data1.insert({"v3", 30});
     data1.insert({"v5", 500});
     data1.insert({"v6", 600});
-
 
     // --- Final ---
     // [ all xxx numbers ]
@@ -52,7 +48,5 @@ void GMap_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespaces
-
-
+}  // namespace CvRDT
+}  // namespace collab

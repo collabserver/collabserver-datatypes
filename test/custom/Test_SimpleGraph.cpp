@@ -1,79 +1,57 @@
-#include "collabdata/custom/SimpleGraph.h"
-
 #include <gtest/gtest.h>
 
 #include "collabdata/custom/OperationObserver.h"
-
+#include "collabdata/custom/SimpleGraph.h"
 
 namespace collab {
 
-
 static int nbCatch = 0;
 static unsigned int localUserID = 42;
-
 
 // /////////////////////////////////////////////////////////////////////////////
 // Mock classes
 // /////////////////////////////////////////////////////////////////////////////
 
-static int nbOpVertexAdd    = 0;
+static int nbOpVertexAdd = 0;
 static int nbOpVertexRemove = 0;
-static int nbOpEdgeAdd      = 0;
-static int nbOpEdgeRemove   = 0;
-static int nbOpAttrAdd      = 0;
-static int nbOpAttrRemove   = 0;
-static int nbOpAttrSet      = 0;
+static int nbOpEdgeAdd = 0;
+static int nbOpEdgeRemove = 0;
+static int nbOpAttrAdd = 0;
+static int nbOpAttrRemove = 0;
+static int nbOpAttrSet = 0;
 
 static void resetNbOpCounters() {
-    nbOpVertexAdd           = 0;
-    nbOpVertexRemove        = 0;
-    nbOpEdgeAdd             = 0;
-    nbOpEdgeRemove          = 0;
-    nbOpAttrAdd             = 0;
-    nbOpAttrRemove          = 0;
-    nbOpAttrSet             = 0;
+    nbOpVertexAdd = 0;
+    nbOpVertexRemove = 0;
+    nbOpEdgeAdd = 0;
+    nbOpEdgeRemove = 0;
+    nbOpAttrAdd = 0;
+    nbOpAttrRemove = 0;
+    nbOpAttrSet = 0;
 }
 
-
 class HandlerMock : public SimpleGraph::OpHandler {
-    public:
-        void handleOperation(const SimpleGraph::VertexAddOperation& op) {
-            nbOpVertexAdd++;
-        }
-        void handleOperation(const SimpleGraph::VertexRemoveOperation& op) {
-            nbOpVertexRemove++;
-        }
-        void handleOperation(const SimpleGraph::EdgeAddOperation& op) {
-            nbOpEdgeAdd++;
-        }
-        void handleOperation(const SimpleGraph::EdgeRemoveOperation& op) {
-            nbOpEdgeRemove++;
-        }
-        void handleOperation(const SimpleGraph::AttributeAddOperation& op) {
-            nbOpAttrAdd++;
-        }
-        void handleOperation(const SimpleGraph::AttributeRemoveOperation& op) {
-            nbOpAttrRemove++;
-        }
-        void handleOperation(const SimpleGraph::AttributeSetOperation& op) {
-            nbOpAttrSet++;
-        }
+   public:
+    void handleOperation(const SimpleGraph::VertexAddOperation& op) { nbOpVertexAdd++; }
+    void handleOperation(const SimpleGraph::VertexRemoveOperation& op) { nbOpVertexRemove++; }
+    void handleOperation(const SimpleGraph::EdgeAddOperation& op) { nbOpEdgeAdd++; }
+    void handleOperation(const SimpleGraph::EdgeRemoveOperation& op) { nbOpEdgeRemove++; }
+    void handleOperation(const SimpleGraph::AttributeAddOperation& op) { nbOpAttrAdd++; }
+    void handleOperation(const SimpleGraph::AttributeRemoveOperation& op) { nbOpAttrRemove++; }
+    void handleOperation(const SimpleGraph::AttributeSetOperation& op) { nbOpAttrSet++; }
 };
 
 class ObserverMock : public OperationObserver {
-    private:
-        HandlerMock _handler;
-    public:
-        void onOperation(const Operation& op) override {
-            op.accept(_handler);
-        }
-};
+   private:
+    HandlerMock _handler;
 
+   public:
+    void onOperation(const Operation& op) override { op.accept(_handler); }
+};
 
 // /////////////////////////////////////////////////////////////////////////////
 // Tests
 // /////////////////////////////////////////////////////////////////////////////
-
 
 // -----------------------------------------------------------------------------
 // empty()
@@ -90,7 +68,6 @@ TEST(SimpleGraph, emptyTest) {
     ASSERT_TRUE(data0.empty());
 }
 
-
 // -----------------------------------------------------------------------------
 // at()
 // -----------------------------------------------------------------------------
@@ -99,10 +76,26 @@ TEST(SimpleGraph, atTest_ThrowException) {
     SimpleGraph data0 = SimpleGraph::build(localUserID);
     nbCatch = 0;
 
-    try { data0.at("v1"); } catch(...) { nbCatch++; }
-    try { data0.at("v2"); } catch(...) { nbCatch++; }
-    try { data0.at("v3"); } catch(...) { nbCatch++; }
-    try { data0.at("v4"); } catch(...) { nbCatch++; }
+    try {
+        data0.at("v1");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v2");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v3");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v4");
+    } catch (...) {
+        nbCatch++;
+    }
 
     EXPECT_EQ(nbCatch, 4);
 
@@ -110,10 +103,26 @@ TEST(SimpleGraph, atTest_ThrowException) {
     data0.addVertex("v1");
     data0.addVertex("v2");
 
-    try { data0.at("v1"); } catch(...) { nbCatch++; }
-    try { data0.at("v2"); } catch(...) { nbCatch++; }
-    try { data0.at("v3"); } catch(...) { nbCatch++; }
-    try { data0.at("v4"); } catch(...) { nbCatch++; }
+    try {
+        data0.at("v1");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v2");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v3");
+    } catch (...) {
+        nbCatch++;
+    }
+    try {
+        data0.at("v4");
+    } catch (...) {
+        nbCatch++;
+    }
     EXPECT_EQ(nbCatch, 2);
 }
 
@@ -155,7 +164,6 @@ TEST(SimpleGraph, atTest_ReturnValue) {
     EXPECT_EQ(current3.value(), "Corbeau");
 }
 
-
 // -----------------------------------------------------------------------------
 // hasVertex()
 // -----------------------------------------------------------------------------
@@ -184,7 +192,6 @@ TEST(SimpleGraph, hasVertexTest) {
     EXPECT_FALSE(data0.hasVertex("v3"));
 }
 
-
 // -----------------------------------------------------------------------------
 // hasEdge()
 // -----------------------------------------------------------------------------
@@ -212,7 +219,6 @@ TEST(SimpleGraph, hasEdgeTest) {
     EXPECT_FALSE(data0.hasEdge("v1", "v2"));
     EXPECT_FALSE(data0.hasEdge("v1", "v3"));
 }
-
 
 // -----------------------------------------------------------------------------
 // OperationHandler
@@ -257,7 +263,4 @@ TEST(SimpleGraph, operationHandlersTest) {
     ASSERT_EQ(nbOpEdgeAdd, 1);
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

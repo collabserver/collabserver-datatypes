@@ -1,19 +1,16 @@
-#include "collabdata/CmRDT/LWWMap.h"
-
 #include <gtest/gtest.h>
 
+#include "collabdata/CmRDT/LWWMap.h"
 
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it_, key_, is_removed_, stamp_, data_) \
-    ASSERT_TRUE(elt_it_ != data_.crdt_end()); \
-    EXPECT_EQ(elt_it_->first, key_); \
-    EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_); \
+    ASSERT_TRUE(elt_it_ != data_.crdt_end());                     \
+    EXPECT_EQ(elt_it_->first, key_);                              \
+    EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_);          \
     EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
-
 
 namespace collab {
 namespace CmRDT {
-
 
 // -----------------------------------------------------------------------------
 // empty()
@@ -38,7 +35,6 @@ TEST(LWWMap, emptyTest) {
     ASSERT_FALSE(data0.empty());
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_empty()
 // -----------------------------------------------------------------------------
@@ -58,7 +54,6 @@ TEST(LWWMap, crdtEmptyTest) {
     data0.add(2, 30);
     ASSERT_FALSE(data0.crdt_empty());
 }
-
 
 // -----------------------------------------------------------------------------
 // size()
@@ -144,7 +139,7 @@ TEST(LWWMap, sizeTest_WithRemoveFirst) {
     data0.remove(1, 29);
     data0.remove(1, 25);
     data0.remove(1, 21);
-    ASSERT_EQ(data0.size(), 0); // 0, not -5 or shit
+    ASSERT_EQ(data0.size(), 0);  // 0, not -5 or shit
 
     data0.add(1, 10);
     ASSERT_EQ(data0.size(), 0);
@@ -169,9 +164,8 @@ TEST(LWWMap, sizeTest_WithOlderRemoveAfterAdd) {
     data0.remove(1, 11);
     data0.remove(1, 12);
     data0.remove(1, 18);
-    ASSERT_EQ(data0.size(), 1); // Not removed (See timestamps)
+    ASSERT_EQ(data0.size(), 1);  // Not removed (See timestamps)
 }
-
 
 // -----------------------------------------------------------------------------
 // max_size()
@@ -179,13 +173,12 @@ TEST(LWWMap, sizeTest_WithOlderRemoveAfterAdd) {
 
 TEST(LWWMap, maxSizeTest) {
     // Well, this is not really a test, my goal here is just to call max_size
-    // (So that I'm sure it's compiling). But max_size itself is just a 
+    // (So that I'm sure it's compiling). But max_size itself is just a
     // 'foward' of unordered_map::max_size. See code.
     LWWMap<int, int, int> data0;
     LWWMap<int, int, int>::size_type t = data0.max_size();
     ASSERT_TRUE(t > 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // count()
@@ -217,7 +210,6 @@ TEST(LWWMap, countTest_AfterRemove) {
     data0.remove(42, 20);
     ASSERT_EQ(data0.count(42), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_count()
@@ -252,7 +244,6 @@ TEST(LWWMap, crdtCountTest_AfterRemove) {
     data0.remove(42, 20);
     ASSERT_EQ(data0.crdt_count(42), 1);
 }
-
 
 // -----------------------------------------------------------------------------
 // at()
@@ -295,11 +286,10 @@ TEST(LWWMap, atTest_RemovedElement) {
     // Check at() exceptions
     int nbException = 0;
     const char* values[3] = {"e1", "e2", "e3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.at(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
@@ -334,17 +324,15 @@ TEST(LWWMap, atTest_InvalidKeyThrowException) {
 
     int nbException = 0;
     const char* values[5] = {"e1", "e2", "e3", "carrot", "SuperRabbit"};
-    for(int k = 0; k < 5; ++k) {
+    for (int k = 0; k < 5; ++k) {
         try {
             data0.at(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
     ASSERT_EQ(nbException, 5);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_at()
@@ -387,11 +375,10 @@ TEST(LWWMap, crdtAtTest_RemovedElement) {
     // Check.crdt_at() exceptions
     int nbException = 0;
     const char* values[3] = {"e1", "e2", "e3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.crdt_at(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
@@ -426,17 +413,15 @@ TEST(LWWMap, crdtAtTest_InvalidKeyThrowException) {
 
     int nbException = 0;
     const char* values[5] = {"e1", "e2", "e3", "carrot", "SuperRabbit"};
-    for(int k = 0; k < 5; ++k) {
+    for (int k = 0; k < 5; ++k) {
         try {
             data0.crdt_at(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
     ASSERT_EQ(nbException, 5);
 }
-
 
 // -----------------------------------------------------------------------------
 // find()
@@ -474,8 +459,8 @@ TEST(LWWMap, findTest_AndChangeValue) {
     LWWMap<std::string, int, int> data0;
 
     // Setup data
-    data0.add("e1", 1); // v1 == default set value
-    data0.add("e2", 2); // v2 == default set value
+    data0.add("e1", 1);  // v1 == default set value
+    data0.add("e2", 2);  // v2 == default set value
 
     // Change values of container
     auto it_e1 = data0.find("e1");
@@ -489,7 +474,6 @@ TEST(LWWMap, findTest_AndChangeValue) {
     EXPECT_EQ(e1->second, 42);
     EXPECT_EQ(e2->second, 1024);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_find()
@@ -538,7 +522,6 @@ TEST(LWWMap, findTest_QueryAndChangeValue) {
     EXPECT_EQ(e1_it->second.value(), 42);
     EXPECT_EQ(e2_it->second.value(), 1024);
 }
-
 
 // -----------------------------------------------------------------------------
 // clear()
@@ -619,7 +602,6 @@ TEST(LWWMap, clearTest_Indenpotent) {
     EXPECT_EQ(data0.size(), 5);
     EXPECT_EQ(data0.crdt_size(), 5);
 
-
     // Newer clear called first
     data0.clear(30);
     data0.clear(30);
@@ -677,12 +659,12 @@ TEST(LWWMap, clearTest_ReturnType) {
     data0.add("e2", 12);
     data0.add("e3", 13);
     EXPECT_TRUE(data0.clear(10));
-    EXPECT_EQ(data0.size(), 3); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 3);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 
     // Duplicate clear later (Is applied)
     EXPECT_TRUE(data0.clear(20));
-    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 0);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 
     // Duplicate calls (Earlier. Not applied)
@@ -691,7 +673,7 @@ TEST(LWWMap, clearTest_ReturnType) {
     EXPECT_FALSE(data0.clear(13));
     EXPECT_FALSE(data0.clear(14));
 
-    EXPECT_EQ(data0.size(), 0); // Note: See clear() doc to understand '3'
+    EXPECT_EQ(data0.size(), 0);  // Note: See clear() doc to understand '3'
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
@@ -721,7 +703,6 @@ TEST(LWWMap, clearTest_ThenAddAfterOlderClear) {
     EXPECT_EQ(data0.crdt_size(), 3);
 }
 
-
 // -----------------------------------------------------------------------------
 // add()
 // -----------------------------------------------------------------------------
@@ -734,7 +715,7 @@ TEST(LWWMap, addTest) {
     data0.add(1, 10);
     data0.add(2, 10);
     data0.add(3, 10);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 10, data0);
     }
@@ -744,7 +725,7 @@ TEST(LWWMap, addTest) {
     data0.add(1, 20);
     data0.add(2, 20);
     data0.add(3, 20);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto coco = data0.crdt_find(k);
         _ASSERT_ELT_EQ(coco, k, false, 20, data0);
     }
@@ -753,7 +734,7 @@ TEST(LWWMap, addTest) {
 TEST(LWWMap, addTest_DuplicateCalls) {
     LWWMap<int, int, int> data0;
 
-    // Test duplicate add, keep max timestamps 
+    // Test duplicate add, keep max timestamps
     data0.add(42, 15);
     data0.add(42, 14);
     data0.add(42, 18);
@@ -763,7 +744,7 @@ TEST(LWWMap, addTest_DuplicateCalls) {
     auto carrot = data0.crdt_find(42);
     _ASSERT_ELT_EQ(carrot, 42, false, 19, data0);
 
-    // Test duplicate add, keep max timestamps 
+    // Test duplicate add, keep max timestamps
     data0.add(64, 28);
     data0.add(64, 29);
     data0.add(64, 21);
@@ -844,7 +825,6 @@ TEST(LWWMap, addTest_IdempotentReturnType) {
     _ASSERT_ELT_EQ(coco, "e1", false, 10, data0);
 }
 
-
 // -----------------------------------------------------------------------------
 // remove()
 // -----------------------------------------------------------------------------
@@ -861,7 +841,7 @@ TEST(LWWMap, removeTest) {
     data0.remove(1, 20);
     data0.remove(2, 20);
     data0.remove(3, 20);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto res = data0.crdt_find(k);
         _ASSERT_ELT_EQ(res, k, true, 20, data0);
     }
@@ -959,7 +939,6 @@ TEST(LWWMap, removeTest_IdempotentReturnType) {
     _ASSERT_ELT_EQ(coco, "e1", true, 20, data0);
 }
 
-
 // -----------------------------------------------------------------------------
 // add() + remove()
 // -----------------------------------------------------------------------------
@@ -1030,7 +1009,6 @@ TEST(LWWMap, addTest_ConcurrentRemoveUseCase) {
     EXPECT_FALSE(data0 != data1);
 }
 
-
 // -----------------------------------------------------------------------------
 // reserve()
 // -----------------------------------------------------------------------------
@@ -1042,7 +1020,6 @@ TEST(LWWMap, reserveTest) {
     // For now, just do a call to be sure it compiles.
     data0.reserve(10);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_size()
@@ -1068,7 +1045,6 @@ TEST(LWWMap, crdtSizeTest) {
     data0.remove(3, 300);
     ASSERT_EQ(data0.crdt_size(), 3);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_equal()
@@ -1217,7 +1193,6 @@ TEST(LWWMap, crdtEqualTest_EmptyVsAdd) {
     ASSERT_TRUE(data1.crdt_equal(data0));
 }
 
-
 // -----------------------------------------------------------------------------
 // Operator==
 // -----------------------------------------------------------------------------
@@ -1273,23 +1248,22 @@ TEST(LWWMap, operatorEQTest_WithDifferentValue) {
     LWWMap<std::string, int, int> data1;
 
     // Setup data
-    data0.add("v1", 1); // v1 == default set value
-    data1.add("v1", 1); // v2 == default set value
+    data0.add("v1", 1);  // v1 == default set value
+    data1.add("v1", 1);  // v2 == default set value
 
     // Change value
     LWWMap<std::string, int, int>::iterator it0 = data0.find("v1");
-    it0->second = 42; // v1 == 42
+    it0->second = 42;  // v1 == 42
 
     ASSERT_TRUE(data0 != data1);
     ASSERT_FALSE(data0 == data1);
 
     // Restore to same value
     auto it_1 = data1.find("v1");
-    it_1->second = 42; // v1 == 42
+    it_1->second = 42;  // v1 == 42
     ASSERT_TRUE(data0 == data1);
     ASSERT_FALSE(data0 != data1);
 }
-
 
 // -----------------------------------------------------------------------------
 // LWWMap::iterator
@@ -1310,20 +1284,19 @@ TEST(LWWMap, iteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         ++k;
         total += it->second;
     }
     EXPECT_EQ(k, 4);
     EXPECT_EQ(total, 600);
 
-
     // Remove elements, then iterator should not use them
     data0.remove("e1", 20);
     data0.remove("e2", 20);
     k = 0;
     total = 0;
-    for(auto& elt : data0) {
+    for (auto& elt : data0) {
         ++k;
         total += elt.second;
     }
@@ -1341,7 +1314,7 @@ TEST(LWWMap, iteratorTest) {
     data0.at("e7") = 700;
     k = 0;
     total = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         ++k;
         total += it->second;
     }
@@ -1354,7 +1327,7 @@ TEST(LWWMap, iteratorTest_EmptyMap) {
 
     int k = 0;
     // If you wonder: LWWMap<int,int,int>::iterator it = data0.begin();
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1374,7 +1347,7 @@ TEST(LWWMap, iteratorTest_EmptyMapAfterAddRemove) {
     data0.remove(3, 20);
     data0.remove(4, 20);
     int k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1383,7 +1356,7 @@ TEST(LWWMap, iteratorTest_EmptyMapAfterAddRemove) {
     data0.add(5, 30);
     data0.remove(5, 31);
     k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1398,7 +1371,7 @@ TEST(LWWMap, iteratorTest_EmptyMapAfterAddRemove) {
     data0.remove(8, 46);
     data0.remove(9, 47);
     k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1417,7 +1390,7 @@ TEST(LWWMap, iteratorTest_end) {
     LWWMap<std::string, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.end(); it != data0.end(); ++it) {
+    for (auto it = data0.end(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -1426,12 +1399,11 @@ TEST(LWWMap, iteratorTest_end) {
     data0.add("e2", 10);
     data0.add("e3", 10);
     k = 0;
-    for(auto it = data0.end(); it != data0.end(); ++it) {
+    for (auto it = data0.end(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // LWWMap::const_iterator
@@ -1452,20 +1424,19 @@ TEST(LWWMap, constIteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         ++k;
         total += it->second;
     }
     EXPECT_EQ(k, 4);
     EXPECT_EQ(total, 600);
 
-
     // Remove elements, then iterator should not use them
     data0.remove("e1", 20);
     data0.remove("e2", 20);
     k = 0;
     total = 0;
-    for(const auto& elt : data0) {
+    for (const auto& elt : data0) {
         ++k;
         total += elt.second;
     }
@@ -1483,7 +1454,7 @@ TEST(LWWMap, constIteratorTest) {
     data0.at("e7") = 700;
     k = 0;
     total = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         ++k;
         total += it->second;
     }
@@ -1495,7 +1466,7 @@ TEST(LWWMap, constIteratorTest_EmptyMap) {
     LWWMap<int, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1515,7 +1486,7 @@ TEST(LWWMap, constIteratorTest_EmptyMapAfterAddRemove) {
     data0.remove(3, 20);
     data0.remove(4, 20);
     int k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1524,7 +1495,7 @@ TEST(LWWMap, constIteratorTest_EmptyMapAfterAddRemove) {
     data0.add(5, 30);
     data0.remove(5, 31);
     k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         ++k;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1539,7 +1510,7 @@ TEST(LWWMap, constIteratorTest_EmptyMapAfterAddRemove) {
     data0.remove(8, 46);
     data0.remove(9, 47);
     k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1558,7 +1529,7 @@ TEST(LWWMap, constIteratorTest_end) {
     LWWMap<std::string, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+    for (auto it = data0.cend(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -1567,12 +1538,11 @@ TEST(LWWMap, constIteratorTest_end) {
     data0.add("e2", 10);
     data0.add("e3", 10);
     k = 0;
-    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+    for (auto it = data0.cend(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // LWWMap::crdt_iterator
@@ -1593,20 +1563,19 @@ TEST(LWWMap, crdtIteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         total += it->second.value();
     }
     EXPECT_EQ(k, 4);
     EXPECT_EQ(total, 600);
 
-
     // Remove elements
     data0.remove("e1", 20);
     data0.remove("e2", 20);
     k = 0;
     total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         total += it->second.value();
     }
@@ -1624,7 +1593,7 @@ TEST(LWWMap, crdtIteratorTest) {
     data0.at("e7") = 700;
     k = 0;
     total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         ++k;
         total += it->second.value();
     }
@@ -1636,7 +1605,7 @@ TEST(LWWMap, crdtIteratorTest_EmptyMap) {
     LWWMap<int, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0) << "Iterator should be empty";
@@ -1665,7 +1634,7 @@ TEST(LWWMap, crdtIteratorTest_EmptyMapAfterAddRemove) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
         total += it->second.value();
     }
@@ -1686,7 +1655,7 @@ TEST(LWWMap, crdtIteratorTest_end) {
     LWWMap<std::string, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -1695,13 +1664,11 @@ TEST(LWWMap, crdtIteratorTest_end) {
     data0.add("e2", 10);
     data0.add("e3", 10);
     k = 0;
-    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
 
-
-}} // End namespaces
-
-
+}  // namespace CmRDT
+}  // namespace collab

@@ -6,7 +6,6 @@
 
 namespace collab {
 
-
 /**
  * \brief
  * Interface of any operation applicable on a CollabData.
@@ -18,50 +17,46 @@ namespace collab {
  * \see OperationHandler
  */
 class Operation {
-    protected:
-        Operation() = default;
-        Operation(const Operation& other) = default;
-        Operation& operator=(const Operation& other) = default;
-    public:
-        virtual ~Operation() = default;
+   protected:
+    Operation() = default;
+    Operation(const Operation& other) = default;
+    Operation& operator=(const Operation& other) = default;
 
+   public:
+    virtual ~Operation() = default;
 
-    public:
+   public:
+    /**
+     * Get the type of this operation.
+     * Returns 0 if not type set. (This may be an internal error.)
+     *
+     * \return ID of the operation's type.
+     */
+    virtual unsigned int getType() const = 0;
 
-        /**
-         * Get the type of this operation.
-         * Returns 0 if not type set. (This may be an internal error.)
-         *
-         * \return ID of the operation's type.
-         */
-        virtual unsigned int getType() const = 0;
+    /**
+     * Serialize the operation data in internal packed format.
+     *
+     * \param buffer Where to place serialized data.
+     * \return True if successfully serialized, otherwise, return false.
+     */
+    virtual bool serialize(std::stringstream& buffer) const = 0;
 
-        /**
-         * Serialize the operation data in internal packed format.
-         *
-         * \param buffer Where to place serialized data.
-         * \return True if successfully serialized, otherwise, return false.
-         */
-        virtual bool serialize(std::stringstream& buffer) const = 0;
+    /**
+     * Unserialize the operation from its internal packed format.
+     *
+     * \param buffer Where to place unserialized data.
+     * \return True if successfully unserialized, otherwise, return false.
+     */
+    virtual bool unserialize(const std::stringstream& buffer) = 0;
 
-        /**
-         * Unserialize the operation from its internal packed format.
-         *
-         * \param buffer Where to place unserialized data.
-         * \return True if successfully unserialized, otherwise, return false.
-         */
-        virtual bool unserialize(const std::stringstream& buffer) = 0;
-
-        /**
-         * Apply an handler on this operation.
-         * This is based on visitor pattern.
-         *
-         * \param handler The famous concrete handler to use.
-         */
-        virtual void accept(OperationHandler& handler) const = 0;
+    /**
+     * Apply an handler on this operation.
+     * This is based on visitor pattern.
+     *
+     * \param handler The famous concrete handler to use.
+     */
+    virtual void accept(OperationHandler& handler) const = 0;
 };
 
-
-} // End namespace
-
-
+}  // namespace collab

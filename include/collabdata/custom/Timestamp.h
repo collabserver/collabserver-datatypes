@@ -4,7 +4,6 @@
 
 namespace collab {
 
-
 /**
  * \brief
  * Timestamps implementation for CollabServer.
@@ -22,98 +21,89 @@ namespace collab {
  *
  */
 class Timestamp {
-    public:
-        typedef std::chrono::steady_clock       Clock;
-        typedef std::chrono::time_point<Clock>  TimePoint;
+   public:
+    typedef std::chrono::steady_clock Clock;
+    typedef std::chrono::time_point<Clock> TimePoint;
 
-    private:
-        TimePoint           _time;
-        unsigned int        _id = 0;
-        static unsigned int _effectiveID;
-
+   private:
+    TimePoint _time;
+    unsigned int _id = 0;
+    static unsigned int _effectiveID;
 
     // -------------------------------------------------------------------------
     // Intitialization
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Create a timestamp with the minimal possible value.
+     * Uses current effectiveID as timestamp id.
+     *
+     * \note
+     * The parameters is only used to allow "Timestamp t = 0".
+     * This may be weird, but this is required by CRDTs.
+     * (See implementation). Note that, I had an issue with gcc 4.6.4 and
+     * "Timestamp t = 0" was not compiling. Use "Timestamp t = {0}" instead.
+     *
+     * \param value Dummy value (See note)
+     */
+    Timestamp(const int value);
 
-        /**
-         * Create a timestamp with the minimal possible value.
-         * Uses current effectiveID as timestamp id.
-         *
-         * \note
-         * The parameters is only used to allow "Timestamp t = 0".
-         * This may be weird, but this is required by CRDTs.
-         * (See implementation). Note that, I had an issue with gcc 4.6.4 and
-         * "Timestamp t = 0" was not compiling. Use "Timestamp t = {0}" instead.
-         *
-         * \param value Dummy value (See note)
-         */
-        Timestamp(const int value);
+    /**
+     * Create a timestamp with a specific time and id.
+     *
+     * \param time Time to set in this Timestamp.
+     * \param id User ID to set.
+     */
+    explicit Timestamp(const TimePoint time, const int id);
 
-        /**
-         * Create a timestamp with a specific time and id.
-         *
-         * \param time Time to set in this Timestamp.
-         * \param id User ID to set.
-         */
-        explicit Timestamp(const TimePoint time, const int id);
+    /**
+     * Creates a timestamps that correspond to current time.
+     * Uses current effectiveID as ID.
+     *
+     * \return Timestamp corresponding to current time.
+     */
+    static Timestamp now();
 
-        /**
-         * Creates a timestamps that correspond to current time.
-         * Uses current effectiveID as ID.
-         *
-         * \return Timestamp corresponding to current time.
-         */
-        static Timestamp now();
-
-        /**
-         * Set the current effective ID.
-         * See the paragraph about effective ID (In Timestamp doc) to
-         * understand its usage.
-         *
-         * \param id Current effective ID to use.
-         * \see Timestamp
-         */
-        static void setEffectiveID(const unsigned int id);
-
+    /**
+     * Set the current effective ID.
+     * See the paragraph about effective ID (In Timestamp doc) to
+     * understand its usage.
+     *
+     * \param id Current effective ID to use.
+     * \see Timestamp
+     */
+    static void setEffectiveID(const unsigned int id);
 
     // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * \copydoc Timestamp::Timestamp(const int)
+     */
+    Timestamp& operator=(const int value);
+    Timestamp& operator=(const Timestamp& other);
 
-        /**
-         * \copydoc Timestamp::Timestamp(const int)
-         */
-        Timestamp& operator=(const int value);
-        Timestamp& operator=(const Timestamp& other);
-
-        friend bool operator==(const Timestamp& rhs, const Timestamp& lhs);
-        friend bool operator!=(const Timestamp& rhs, const Timestamp& lhs);
-        friend bool operator<(const Timestamp& rhs, const Timestamp& lhs);
-        friend bool operator>(const Timestamp& rhs, const Timestamp& lhs);
-
+    friend bool operator==(const Timestamp& rhs, const Timestamp& lhs);
+    friend bool operator!=(const Timestamp& rhs, const Timestamp& lhs);
+    friend bool operator<(const Timestamp& rhs, const Timestamp& lhs);
+    friend bool operator>(const Timestamp& rhs, const Timestamp& lhs);
 
     // -------------------------------------------------------------------------
     // Getter - Setters
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    const TimePoint& getTime() const { return _time; }
 
-        const TimePoint& getTime() const { return _time; }
-
-        /**
-         * Get the actual Timestamp's ID.
-         * This is not the effectiveID but the actual ID for this specific
-         * Timestamp instance.
-         */
-        unsigned int getID() const { return _id; }
+    /**
+     * Get the actual Timestamp's ID.
+     * This is not the effectiveID but the actual ID for this specific
+     * Timestamp instance.
+     */
+    unsigned int getID() const { return _id; }
 };
 
-
-} // End namespace
-
-
+}  // namespace collab

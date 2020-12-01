@@ -1,26 +1,23 @@
 #pragma once
 
-#include "collabdata/CvRDT/GSet.h"
-
 #include <iostream>
+
+#include "collabdata/CvRDT/GSet.h"
 
 namespace collab {
 namespace CvRDT {
 
-
 void GSet_example() {
     std::cout << "\n----- CvRDT GSet Example ----------\n";
 
-    GSet<int> data0; // Data at replicate 0
-    GSet<int> data1; // Data at replicate 1
-
+    GSet<int> data0;  // Data at replicate 0
+    GSet<int> data1;  // Data at replicate 1
 
     // --- Replicate 0 (data0) ---
     // data0 = [0,2,4]
     data0.insert(0);
     data0.insert(2);
     data0.insert(4);
-
 
     // --- Replicate 1 (data1) ---
     // data1 = [1,2,3,4,5]
@@ -29,7 +26,6 @@ void GSet_example() {
     data1.insert(3);
     data1.insert(4);
     data1.insert(5);
-
 
     // --- Final ---
     // Merge result = {0,1,2,3,4,5}
@@ -47,5 +43,5 @@ void GSet_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespaces
+}  // namespace CvRDT
+}  // namespace collab

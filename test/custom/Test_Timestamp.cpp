@@ -1,11 +1,10 @@
-#include "collabdata/custom/Timestamp.h"
-
 #include <gtest/gtest.h>
+
+#include "collabdata/custom/Timestamp.h"
 
 namespace collab {
 
-static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
-
+static unsigned int localUserID = 42;  // See SimpleGraph constructor and Timestamp
 
 // -----------------------------------------------------------------------------
 // operators=()
@@ -20,7 +19,6 @@ TEST(Timestamp, operatorAssign) {
     ASSERT_TRUE(t1 < t2);
     ASSERT_TRUE(t2 > t1);
 }
-
 
 // -----------------------------------------------------------------------------
 // operators==()
@@ -42,7 +40,7 @@ TEST(Timestamp, operatorEQ) {
 TEST(Timestamp, operatorEQ_WithDiffEffectiveID) {
     Timestamp::setEffectiveID(localUserID);
     Timestamp t1 = {0};
-    Timestamp::setEffectiveID(64); // ex: User2
+    Timestamp::setEffectiveID(64);  // ex: User2
     Timestamp t2 = {0};
 
     ASSERT_TRUE(t1 == t1);
@@ -51,7 +49,6 @@ TEST(Timestamp, operatorEQ_WithDiffEffectiveID) {
     ASSERT_FALSE(t1 == t2);
     ASSERT_FALSE(t2 == t1);
 }
-
 
 // -----------------------------------------------------------------------------
 // operators<()
@@ -77,7 +74,6 @@ TEST(Timestamp, operatorInf_WithDiffEffectiveID) {
     ASSERT_FALSE(t2 < t1);
 }
 
-
 // -----------------------------------------------------------------------------
 // operators>()
 // -----------------------------------------------------------------------------
@@ -102,7 +98,4 @@ TEST(Timestamp, operatorSup_WithDiffEffectiveID) {
     ASSERT_FALSE(t1 > t2);
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

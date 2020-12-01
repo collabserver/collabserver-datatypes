@@ -1,56 +1,49 @@
-#include "collabdata/custom/SimpleGraph.h"
-
 #include <iostream>
+
+#include "collabdata/custom/SimpleGraph.h"
 
 namespace collab {
 
-
 static const unsigned int localID = 42;
-
-
 
 // -----------------------------------------------------------------------------
 // End user SimpleGraph Handler / Observer
 // -----------------------------------------------------------------------------
 
-
 // Example of end-user handler for each operation on SimpleGraph
 class SimpleGraphHandler : public SimpleGraph::OpHandler {
-    public:
-        void handleOperation(const SimpleGraph::VertexAddOperation& op) {
-            std::cout << "handleOperation(VertexAddOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::VertexRemoveOperation& op) {
-            std::cout << "handleOperation(VertexRemoveOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::EdgeAddOperation& op) {
-            std::cout << "handleOperation(EdgeAddOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::EdgeRemoveOperation& op) {
-            std::cout << "handleOperation(EdgeRemoveOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::AttributeAddOperation& op) {
-            std::cout << "handleOperation(AttributeAddOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::AttributeRemoveOperation& op) {
-            std::cout << "handleOperation(AttributeRemoveOperation)\n";
-        }
-        void handleOperation(const SimpleGraph::AttributeSetOperation& op) {
-            std::cout << "handleOperation(AttributeSetOperation)\n";
-        }
+   public:
+    void handleOperation(const SimpleGraph::VertexAddOperation& op) {
+        std::cout << "handleOperation(VertexAddOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::VertexRemoveOperation& op) {
+        std::cout << "handleOperation(VertexRemoveOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::EdgeAddOperation& op) {
+        std::cout << "handleOperation(EdgeAddOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::EdgeRemoveOperation& op) {
+        std::cout << "handleOperation(EdgeRemoveOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::AttributeAddOperation& op) {
+        std::cout << "handleOperation(AttributeAddOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::AttributeRemoveOperation& op) {
+        std::cout << "handleOperation(AttributeRemoveOperation)\n";
+    }
+    void handleOperation(const SimpleGraph::AttributeSetOperation& op) {
+        std::cout << "handleOperation(AttributeSetOperation)\n";
+    }
 };
-
 
 // Example of SimpleGraph Observer
 class SimpleGraphObserver : public OperationObserver {
-    private:
-        SimpleGraphHandler _handler;
-    public:
-        void onOperation(const Operation& op) override {
-            op.accept(_handler);
-        }
-};
+   private:
+    SimpleGraphHandler _handler;
 
+   public:
+    void onOperation(const Operation& op) override { op.accept(_handler); }
+};
 
 // -----------------------------------------------------------------------------
 // Example
@@ -88,24 +81,23 @@ void SimpleGraph_example() {
     data0.setAttribute("v2", "friend", "Winston");
     data0.addAttribute("v2", "enemy", "Widow");
 
-
     // Display the graph using iterator
     std::cout << "- Iterate on graph\n";
     SimpleGraph::VertexIterator it = data0.vertices();
-    while(it.moveNext()) {
+    while (it.moveNext()) {
         SimpleGraph::VertexDescriptor current = it.current();
         std::cout << current.id() << " -> ";
 
         // Show edges
         SimpleGraph::EdgeIterator it_edges = current.edges();
-        while(it_edges.moveNext()) {
+        while (it_edges.moveNext()) {
             const SimpleGraph::UUID& edge = it_edges.current();
             std::cout << edge << " ";
         }
 
         // Show attributes
         SimpleGraph::AttributeIterator it_attrs = current.attributes();
-        while(it_attrs.moveNext()) {
+        while (it_attrs.moveNext()) {
             const SimpleGraph::AttributeDescriptor attr = it_attrs.current();
             std::cout << "(" << attr.name() << "=" << attr.value() << ") ";
         }
@@ -113,7 +105,4 @@ void SimpleGraph_example() {
     }
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

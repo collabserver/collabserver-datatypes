@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ostream>
 #include <cassert>
+#include <ostream>
 #include <type_traits>
 
 #include "LWWMap.h"
@@ -9,7 +9,6 @@
 
 namespace collab {
 namespace CmRDT {
-
 
 /**
  * Information used by add_edge method.
@@ -22,7 +21,6 @@ struct AddEdgeInfo {
     bool isFromAdded;
     bool isToAdded;
 };
-
 
 /**
  * \brief
@@ -93,716 +91,642 @@ struct AddEdgeInfo {
  * \tparam T    Type of vertex content data.
  * \tparam U    Type of timestamps (Must implements operators > and <).
  */
-template<typename Key, typename T, typename U>
+template <typename Key, typename T, typename U>
 class LWWGraph {
-    public:
-        class Vertex;
+   public:
+    class Vertex;
 
-        typedef typename LWWMap<Key,Vertex,U>::size_type        size_type;
-        typedef typename LWWMap<Key,Vertex,U>::iterator         iterator;
-        typedef typename LWWMap<Key,Vertex,U>::const_iterator   const_iterator;
-        typedef typename LWWMap<Key,Vertex,U>::crdt_iterator    crdt_iterator;
-        typedef typename LWWMap<Key,Vertex,U>::const_crdt_iterator
-            const_crdt_iterator;
+    typedef typename LWWMap<Key, Vertex, U>::size_type size_type;
+    typedef typename LWWMap<Key, Vertex, U>::iterator iterator;
+    typedef typename LWWMap<Key, Vertex, U>::const_iterator const_iterator;
+    typedef typename LWWMap<Key, Vertex, U>::crdt_iterator crdt_iterator;
+    typedef typename LWWMap<Key, Vertex, U>::const_crdt_iterator const_crdt_iterator;
 
-        typedef typename LWWSet<Key,U>::size_type               size_type_edges;
+    typedef typename LWWSet<Key, U>::size_type size_type_edges;
 
-    private:
-        LWWMap<Key, Vertex, U> _adj;
-
+   private:
+    LWWMap<Key, Vertex, U> _adj;
 
     // -------------------------------------------------------------------------
     // Capacity methods
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Checks if the graph has no vertex.
+     *
+     * \return True if the container is empty, false otherwise.
+     */
+    bool empty() const noexcept { return _adj.empty(); }
 
-        /**
-         * Checks if the graph has no vertex.
-         *
-         * \return True if the container is empty, false otherwise.
-         */
-        bool empty() const noexcept {
-            return _adj.empty();
+    /**
+     * Checks if the graph has no vertex.
+     * Also check for elements marked as 'removed'.
+     *
+     * \return True if the container is empty, false otherwise.
+     */
+    bool crdt_empty() const noexcept { return _adj.crdt_empty(); }
+
+    /**
+     * Returns the number of vertex in this graph.
+     *
+     * \return Number of elements in the container.
+     */
+    size_type size_vertex() const noexcept { return _adj.size(); }
+
+    /**
+     * Returns the number of vertex in this graph.
+     * Also check for elements marked as 'removed'.
+     *
+     * \return Number of elements in the container.
+     */
+    size_type crdt_size_vertex() const noexcept { return _adj.crdt_size(); }
+
+    /**
+     * Returns the total number of edges in this graph.
+     *
+     * \return Number of edges in the graph.
+     */
+    size_type_edges size_edges() const noexcept {
+        size_type_edges total = 0;
+
+        for (const auto& elt : _adj) {
+            total += elt.second._edges.size();
         }
+        return total;
+    }
 
-        /**
-         * Checks if the graph has no vertex.
-         * Also check for elements marked as 'removed'.
-         *
-         * \return True if the container is empty, false otherwise.
-         */
-        bool crdt_empty() const noexcept {
-            return _adj.crdt_empty();
+    /**
+     * Returns the total number of edges in this graph.
+     * Also check for elements marked as 'removed'.
+     *
+     * \return Number of edges in the graph.
+     */
+    size_type_edges crdt_size_edges() const noexcept {
+        size_type_edges total = 0;
+
+        for (auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+            total += it->second.value()._edges.crdt_size();
         }
-
-        /**
-         * Returns the number of vertex in this graph.
-         *
-         * \return Number of elements in the container.
-         */
-        size_type size_vertex() const noexcept {
-            return _adj.size();
-        }
-
-        /**
-         * Returns the number of vertex in this graph.
-         * Also check for elements marked as 'removed'.
-         *
-         * \return Number of elements in the container.
-         */
-        size_type crdt_size_vertex() const noexcept {
-            return _adj.crdt_size();
-        }
-
-        /**
-         * Returns the total number of edges in this graph.
-         *
-         * \return Number of edges in the graph.
-         */
-        size_type_edges size_edges() const noexcept {
-            size_type_edges total = 0;
-
-            for(const auto& elt : _adj) {
-                total += elt.second._edges.size();
-            }
-            return total;
-        }
-
-        /**
-         * Returns the total number of edges in this graph.
-         * Also check for elements marked as 'removed'.
-         *
-         * \return Number of edges in the graph.
-         */
-        size_type_edges crdt_size_edges() const noexcept {
-            size_type_edges total = 0;
-
-            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                total += it->second.value()._edges.crdt_size();
-            }
-            return total;
-        }
-
+        return total;
+    }
 
     // -------------------------------------------------------------------------
     // Lookup methods (Vertex)
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Returns a reference to the vertex content for this key. If no such
+     * vertex exists, an exception of type std::out_of_range is thrown.
+     *
+     * \param key Key value of the vertex to search for.
+     * \return Reference to the mapped value of the requested vertex.
+     */
+    T& at_vertex(const Key& key) {
+        Vertex& v = _adj.at(key);
+        return v.content();
+    }
 
-        /**
-         * Returns a reference to the vertex content for this key. If no such
-         * vertex exists, an exception of type std::out_of_range is thrown.
-         *
-         * \param key Key value of the vertex to search for.
-         * \return Reference to the mapped value of the requested vertex.
-         */
-        T& at_vertex(const Key& key) {
-            Vertex& v = _adj.at(key);
-            return v.content();
-        }
+    /**
+     * \copydoc LWWGraph::at_vertex
+     */
+    const T& at_vertex(const Key& key) const { return this->at_vertex(key); }
 
-        /**
-         * \copydoc LWWGraph::at_vertex
-         */
-        const T& at_vertex(const Key& key) const {
-            return this->at_vertex(key);
-        }
+    /**
+     * Returns a reference to the vertex content for this key. If no such
+     * vertex exists, an exception of type std::out_of_range is thrown.
+     *
+     * Also check for elements marked as 'removed'.
+     *
+     * \param key Key value of the vertex to search for.
+     * \return Reference to the mapped value of the requested vertex.
+     */
+    T& crdt_at_vertex(const Key& key) {
+        Vertex& v = _adj.crdt_at(key);
+        return v.content();
+    }
 
-        /**
-         * Returns a reference to the vertex content for this key. If no such
-         * vertex exists, an exception of type std::out_of_range is thrown.
-         *
-         * Also check for elements marked as 'removed'.
-         *
-         * \param key Key value of the vertex to search for.
-         * \return Reference to the mapped value of the requested vertex.
-         */
-        T& crdt_at_vertex(const Key& key) {
-            Vertex& v = _adj.crdt_at(key);
-            return v.content();
-        }
+    /**
+     * \copydoc LWWGraph::at_vertex
+     */
+    const T& crdt_at_vertex(const Key& key) const { return this->crdt_at_vertex(key); }
 
-        /**
-         * \copydoc LWWGraph::at_vertex
-         */
-        const T& crdt_at_vertex(const Key& key) const {
-            return this->crdt_at_vertex(key);
-        }
+    /**
+     * Find a vertex in the graph.
+     *
+     * This only lookup for vertex that are not internally deleted.
+     * If element is internally removed (removed flag is true), find returns
+     * past-the-end anyway (see end()).
+     *
+     * \param key   Vertex's key to find.
+     * \return      Iterator to the vertex or end() if not found.
+     */
+    iterator find_vertex(const Key& key) { return _adj.find(key); }
 
-        /**
-         * Find a vertex in the graph.
-         *
-         * This only lookup for vertex that are not internally deleted.
-         * If element is internally removed (removed flag is true), find returns
-         * past-the-end anyway (see end()).
-         *
-         * \param key   Vertex's key to find.
-         * \return      Iterator to the vertex or end() if not found.
-         */
-        iterator find_vertex(const Key& key) {
-            return _adj.find(key);
-        }
+    /**
+     * \copydoc LWWGraph::find_vertex
+     */
+    const_iterator find_vertex(const Key& key) const { return _adj.find(key); }
 
-        /**
-         * \copydoc LWWGraph::find_vertex
-         */
-        const_iterator find_vertex(const Key& key) const {
-            return _adj.find(key);
-        }
+    /**
+     * Query a vertex and its internal CRDT metadata.
+     *
+     * If vertex with this key exists in the internal container, it is
+     * returned, regardless its 'removed' status.
+     * This may be useful for datatypes built on top of this set.
+     * To have CRDT updates, you must apply the update, regardless its
+     * internal status. This query will return the vertex in any case
+     * (If already added once in the container.)
+     *
+     * If this key has never been added, returns crdt past-the-end
+     * (See crdt_end()) iterator.
+     *
+     * \param key   Vertex's key to find.
+     * \return      CRDT iterator to the vertex or crdt_end() if not found.
+     */
+    crdt_iterator crdt_find_vertex(const Key& key) { return _adj.crdt_find(key); }
 
-        /**
-         * Query a vertex and its internal CRDT metadata.
-         *
-         * If vertex with this key exists in the internal container, it is
-         * returned, regardless its 'removed' status.
-         * This may be useful for datatypes built on top of this set.
-         * To have CRDT updates, you must apply the update, regardless its
-         * internal status. This query will return the vertex in any case
-         * (If already added once in the container.)
-         *
-         * If this key has never been added, returns crdt past-the-end
-         * (See crdt_end()) iterator.
-         *
-         * \param key   Vertex's key to find.
-         * \return      CRDT iterator to the vertex or crdt_end() if not found.
-         */
-        crdt_iterator crdt_find_vertex(const Key& key) {
-            return _adj.crdt_find(key);
-        }
+    /**
+     * \copydoc LWWGraph::crdt_find_vertex
+     */
+    const_crdt_iterator crdt_find_vertex(const Key& key) const { return _adj.crdt_find(key); }
 
-        /**
-         * \copydoc LWWGraph::crdt_find_vertex
-         */
-        const_crdt_iterator crdt_find_vertex(const Key& key) const {
-            return _adj.crdt_find(key);
-        }
+    /**
+     * Count the number of vertex with this key.
+     * Since no duplicate are allowed, return 0 or 1.
+     *
+     * \param key Key value of the element to count.
+     * \return Number of elements with this key, either 0 or 1.
+     */
+    size_type count_vertex(const Key& key) const { return _adj.count(key); }
 
-        /**
-         * Count the number of vertex with this key.
-         * Since no duplicate are allowed, return 0 or 1.
-         *
-         * \param key Key value of the element to count.
-         * \return Number of elements with this key, either 0 or 1.
-         */
-        size_type count_vertex(const Key& key) const {
-            return _adj.count(key);
-        }
+    /**
+     * Count the number of vertex with this key.
+     * Since no duplicate are allowed, return 0 or 1.
+     * Also lookup for element internally marked as 'removed'.
+     *
+     * \param key Key value of the element to count.
+     * \return Number of elements with this key, either 0 or 1.
+     */
+    size_type crdt_count_vertex(const Key& key) const { return _adj.crdt_count(key); }
 
-        /**
-         * Count the number of vertex with this key.
-         * Since no duplicate are allowed, return 0 or 1.
-         * Also lookup for element internally marked as 'removed'.
-         *
-         * \param key Key value of the element to count.
-         * \return Number of elements with this key, either 0 or 1.
-         */
-        size_type crdt_count_vertex(const Key& key) const {
-            return _adj.crdt_count(key);
-        }
+    /**
+     * Check whether vertex is in the graph.
+     *
+     * \param key Key value of the vertex to check.
+     * \return True if in graph, otherwise, return false.
+     */
+    bool has_vertex(const Key& key) const { return _adj.count(key) == 1; }
 
-        /**
-         * Check whether vertex is in the graph.
-         *
-         * \param key Key value of the vertex to check.
-         * \return True if in graph, otherwise, return false.
-         */
-        bool has_vertex(const Key& key) const {
-            return _adj.count(key) == 1;
-        }
-
-        /**
-         * Check whether vertex is in the graph.
-         * Also lookup for element internally marked as 'removed'.
-         *
-         * \param key Key value of the vertex to check.
-         * \return True if in graph, otherwise, return false.
-         */
-        bool crdt_has_vertex(const Key& key) const {
-            return _adj.crdt_count(key) == 1;
-        }
-
+    /**
+     * Check whether vertex is in the graph.
+     * Also lookup for element internally marked as 'removed'.
+     *
+     * \param key Key value of the vertex to check.
+     * \return True if in graph, otherwise, return false.
+     */
+    bool crdt_has_vertex(const Key& key) const { return _adj.crdt_count(key) == 1; }
 
     // -------------------------------------------------------------------------
     // Lookup methods (Edges)
     // -------------------------------------------------------------------------
 
-    public:
-
-        /**
-         * Count the number of edge from given vertex to another.
-         * Since no duplicate are allowed, return 0 or 1.
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return Number of edges with this characteristic, either 0 or 1.
-         */
-        size_type count_edge(const Key& from, const Key& to) const {
-            auto vertex_it = _adj.find(from);
-            if(vertex_it != _adj.end()) {
-                return vertex_it->second.edges().count(to);
-            }
-            return 0;
+   public:
+    /**
+     * Count the number of edge from given vertex to another.
+     * Since no duplicate are allowed, return 0 or 1.
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return Number of edges with this characteristic, either 0 or 1.
+     */
+    size_type count_edge(const Key& from, const Key& to) const {
+        auto vertex_it = _adj.find(from);
+        if (vertex_it != _adj.end()) {
+            return vertex_it->second.edges().count(to);
         }
+        return 0;
+    }
 
-        /**
-         * Count the number of edge from given vertex to another.
-         * Since no duplicate are allowed, return 0 or 1.
-         * Also check for elements marked as 'removed'. (Internal CRDT data).
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return Number of edges with this characteristic, either 0 or 1.
-         */
-        size_type crdt_count_edge(const Key& from, const Key& to) const {
-            auto vertex_it = _adj.crdt_find(from);
-            if(vertex_it != _adj.crdt_end()) {
-                return vertex_it->second.value().edges().crdt_count(to);
-            }
-            return 0;
+    /**
+     * Count the number of edge from given vertex to another.
+     * Since no duplicate are allowed, return 0 or 1.
+     * Also check for elements marked as 'removed'. (Internal CRDT data).
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return Number of edges with this characteristic, either 0 or 1.
+     */
+    size_type crdt_count_edge(const Key& from, const Key& to) const {
+        auto vertex_it = _adj.crdt_find(from);
+        if (vertex_it != _adj.crdt_end()) {
+            return vertex_it->second.value().edges().crdt_count(to);
         }
+        return 0;
+    }
 
-        /**
-         * Check whether edge is in the graph.
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return True if in graph, otherwise, return false.
-         */
-        bool has_edge(const Key& from, const Key& to) const {
-            return this->count_edge(from, to) == 1;
-        }
+    /**
+     * Check whether edge is in the graph.
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return True if in graph, otherwise, return false.
+     */
+    bool has_edge(const Key& from, const Key& to) const { return this->count_edge(from, to) == 1; }
 
-        /**
-         * Check whether edge is in the graph.
-         * Also lookup for element internally marked as 'removed'.
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return True if in graph, otherwise, return false.
-         */
-        bool crdt_has_edge(const Key& from, const Key& to) const {
-            return this->crdt_count_edge(from, to) == 1;
-        }
-
+    /**
+     * Check whether edge is in the graph.
+     * Also lookup for element internally marked as 'removed'.
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return True if in graph, otherwise, return false.
+     */
+    bool crdt_has_edge(const Key& from, const Key& to) const { return this->crdt_count_edge(from, to) == 1; }
 
     // -------------------------------------------------------------------------
     // Modifiers methods
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Removes all vertex from this graph.
+     * This also remove all existing edges.
+     *
+     * Only elements with timestamp inferior to clear timestamp are
+     * actually removed.
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \warning
+     * Container may not be empty after clear call.
+     * This is because if a really older clear is applied, this doesn't
+     * affect elements that have been added later.
+     * From a user point of view, if you display a UI after a clear, you
+     * should iterate over the set anyway.
+     *
+     * \param stamp Timestamp of this operation.
+     * \return True if clear actually applied, otherwise, return false.
+     */
+    bool clear_vertices(const U& stamp) {
+        for (auto& vertex_elt : _adj) {
+            vertex_elt.second._edges.clear(stamp);
+        }
+        return _adj.clear(stamp);
+    }
 
-        /**
-         * Removes all vertex from this graph.
-         * This also remove all existing edges.
-         *
-         * Only elements with timestamp inferior to clear timestamp are
-         * actually removed.
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \warning
-         * Container may not be empty after clear call.
-         * This is because if a really older clear is applied, this doesn't
-         * affect elements that have been added later.
-         * From a user point of view, if you display a UI after a clear, you
-         * should iterate over the set anyway.
-         *
-         * \param stamp Timestamp of this operation.
-         * \return True if clear actually applied, otherwise, return false.
-         */
-        bool clear_vertices(const U& stamp) {
-            for(auto& vertex_elt : _adj) {
-                vertex_elt.second._edges.clear(stamp);
+    /**
+     * Removes all edge for a specific vertex.
+     *
+     * Only elements with timestamp inferior to clear timestamp are
+     * actually removed.
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \param key   The unique vertex's key.
+     * \param stamp Timestamp of this operation.
+     * \return True if clear actually applied, otherwise, return false.
+     */
+    bool clear_vertex_edges(const Key& key, const U& stamp) {
+        auto vertex_it = _adj.crdt_find(key);
+        if (vertex_it == _adj.crdt_end()) {
+            return false;
+        }
+        auto& edges = vertex_it->second.value()._edges;
+        return edges.clear(stamp);
+    }
+
+    /**
+     * Add a new vertex in the graph.
+     *
+     * If key already exists, use timestamps for concurrency control.
+     *
+     * \par Concurrent add_vertex / add_vertex
+     * Timestamp is updated with the higher value. Key is added in any case.
+     * Returns false. This is because, it only updates timestamp of the
+     * operation. Key was already added in container before the operation.
+     *
+     * \par Concurrent add_vertex / remove_vertex
+     * Uses the higher timestamp select the winning operation.
+     * If remove timestamp wins, this add operation does nothing.
+     * Otherwise, add is applied and true is returned.
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \note
+     * This only adds the key. A default vertex is created.
+     * To add key and set its content, call this add method and query the
+     * newly added vertex (Then update it with its default value).
+     *
+     * \param key   The unique vertex's key.
+     * \param stamp Timestamp of this operation.
+     * \return True if vertex added, otherwise, return false.
+     */
+    bool add_vertex(const Key& key, const U& stamp) { return _adj.add(key, stamp); }
+
+    /**
+     * Remove a vertex from the graph.
+     *
+     * If key doesn't exists, internally add it first (with removed flag).
+     * This is because remove / add are commutative and remove may be
+     * received before add. (Note that receiving the actual add wont do
+     * anything since its timestamps will be smaller).
+     *
+     * After timestamp check, if vertex actually removed, also remove all
+     * edges that implies this vertex.
+     *
+     * \par Concurrent add_edge / remove_vertex
+     * See documentation of LWWGraph::add_edge
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \see LWWGraph::add_edge
+     *
+     * \param key   The unique vertex's key.
+     * \param stamp Timestamp of this operation.
+     * \return True if vertex removed, otherwise, return false.
+     */
+    bool remove_vertex(const Key& key, const U& stamp) {
+        bool isVertexRemoved = _adj.remove(key, stamp);
+
+        // Remove all edges of this vertex
+        auto from_it = _adj.crdt_find(key);
+        auto& edges = from_it->second.value()._edges;
+        edges.clear(stamp);
+
+        // Remove all edge to this vertex (On others vertex)
+        for (auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+            auto& edges = it->second.value()._edges;
+            if (it->first != key && edges.count(key) == 1) {
+                edges.remove(key, stamp);
             }
-            return _adj.clear(stamp);
         }
 
-        /**
-         * Removes all edge for a specific vertex.
-         *
-         * Only elements with timestamp inferior to clear timestamp are
-         * actually removed.
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \param key   The unique vertex's key.
-         * \param stamp Timestamp of this operation.
-         * \return True if clear actually applied, otherwise, return false.
-         */
-        bool clear_vertex_edges(const Key& key, const U& stamp) {
-            auto vertex_it = _adj.crdt_find(key);
-            if(vertex_it == _adj.crdt_end()) {
-                return false;
-            }
-            auto& edges = vertex_it->second.value()._edges;
-            return edges.clear(stamp);
+        return isVertexRemoved;
+    }
+
+    /**
+     * Add edge from a vertex to another.
+     *
+     * This also performs a 'add_vertex' for vertex 'from' and 'to'.
+     * This ensure add_edge is commutative even if add_edge is received
+     * before the add operations.
+     *
+     * \par Concurrent add_edge / remove_vertex
+     * If after the 'add_vertex' operation, any vertex is still marked as
+     * removed. Meaning 'add_edge' was before 'remove_vertex', this edge
+     * is marked as removed (With the 'remove_vertex' timestamp).
+     * This resolve the concurrent 'add_edge' | 'remove_vertex'
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return Structure to know if edge, from and/or, to where added.
+     */
+    AddEdgeInfo add_edge(const Key& from, const Key& to, const U& stamp) {
+        AddEdgeInfo info;
+        info.isFromAdded = _adj.add(from, stamp);
+        info.isToAdded = false;
+        if (from != to) {
+            info.isToAdded = _adj.add(to, stamp);
         }
 
-        /**
-         * Add a new vertex in the graph.
-         *
-         * If key already exists, use timestamps for concurrency control.
-         *
-         * \par Concurrent add_vertex / add_vertex
-         * Timestamp is updated with the higher value. Key is added in any case.
-         * Returns false. This is because, it only updates timestamp of the
-         * operation. Key was already added in container before the operation.
-         *
-         * \par Concurrent add_vertex / remove_vertex
-         * Uses the higher timestamp select the winning operation.
-         * If remove timestamp wins, this add operation does nothing.
-         * Otherwise, add is applied and true is returned.
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \note
-         * This only adds the key. A default vertex is created.
-         * To add key and set its content, call this add method and query the
-         * newly added vertex (Then update it with its default value).
-         *
-         * \param key   The unique vertex's key.
-         * \param stamp Timestamp of this operation.
-         * \return True if vertex added, otherwise, return false.
-         */
-        bool add_vertex(const Key& key, const U& stamp) {
-            return _adj.add(key, stamp);
+        auto from_it = _adj.crdt_find(from);
+        Vertex& vertex = from_it->second.value();
+        info.isEdgeAdded = vertex._edges.add(to, stamp);
+
+        // If edge added, check whether vertex from or to are not removed.
+        // If one of them is removed, this newly created edge must be
+        // removed now. (important for CRDT commutativity)
+
+        auto from_edge_it = vertex.edges().crdt_find(to);
+        if (!from_edge_it->second.isRemoved()) {
+            auto vertex_it_from = _adj.crdt_find(from);
+            auto vertex_it_to = _adj.crdt_find(to);
+            assert(vertex_it_from != _adj.crdt_end());
+            assert(vertex_it_to != _adj.crdt_end());
+            const bool from_removed = vertex_it_from->second.isRemoved();
+            const bool to_removed = vertex_it_to->second.isRemoved();
+
+            if (from_removed || to_removed) {
+                U from_time = vertex_it_from->second.timestamp();
+                U to_time = vertex_it_to->second.timestamp();
+                U high_time = (from_time > to_time) ? from_time : to_time;
+
+                vertex._edges.remove(to, high_time);
+                info.isEdgeAdded = false;
+                return info;
+            }
+        }
+        return info;
+    }
+
+    /**
+     * Removes the specific edge between two vertex.
+     *
+     * If from and/or to doesn't exists, create one with minimum possible
+     * timestamp. This create a temporary vertex. This is use in case of
+     * remove_edge is applied before 'add_edge'. (Required for CRDT
+     * commutativity).
+     *
+     * \par Idempotent
+     * Duplicate calls with same stamp is idempotent.
+     *
+     * \param from  The origin vertex.
+     * \param to    The destination vertex.
+     * \return True if edge removed, otherwise, return false.
+     */
+    bool remove_edge(const Key& from, const Key& to, const U& stamp) {
+        _adj.remove(from, 0);
+        if (from != to) {
+            _adj.remove(to, 0);
         }
 
-        /**
-         * Remove a vertex from the graph.
-         *
-         * If key doesn't exists, internally add it first (with removed flag).
-         * This is because remove / add are commutative and remove may be
-         * received before add. (Note that receiving the actual add wont do
-         * anything since its timestamps will be smaller).
-         *
-         * After timestamp check, if vertex actually removed, also remove all
-         * edges that implies this vertex.
-         *
-         * \par Concurrent add_edge / remove_vertex
-         * See documentation of LWWGraph::add_edge
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \see LWWGraph::add_edge
-         *
-         * \param key   The unique vertex's key.
-         * \param stamp Timestamp of this operation.
-         * \return True if vertex removed, otherwise, return false.
-         */
-        bool remove_vertex(const Key& key, const U& stamp) {
-            bool isVertexRemoved = _adj.remove(key, stamp);
-
-            // Remove all edges of this vertex
-            auto from_it = _adj.crdt_find(key);
-            auto& edges = from_it->second.value()._edges;
-            edges.clear(stamp);
-
-            // Remove all edge to this vertex (On others vertex)
-            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                auto& edges = it->second.value()._edges;
-                if(it->first != key && edges.count(key) == 1) {
-                    edges.remove(key, stamp);
-                }
-            }
-
-            return isVertexRemoved;
-        }
-
-        /**
-         * Add edge from a vertex to another.
-         *
-         * This also performs a 'add_vertex' for vertex 'from' and 'to'.
-         * This ensure add_edge is commutative even if add_edge is received
-         * before the add operations.
-         *
-         * \par Concurrent add_edge / remove_vertex
-         * If after the 'add_vertex' operation, any vertex is still marked as
-         * removed. Meaning 'add_edge' was before 'remove_vertex', this edge
-         * is marked as removed (With the 'remove_vertex' timestamp).
-         * This resolve the concurrent 'add_edge' | 'remove_vertex'
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return Structure to know if edge, from and/or, to where added.
-         */
-        AddEdgeInfo add_edge(const Key& from, const Key& to, const U& stamp) {
-            AddEdgeInfo info;
-            info.isFromAdded = _adj.add(from, stamp);
-            info.isToAdded = false;
-            if(from != to) {
-                info.isToAdded = _adj.add(to, stamp);
-            }
-
-            auto from_it = _adj.crdt_find(from);
-            Vertex& vertex = from_it->second.value();
-            info.isEdgeAdded = vertex._edges.add(to, stamp);
-
-            // If edge added, check whether vertex from or to are not removed.
-            // If one of them is removed, this newly created edge must be
-            // removed now. (important for CRDT commutativity)
-
-            auto from_edge_it = vertex.edges().crdt_find(to);
-            if(!from_edge_it->second.isRemoved()) {
-                auto vertex_it_from = _adj.crdt_find(from);
-                auto vertex_it_to = _adj.crdt_find(to);
-                assert(vertex_it_from != _adj.crdt_end());
-                assert(vertex_it_to != _adj.crdt_end());
-                const bool from_removed = vertex_it_from->second.isRemoved();
-                const bool to_removed = vertex_it_to->second.isRemoved();
-
-                if(from_removed || to_removed) {
-                    U from_time = vertex_it_from->second.timestamp();
-                    U to_time   = vertex_it_to->second.timestamp();
-                    U high_time  = (from_time > to_time) ? from_time : to_time;
-
-                    vertex._edges.remove(to, high_time);
-                    info.isEdgeAdded = false;
-                    return info;
-                }
-            }
-            return info;
-        }
-
-        /**
-         * Removes the specific edge between two vertex.
-         *
-         * If from and/or to doesn't exists, create one with minimum possible
-         * timestamp. This create a temporary vertex. This is use in case of
-         * remove_edge is applied before 'add_edge'. (Required for CRDT
-         * commutativity).
-         *
-         * \par Idempotent
-         * Duplicate calls with same stamp is idempotent.
-         *
-         * \param from  The origin vertex.
-         * \param to    The destination vertex.
-         * \return True if edge removed, otherwise, return false.
-         */
-        bool remove_edge(const Key& from, const Key& to, const U& stamp) {
-            _adj.remove(from, 0);
-            if(from != to) {
-                _adj.remove(to, 0);
-            }
-
-            auto coco_it = _adj.crdt_find(from);
-            Vertex &v = coco_it->second.value();
-            return v._edges.remove(to, stamp);
-        }
-
+        auto coco_it = _adj.crdt_find(from);
+        Vertex& v = coco_it->second.value();
+        return v._edges.remove(to, stamp);
+    }
 
     // -------------------------------------------------------------------------
     // Hash policy methods
     // -------------------------------------------------------------------------
 
-    public:
-
-        /**
-         * Change capacity of the vertex container.
-         * This reserve capacity for the internal adjacency list.
-         * (Edge list for each vertex is not reserved, only vertex list).
-         *
-         * \see http://en.cppreference.com/w/cpp/container/unordered_map/reserve
-         *
-         * \param count New capacity of the container.
-         */
-        void reserve(size_type count) {
-            _adj.reserve(count);
-        }
-
+   public:
+    /**
+     * Change capacity of the vertex container.
+     * This reserve capacity for the internal adjacency list.
+     * (Edge list for each vertex is not reserved, only vertex list).
+     *
+     * \see http://en.cppreference.com/w/cpp/container/unordered_map/reserve
+     *
+     * \param count New capacity of the container.
+     */
+    void reserve(size_type count) { _adj.reserve(count); }
 
     // -------------------------------------------------------------------------
     // CRDT Specific
     // -------------------------------------------------------------------------
 
-    public:
-
-        /**
-         * Check if tow containers have the exact same internal data.
-         * Element with removed flag are used for this comparison.
-         *
-         * \param other Container to compare with.
-         * \return True if equals, otherwise, return false.
-         */
-        bool crdt_equal(const LWWGraph& other) const {
-            if(_adj.crdt_equal(other._adj) == false) {
-                return false;
-            }
-
-            // At this point only edges not marked as deleted are checked.
-            // This is because crdt_equal calls == on each vertex, so edges==
-            // is called instead of edges.crdt_equal()
-
-            for(auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
-                const auto& edges = it->second.value().edges();
-                const auto other_it = other._adj.crdt_find(it->first);
-                const auto& other_edges = other_it->second.value().edges();
-                if(!edges.crdt_equal(other_edges)) {
-                    return false;
-                }
-            }
-            return true;
+   public:
+    /**
+     * Check if tow containers have the exact same internal data.
+     * Element with removed flag are used for this comparison.
+     *
+     * \param other Container to compare with.
+     * \return True if equals, otherwise, return false.
+     */
+    bool crdt_equal(const LWWGraph& other) const {
+        if (_adj.crdt_equal(other._adj) == false) {
+            return false;
         }
 
+        // At this point only edges not marked as deleted are checked.
+        // This is because crdt_equal calls == on each vertex, so edges==
+        // is called instead of edges.crdt_equal()
+
+        for (auto it = _adj.crdt_begin(); it != _adj.crdt_end(); ++it) {
+            const auto& edges = it->second.value().edges();
+            const auto other_it = other._adj.crdt_find(it->first);
+            const auto& other_edges = other_it->second.value().edges();
+            if (!edges.crdt_equal(other_edges)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     // -------------------------------------------------------------------------
     // Iterator
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Returns iterator to the beginning.
+     *
+     * \return iterator to the first element.
+     */
+    iterator begin() { return iterator(_adj); }
 
-        /**
-         * Returns iterator to the beginning.
-         *
-         * \return iterator to the first element.
-         */
-        iterator begin() {
-            return iterator(_adj);
-        }
+    /**
+     * \copydoc LWWGraph::begin
+     */
+    const_iterator begin() const noexcept { return const_iterator(_adj); }
 
-        /**
-         * \copydoc LWWGraph::begin
-         */
-        const_iterator begin() const noexcept {
-            return const_iterator(_adj);
-        }
+    /**
+     * Returns iterator to the end.
+     *
+     * \return iterator to the last element.
+     */
+    iterator end() {
+        iterator it(_adj, _adj.crdt_end());
+        return it;
+    }
 
-        /**
-         * Returns iterator to the end.
-         *
-         * \return iterator to the last element.
-         */
-        iterator end() {
-            iterator it(_adj, _adj.crdt_end());
-            return it;
-        }
+    /**
+     * \copydoc LWWGraph::end
+     */
+    const_iterator end() const noexcept {
+        const_iterator it(_adj, _adj.crdt_end());
+        return it;
+    }
 
-        /**
-         * \copydoc LWWGraph::end
-         */
-        const_iterator end() const noexcept {
-            const_iterator it(_adj, _adj.crdt_end());
-            return it;
-        }
+    /**
+     * \copydoc LWWGraph::begin
+     */
+    const_iterator cbegin() const noexcept { return const_iterator(_adj); }
 
-        /**
-         * \copydoc LWWGraph::begin
-         */
-        const_iterator cbegin() const noexcept {
-            return const_iterator(_adj);
-        }
+    /**
+     * \copydoc LWWGraph::end
+     */
+    const_iterator cend() const noexcept {
+        const_iterator it(_adj, _adj.crdt_end());
+        return it;
+    }
 
-        /**
-         * \copydoc LWWGraph::end
-         */
-        const_iterator cend() const noexcept {
-            const_iterator it(_adj, _adj.crdt_end());
-            return it;
-        }
+    /**
+     * Returns crdt_iterator to the beginning.
+     *
+     * \see LWWGraph::crdt_iterator
+     * \return CRDT iterator to the first vertex.
+     */
+    crdt_iterator crdt_begin() { return _adj.crdt_begin(); }
 
-        /**
-         * Returns crdt_iterator to the beginning.
-         *
-         * \see LWWGraph::crdt_iterator
-         * \return CRDT iterator to the first vertex.
-         */
-        crdt_iterator crdt_begin() {
-            return _adj.crdt_begin();
-        }
+    /**
+     * Returns crdt_iterator to the end.
+     *
+     * \see LWWGraph::crdt_iterator
+     * \return CRDT iterator to the last vertex.
+     */
+    crdt_iterator crdt_end() { return _adj.crdt_end(); }
 
-        /**
-         * Returns crdt_iterator to the end.
-         *
-         * \see LWWGraph::crdt_iterator
-         * \return CRDT iterator to the last vertex.
-         */
-        crdt_iterator crdt_end() {
-            return _adj.crdt_end();
-        }
+    /**
+     * \copydoc LWWGraph::crdt_begin
+     */
+    const_crdt_iterator crdt_begin() const { return _adj.crdt_begin(); }
 
-        /**
-         * \copydoc LWWGraph::crdt_begin
-         */
-        const_crdt_iterator crdt_begin() const {
-            return _adj.crdt_begin();
-        }
-
-        /**
-         * \copydoc LWWGraph::crdt_end
-         */
-        const_crdt_iterator crdt_end() const {
-            return _adj.crdt_end();
-        }
-
+    /**
+     * \copydoc LWWGraph::crdt_end
+     */
+    const_crdt_iterator crdt_end() const { return _adj.crdt_end(); }
 
     // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Check if lhs and rhs are equals.
+     * Two LWWGraphs are equal if their adjacency list of 'living' vertex
+     * are equal.
+     *
+     * \param lhs Left hand side
+     * \param rhs Right hand side
+     * \return True if equal, otherwise, return false.
+     */
+    friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
+        if (lhs._adj.size() != rhs._adj.size()) {
+            return false;
+        }
+        return (lhs._adj == rhs._adj);
+    }
 
-        /**
-         * Check if lhs and rhs are equals.
-         * Two LWWGraphs are equal if their adjacency list of 'living' vertex
-         * are equal.
-         *
-         * \param lhs Left hand side
-         * \param rhs Right hand side
-         * \return True if equal, otherwise, return false.
-         */
-        friend bool operator==(const LWWGraph& lhs, const LWWGraph& rhs) {
-            if(lhs._adj.size() != rhs._adj.size()) {
-                return false;
+    /**
+     * Check if lhs and rhs are not equals.
+     * See operator == for further information about equality meaning.
+     *
+     * \see LWWGraph::operator==
+     *
+     * \param lhs Left hand side
+     * \param rhs Right hand side
+     * \return True if not equal, otherwise, return false.
+     */
+    friend bool operator!=(const LWWGraph& lhs, const LWWGraph& rhs) { return !(lhs == rhs); }
+
+    /**
+     * Display the internal graph content.
+     * This is mainly for debug print purpose.
+     */
+    friend std::ostream& operator<<(std::ostream& out, const LWWGraph<Key, T, U>& o) {
+        out << "CmRDT::LWWGraph = ";
+        for (auto it = o.crdt_begin(); it != o.crdt_end(); ++it) {
+            out << "\n Vertex(" << it->first << "," << it->second.timestamp();
+            if (it->second.isRemoved()) {
+                out << ",x)";
+            } else {
+                out << ",o)";
             }
-            return (lhs._adj == rhs._adj);
+            out << " -> " << it->second.value().edges();
         }
-
-        /**
-         * Check if lhs and rhs are not equals.
-         * See operator == for further information about equality meaning.
-         *
-         * \see LWWGraph::operator==
-         *
-         * \param lhs Left hand side
-         * \param rhs Right hand side
-         * \return True if not equal, otherwise, return false.
-         */
-        friend bool operator!=(const LWWGraph& lhs, const LWWGraph& rhs) {
-            return !(lhs == rhs);
-        }
-
-        /**
-         * Display the internal graph content.
-         * This is mainly for debug print purpose.
-         */
-        friend std::ostream& operator<<(std::ostream& out,
-                                        const LWWGraph<Key,T,U>& o) {
-            out << "CmRDT::LWWGraph = ";
-            for(auto it = o.crdt_begin(); it != o.crdt_end(); ++it) {
-                out << "\n Vertex("
-                    << it->first << ","
-                    << it->second.timestamp();
-                if(it->second.isRemoved()) {
-                    out << ",x)";
-                }
-                else {
-                    out << ",o)";
-                }
-                out << " -> " << it->second.value().edges();
-            }
-            return out;
-        }
+        return out;
+    }
 };
-
 
 // /////////////////////////////////////////////////////////////////////////////
 // *****************************************************************************
@@ -819,76 +743,63 @@ class LWWGraph {
  * \tparam T    Type of element.
  * \tparam U    Type of timestamps.
  */
-template<typename Key, typename T, typename U>
-class LWWGraph<Key,T,U>::Vertex {
-    private:
-        friend LWWGraph;
-        T               _content;
-        LWWSet<Key,U>   _edges;
+template <typename Key, typename T, typename U>
+class LWWGraph<Key, T, U>::Vertex {
+   private:
+    friend LWWGraph;
+    T _content;
+    LWWSet<Key, U> _edges;
 
-    public:
+   public:
+    /**
+     * Returns a reference to the vertex content data.
+     *
+     * \return Reference to the content.
+     */
+    T& content() { return _content; }
 
-        /**
-         * Returns a reference to the vertex content data.
-         *
-         * \return Reference to the content.
-         */
-        T& content() {
-            return _content;
-        }
+    /**
+     * \copydoc Vertex::content
+     */
+    const T& content() const { return _content; }
 
-        /**
-         * \copydoc Vertex::content
-         */
-        const T& content() const {
-            return _content;
-        }
-
-        /**
-         * Returns a reference to the vertex's edges.
-         *
-         * \return Reference to the set of edges.
-         */
-        const LWWSet<Key,U>& edges() const {
-            return _edges;
-        }
-
+    /**
+     * Returns a reference to the vertex's edges.
+     *
+     * \return Reference to the set of edges.
+     */
+    const LWWSet<Key, U>& edges() const { return _edges; }
 
     // -------------------------------------------------------------------------
     // Operators overload
     // -------------------------------------------------------------------------
 
-    public:
+   public:
+    /**
+     * Check if lhs and rhs are equals.
+     * Two Vertex are equal if their set of edges are equal and their
+     * content are equal.
+     *
+     * \param lhs Left hand side
+     * \param rhs Right hand side
+     * \return True if equal, otherwise, return false.
+     */
+    friend bool operator==(const Vertex& lhs, const Vertex& rhs) {
+        return (lhs._edges == rhs._edges) && (lhs._content == rhs._content);
+    }
 
-        /**
-         * Check if lhs and rhs are equals.
-         * Two Vertex are equal if their set of edges are equal and their
-         * content are equal.
-         *
-         * \param lhs Left hand side
-         * \param rhs Right hand side
-         * \return True if equal, otherwise, return false.
-         */
-        friend bool operator==(const Vertex& lhs, const Vertex& rhs) {
-            return (lhs._edges == rhs._edges) && (lhs._content == rhs._content);
-        }
-
-        /**
-         * Check if lhs and rhs are not equals.
-         * See operator == for further information about equality meaning.
-         *
-         * \see LWWMap::Vertex::operator==
-         *
-         * \param lhs Left hand side
-         * \param rhs Right hand side
-         * \return True if not equal, otherwise, return false.
-         */
-        friend bool operator!=(const Vertex& lhs, const Vertex& rhs) {
-            return !(lhs == rhs);
-        }
+    /**
+     * Check if lhs and rhs are not equals.
+     * See operator == for further information about equality meaning.
+     *
+     * \see LWWMap::Vertex::operator==
+     *
+     * \param lhs Left hand side
+     * \param rhs Right hand side
+     * \return True if not equal, otherwise, return false.
+     */
+    friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs == rhs); }
 };
 
-
-}} // End namespaces
-
-
+}  // namespace CmRDT
+}  // namespace collab

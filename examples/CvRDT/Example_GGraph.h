@@ -1,20 +1,18 @@
 #pragma once
 
-#include "collabdata/CvRDT/GGraph.h"
-
 #include <iostream>
 #include <string>
 
+#include "collabdata/CvRDT/GGraph.h"
+
 namespace collab {
 namespace CvRDT {
-
 
 void GGraph_example() {
     std::cout << "\n----- CvRDT GGraph Example ----------\n";
 
     GGraph<std::string, int> data0;
     GGraph<std::string, int> data1;
-
 
     // --- Replicate 0 (data0) ---
     data0.addVertex("v1", 10);
@@ -26,7 +24,6 @@ void GGraph_example() {
     data0.addEdge("v1", "v4");
     data0.addEdge("v2", "v3");
     data0.addEdge("v4", "v3");
-
 
     // --- Replicate 1 (data1) ---
     data1.addVertex("v1", 100);
@@ -57,5 +54,5 @@ void GGraph_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-
-}} // End namespaces
+}  // namespace CvRDT
+}  // namespace collab

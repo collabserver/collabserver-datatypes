@@ -1,27 +1,25 @@
-#include "collabdata/CmRDT/LWWGraph.h"
-
 #include <gtest/gtest.h>
-#include <string>
-#include <iostream>
 
+#include <iostream>
+#include <string>
+
+#include "collabdata/CmRDT/LWWGraph.h"
 
 // Check the whole internal data of a vertex
 #define _ASSERT_VERTEX_EQ(vertex_it, key_, is_removed, stamp_, data_) \
-    EXPECT_TRUE(vertex_it != data_.crdt_end()); \
-    EXPECT_EQ(vertex_it->first, key_); \
-    EXPECT_EQ(vertex_it->second.isRemoved(), is_removed); \
+    EXPECT_TRUE(vertex_it != data_.crdt_end());                       \
+    EXPECT_EQ(vertex_it->first, key_);                                \
+    EXPECT_EQ(vertex_it->second.isRemoved(), is_removed);             \
     EXPECT_EQ(vertex_it->second.timestamp(), stamp_)
 
 // Check AddEdgeInfo data
 #define _ASSERT_ADD_EDGE_INFO_EQ(info_, edge_added_, from_added_, to_added_) \
-    ASSERT_EQ(info_.isEdgeAdded, edge_added_); \
-    ASSERT_EQ(info_.isFromAdded, from_added_); \
+    ASSERT_EQ(info_.isEdgeAdded, edge_added_);                               \
+    ASSERT_EQ(info_.isFromAdded, from_added_);                               \
     ASSERT_EQ(info_.isToAdded, to_added_)
-
 
 namespace collab {
 namespace CmRDT {
-
 
 // -----------------------------------------------------------------------------
 // empty()
@@ -46,7 +44,6 @@ TEST(LWWGraph, emptyTest) {
     ASSERT_FALSE(data0.empty());
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_empty()
 // -----------------------------------------------------------------------------
@@ -69,7 +66,6 @@ TEST(LWWGraph, crdtEmptyTest) {
     data0.add_vertex("v2", 30);
     ASSERT_FALSE(data0.crdt_empty());
 }
-
 
 // -----------------------------------------------------------------------------
 // size_vertex()
@@ -170,7 +166,6 @@ TEST(LWWGraph, sizeWithadd_edgeremove_vertex) {
     ASSERT_EQ(data0.size_vertex(), data1.size_vertex());
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_size()
 // -----------------------------------------------------------------------------
@@ -199,7 +194,6 @@ TEST(LWWGraph, crdtSizeTest) {
     data0.remove_vertex("v4", 80);
     ASSERT_EQ(data0.crdt_size_vertex(), 4);
 }
-
 
 // -----------------------------------------------------------------------------
 // size_edges()
@@ -241,7 +235,6 @@ TEST(LWWGraph, sizeEdgesTest_WithRemoveCalls) {
     EXPECT_EQ(data0.size_edges(), 3);
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_size_edges()
 // -----------------------------------------------------------------------------
@@ -281,7 +274,6 @@ TEST(LWWGraph, crdtSizeEdgesTest_WithRemoveCalls) {
 
     EXPECT_EQ(data0.crdt_size_edges(), 6);
 }
-
 
 // -----------------------------------------------------------------------------
 // at_vertex()
@@ -329,11 +321,10 @@ TEST(LWWGraph, atVertexTest_RemovedVertex) {
     // Check results
     int nbException = 0;
     const char* values[3] = {"v1", "v2", "v3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.at_vertex(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
@@ -346,17 +337,15 @@ TEST(LWWGraph, atVertexTest_InvalidVertexThrowException) {
     // Check results
     int nbException = 0;
     const char* values[3] = {"v1", "v2", "v3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.at_vertex(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
     ASSERT_EQ(nbException, 3);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_at_vertex()
@@ -409,11 +398,10 @@ TEST(LWWGraph, crdtAtVertexTest_RemovedVertex) {
     // Check results
     int nbException = 0;
     const char* values[3] = {"v1", "v2", "v3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.crdt_at_vertex(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
@@ -426,17 +414,15 @@ TEST(LWWGraph, crdtAtVertexTest_InvalidVertexThrowException) {
     // Check results
     int nbException = 0;
     const char* values[3] = {"v1", "v2", "v3"};
-    for(int k = 0; k < 3; ++k) {
+    for (int k = 0; k < 3; ++k) {
         try {
             data0.crdt_at_vertex(values[k]);
-        }
-        catch(std::out_of_range e) {
+        } catch (std::out_of_range e) {
             nbException++;
         }
     }
     ASSERT_EQ(nbException, 3);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_find_vertex()
@@ -469,7 +455,6 @@ TEST(LWWGraph, crdtFindVertexTest) {
     _ASSERT_VERTEX_EQ(res, 2, false, 30, data0);
 }
 
-
 // -----------------------------------------------------------------------------
 // count_vertex()
 // -----------------------------------------------------------------------------
@@ -497,7 +482,6 @@ TEST(LWWGraph, countVertexTest) {
     EXPECT_EQ(data0.count_vertex(4), 1);
     EXPECT_EQ(data0.count_vertex(5), 1);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_count_vertex()
@@ -559,7 +543,6 @@ TEST(LWWGraph, crdtHasVertexTest) {
     EXPECT_FALSE(data0.has_vertex("e64"));
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_has_vertex()
 // -----------------------------------------------------------------------------
@@ -591,7 +574,6 @@ TEST(LWWGraph, hasVertexTest) {
     EXPECT_FALSE(data0.crdt_has_vertex("e64"));
 }
 
-
 // -----------------------------------------------------------------------------
 // count_edge()
 // -----------------------------------------------------------------------------
@@ -618,7 +600,6 @@ TEST(LWWGraph, countEdgeTest) {
     data0.add_edge("v3", "v2", 27);
     data0.remove_edge("v3", "v2", 33);
 
-
     // Check v1 edges
     ASSERT_EQ(data0.count_edge("v1", "v1"), 1);
     ASSERT_EQ(data0.count_edge("v1", "v2"), 0);
@@ -634,7 +615,6 @@ TEST(LWWGraph, countEdgeTest) {
     ASSERT_EQ(data0.count_edge("v3", "v2"), 0);
     ASSERT_EQ(data0.count_edge("v3", "v3"), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_count_edge()
@@ -662,7 +642,6 @@ TEST(LWWGraph, crdtCountEdgeTest) {
     data0.add_edge("v3", "v2", 27);
     data0.remove_edge("v3", "v2", 33);
 
-
     // Check v1 edges
     ASSERT_EQ(data0.crdt_count_edge("v1", "v1"), 1);
     ASSERT_EQ(data0.crdt_count_edge("v1", "v2"), 1);
@@ -678,7 +657,6 @@ TEST(LWWGraph, crdtCountEdgeTest) {
     ASSERT_EQ(data0.crdt_count_edge("v3", "v2"), 1);
     ASSERT_EQ(data0.crdt_count_edge("v3", "v3"), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // has_edge()
@@ -706,7 +684,6 @@ TEST(LWWGraph, hasEdgeTest) {
     data0.add_edge("v3", "v2", 27);
     data0.remove_edge("v3", "v2", 33);
 
-
     // Check v1 edges
     ASSERT_TRUE(data0.has_edge("v1", "v1"));
     ASSERT_FALSE(data0.has_edge("v1", "v2"));
@@ -726,7 +703,6 @@ TEST(LWWGraph, hasEdgeTest) {
     ASSERT_FALSE(data0.has_edge("v42", "v43"));
     ASSERT_FALSE(data0.has_edge("v1024", "v1024"));
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_has_edge()
@@ -754,7 +730,6 @@ TEST(LWWGraph, crdtHasEdgeTest) {
     data0.add_edge("v3", "v2", 27);
     data0.remove_edge("v3", "v2", 33);
 
-
     // Check v1 edges
     ASSERT_TRUE(data0.crdt_has_edge("v1", "v1"));
     ASSERT_TRUE(data0.crdt_has_edge("v1", "v2"));
@@ -774,7 +749,6 @@ TEST(LWWGraph, crdtHasEdgeTest) {
     ASSERT_FALSE(data0.crdt_has_edge("v42", "v43"));
     ASSERT_FALSE(data0.crdt_has_edge("v1024", "v1024"));
 }
-
 
 // -----------------------------------------------------------------------------
 // clear_vertices()
@@ -826,7 +800,7 @@ TEST(LWWGraph, clearVerticesTest_WithAddEdge) {
     _ASSERT_VERTEX_EQ(v2, "v2", true, 30, data0);
 
     // Each vertex's edges should be empty
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
         ASSERT_EQ(edges.size(), 0);
         ASSERT_TRUE(edges.empty());
@@ -880,7 +854,6 @@ TEST(LWWGraph, clearVerticesTest_ReceivedTooLate) {
     ASSERT_EQ(v4_edges.size(), 2);
     ASSERT_EQ(v5_edges.size(), 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // clear_vertex_edges()
@@ -967,7 +940,6 @@ TEST(LWWGraph, clearVertexEdgesTest_OnInvalidVertexReturnType) {
     ASSERT_FALSE(data0.clear_vertex_edges(32, 13));
 }
 
-
 // -----------------------------------------------------------------------------
 // add_vertex()
 // -----------------------------------------------------------------------------
@@ -980,9 +952,9 @@ TEST(LWWGraph, addVertexTest) {
     data0.add_vertex(1, 11);
     data0.add_vertex(2, 12);
     data0.add_vertex(3, 13);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto res = data0.crdt_find_vertex(k);
-        _ASSERT_VERTEX_EQ(res, k, false, (10+k), data0);
+        _ASSERT_VERTEX_EQ(res, k, false, (10 + k), data0);
     }
 
     // Add duplicate (With various timestamps but always inferior)
@@ -990,9 +962,9 @@ TEST(LWWGraph, addVertexTest) {
     data0.add_vertex(1, 9);
     data0.add_vertex(2, 2);
     data0.add_vertex(3, 7);
-    for(int k = 0; k < 4; ++k) {
+    for (int k = 0; k < 4; ++k) {
         auto res = data0.crdt_find_vertex(k);
-        _ASSERT_VERTEX_EQ(res, k, false, (10+k), data0);
+        _ASSERT_VERTEX_EQ(res, k, false, (10 + k), data0);
     }
 
     // Add duplicate, check timestamps is the last value.
@@ -1082,7 +1054,6 @@ TEST(LWWGraph, addVertexTest_WithRemoveVertexReturnType) {
     ASSERT_FALSE(data0.add_vertex("v1", 90));
 }
 
-
 // -----------------------------------------------------------------------------
 // remove_vertex()
 // -----------------------------------------------------------------------------
@@ -1112,13 +1083,13 @@ TEST(LWWGraph, removeVertexTest) {
     _ASSERT_VERTEX_EQ(res, "v2", true, 29, data0);
 
     // All edges with v2 (to and from) should be removed.
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
         auto edge_it = edges.crdt_find("v2");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 
-        ASSERT_TRUE(edge_it != edges.crdt_end()); // They all add edge with v2
+        ASSERT_TRUE(edge_it != edges.crdt_end());  // They all add edge with v2
         ASSERT_TRUE(isRemoved);
         ASSERT_EQ(timestamp, 29);
     }
@@ -1218,7 +1189,6 @@ TEST(LWWGraph, removeVertexTest_WithAddVertexReturnType) {
     ASSERT_FALSE(data0.remove_vertex("v1", 31));
 }
 
-
 // -----------------------------------------------------------------------------
 // add_edge()
 // -----------------------------------------------------------------------------
@@ -1262,12 +1232,11 @@ TEST(LWWGraph, addEdgeTest_BeforeVertexCreated) {
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value().edges();
-    auto edge = edges.crdt_find("v2"); // LWWSet. Returns const_crdt_iterator
+    auto edge = edges.crdt_find("v2");  // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);
     EXPECT_FALSE(edge->second.isRemoved());
-
 
     // Now receive the actual 'add_vertex'. (But add_edge created earlier stamp)
     data0.add_vertex("v1", 1);
@@ -1288,7 +1257,7 @@ TEST(LWWGraph, addEdgeTest_DuplicateCalls) {
     // Received many duplicate add_edge calls
     data0.add_edge("v1", "v2", 10);
     data0.add_edge("v1", "v2", 17);
-    data0.add_edge("v1", "v2", 19); // Winner
+    data0.add_edge("v1", "v2", 19);  // Winner
     data0.add_edge("v1", "v2", 13);
     data0.add_edge("v1", "v2", 11);
     data0.add_edge("v1", "v2", 12);
@@ -1384,14 +1353,13 @@ TEST(LWWGraph, addEdgeTest_WithToAndFromEqualReturnType) {
 
     // v1 (Edge without add vertex)
     auto coco = data0.add_edge("v1", "v1", 42);
-    _ASSERT_ADD_EDGE_INFO_EQ(coco, true, true, false); // See doc
+    _ASSERT_ADD_EDGE_INFO_EQ(coco, true, true, false);  // See doc
 
     // v2 (Edge with add vertex first)
     data0.add_vertex("v2", 11);
     coco = data0.add_edge("v2", "v2", 20);
     _ASSERT_ADD_EDGE_INFO_EQ(coco, true, false, false);
 }
-
 
 // -----------------------------------------------------------------------------
 // remove_edge()
@@ -1456,20 +1424,19 @@ TEST(LWWGraph, removeEdgeTest_BeforeAdded) {
 
     // vertex 1 should have been created (with tmp timestamps)
     auto v1 = data0.crdt_find_vertex("v1");
-    _ASSERT_VERTEX_EQ(v1, "v1", true, 0, data0); // Smallest timestamp.
+    _ASSERT_VERTEX_EQ(v1, "v1", true, 0, data0);  // Smallest timestamp.
 
     // vertex 2 should have been created (with tmp timestamps)
     auto v2 = data0.crdt_find_vertex("v2");
-    _ASSERT_VERTEX_EQ(v2, "v2", true, 0, data0); // Smallest timestamp.
+    _ASSERT_VERTEX_EQ(v2, "v2", true, 0, data0);  // Smallest timestamp.
 
     // Edge v1 -> v2 should have been created and marked as removed
     auto edges = v1->second.value().edges();
-    auto edge = edges.crdt_find("v2"); // LWWSet. Returns const_crdt_iterator
+    auto edge = edges.crdt_find("v2");  // LWWSet. Returns const_crdt_iterator
     EXPECT_TRUE(edge != edges.crdt_end());
     EXPECT_EQ(edge->first, "v2");
     EXPECT_EQ(edge->second.timestamp(), 10);
     EXPECT_TRUE(edge->second.isRemoved());
-
 
     // Duplicate remove calls
     // All timestamps stay same (v1, v2, edge)
@@ -1483,7 +1450,6 @@ TEST(LWWGraph, removeEdgeTest_BeforeAdded) {
     EXPECT_EQ(v1->second.timestamp(), 0);
     EXPECT_EQ(v2->second.timestamp(), 0);
     EXPECT_EQ(edge->second.timestamp(), 10);
-
 
     // Duplicate remove calls with higher timestamps
     // Vertex still have same timestamps. Edge is updated.
@@ -1522,7 +1488,6 @@ TEST(LWWGraph, removeEdgeTest_CalledBeforeAddEdgeReturnType) {
     _ASSERT_ADD_EDGE_INFO_EQ(coco1, false, true, true);
     _ASSERT_ADD_EDGE_INFO_EQ(coco2, false, false, false);
 
-
     // Add after remove (Re-add)
     auto coco3 = data0.add_edge("v1", "v2", 30);
     auto coco4 = data0.add_edge("v1", "v2", 31);
@@ -1550,7 +1515,7 @@ TEST(LWWGraph, removeEdgeTest_FirstThenAddEdgeThenAddVertexReturnType) {
 
     // Add edge, but already removed. User doesn't see anything
     auto coco1 = data0.add_edge("v1", "v2", 20);
-    auto coco2 = data0.add_edge("v1", "v2", 30); // Duplicate call
+    auto coco2 = data0.add_edge("v1", "v2", 30);  // Duplicate call
 
     _ASSERT_ADD_EDGE_INFO_EQ(coco1, false, true, true);
     _ASSERT_ADD_EDGE_INFO_EQ(coco2, false, false, false);
@@ -1559,7 +1524,6 @@ TEST(LWWGraph, removeEdgeTest_FirstThenAddEdgeThenAddVertexReturnType) {
     ASSERT_FALSE(data0.add_vertex("v1", 10));
     ASSERT_FALSE(data0.add_vertex("v2", 20));
 }
-
 
 // -----------------------------------------------------------------------------
 // add_edge() || remove_vertex()
@@ -1592,13 +1556,13 @@ TEST(LWWGraph, removeVertexTest_WithEdgesDuplicateCalls) {
     // Remove vertex, should also remove all edges
     auto res = data0.crdt_find_vertex("v1");
     _ASSERT_VERTEX_EQ(res, "v1", true, 30, data0);
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
         auto edge_it = edges.crdt_find("v1");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 
-        ASSERT_TRUE(edge_it != edges.crdt_end()); // They all add edge with v1
+        ASSERT_TRUE(edge_it != edges.crdt_end());  // They all add edge with v1
         ASSERT_TRUE(isRemoved);
         ASSERT_EQ(timestamp, 30);
     }
@@ -1630,13 +1594,13 @@ TEST(LWWGraph, addEdgeTest_RemoveVertexConcurrent) {
     EXPECT_EQ(v1_it->first, "v1");
     EXPECT_EQ(v1_it->second.timestamp(), 100);
     EXPECT_TRUE(v1_it->second.isRemoved());
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         auto& edges = it->second.value().edges();
         auto edge_it = edges.crdt_find("v1");
         bool isRemoved = edge_it->second.isRemoved();
         int timestamp = edge_it->second.timestamp();
 
-        ASSERT_TRUE(edge_it != edges.crdt_end()); // They all add edge with v1
+        ASSERT_TRUE(edge_it != edges.crdt_end());  // They all add edge with v1
         ASSERT_TRUE(isRemoved);
         ASSERT_EQ(timestamp, 100);
     }
@@ -1663,7 +1627,6 @@ TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReadded) {
     // For now, data0 == data1
     ASSERT_TRUE(data0 == data1);
     ASSERT_TRUE(data0.crdt_equal(data1));
-
 
     // data1 remove vertex
     data1.remove_vertex("v2", 30);
@@ -1706,14 +1669,13 @@ TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReaddedReturnType) {
     ASSERT_TRUE(data0 == data1);
     ASSERT_TRUE(data0.crdt_equal(data1));
 
-
     // data1 remove vertex. data0 add edge v2->v2 (Re-add v2)
     ASSERT_TRUE(data1.remove_vertex("v2", 30));
     auto coco0 = data0.add_edge("v2", "v2", 40);
     _ASSERT_ADD_EDGE_INFO_EQ(coco0, true, false, false);
 
     // Broadcast changes
-    ASSERT_FALSE(data0.remove_vertex("v2", 30)); // Not actually applied: false
+    ASSERT_FALSE(data0.remove_vertex("v2", 30));  // Not actually applied: false
     auto coco1 = data1.add_edge("v2", "v2", 40);
     _ASSERT_ADD_EDGE_INFO_EQ(coco1, true, true, false);
 
@@ -1726,7 +1688,6 @@ TEST(LWWGraph, removeVertexTest_AddEdgeWithVertexReaddedReturnType) {
     _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v2"), "v2", false, 40, data0);
     _ASSERT_VERTEX_EQ(data0.crdt_find_vertex("v3"), "v3", false, 22, data0);
 }
-
 
 TEST(LWWGraph, removeVertexTest_AddEdgeConcurrentWithFromDeletedLater) {
     LWWGraph<std::string, int, int> data0;
@@ -1744,7 +1705,6 @@ TEST(LWWGraph, removeVertexTest_AddEdgeConcurrentWithFromDeletedLater) {
     ASSERT_FALSE(data0.has_edge("v1", "v2"));
     ASSERT_TRUE(data0.crdt_has_edge("v1", "v2"));
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_size()
@@ -1778,7 +1738,6 @@ TEST(LWWGraph, crdtSizeTest_WithAddEdgeRemoveVertex) {
     ASSERT_EQ(data1.crdt_size_vertex(), 3);
     ASSERT_EQ(data0.crdt_size_vertex(), data1.crdt_size_vertex());
 }
-
 
 // -----------------------------------------------------------------------------
 // crdt_equal()
@@ -1848,7 +1807,6 @@ TEST(LWWGraph, crdtEqualTest_WithAddVertexRemoveVertex) {
     ASSERT_FALSE(data0.crdt_equal(data1));
     ASSERT_FALSE(data1.crdt_equal(data0));
 
-
     // Broadcast data0 to data1
     data1.add_vertex("v1", 110);
     data1.add_vertex("v2", 120);
@@ -1890,7 +1848,6 @@ TEST(LWWGraph, crdtEqualTest_WithAddEdgeRemoveVertex) {
     data1.add_edge("v1", "v2", 131);
     data1.remove_vertex("v1", 301);
 
-
     // data0 != data1
     ASSERT_FALSE(data0.crdt_equal(data1));
     ASSERT_FALSE(data1.crdt_equal(data0));
@@ -1907,7 +1864,6 @@ TEST(LWWGraph, crdtEqualTest_WithAddEdgeRemoveVertex) {
     data0.add_vertex("v2", 121);
     data0.add_edge("v1", "v2", 131);
     data0.remove_vertex("v1", 301);
-
 
     // data0 == data1
     ASSERT_TRUE(data0.crdt_equal(data1));
@@ -1942,15 +1898,13 @@ TEST(LWWGraph, crdtEqualTest_EmptyVsAddVertex) {
     ASSERT_FALSE(data1.crdt_equal(data0));
 }
 
-
 // -----------------------------------------------------------------------------
 // Operator==()
 // -----------------------------------------------------------------------------
 
 TEST(LWWGraph, operatorEQTest) {
-    LWWGraph<std::string, int, int> data0; // Data at replicate 0
-    LWWGraph<std::string, int, int> data1; // Data at replicate 1
-
+    LWWGraph<std::string, int, int> data0;  // Data at replicate 0
+    LWWGraph<std::string, int, int> data1;  // Data at replicate 1
 
     // Replicate 0
     data0.add_vertex("v1", 1);
@@ -1980,7 +1934,6 @@ TEST(LWWGraph, operatorEQTest) {
 
     EXPECT_FALSE(data0 == data1);
     EXPECT_TRUE(data0 != data1);
-
 
     // Replicate 1
     data1.add_vertex("v1", 1);
@@ -2012,7 +1965,6 @@ TEST(LWWGraph, operatorEQTest) {
     EXPECT_FALSE(data0 != data1);
 }
 
-
 // -----------------------------------------------------------------------------
 // LWWGraph::iterator
 // -----------------------------------------------------------------------------
@@ -2031,7 +1983,7 @@ TEST(LWWGraph, iteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2042,7 +1994,7 @@ TEST(LWWGraph, iteratorTest) {
     data0.remove_vertex("v1", 20);
     k = 0;
     total = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2058,7 +2010,7 @@ TEST(LWWGraph, iteratorTest) {
     data0.at_vertex("v5") = 500;
     k = 0;
     total = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2070,7 +2022,7 @@ TEST(LWWGraph, iteratorTest_EmptyGraph) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 0);
@@ -2090,7 +2042,7 @@ TEST(LWWGraph, iteratorTest_EmptyGraphAfterRemove) {
     data0.remove_vertex("v4", 20);
 
     int k = 0;
-    for(auto it = data0.begin(); it != data0.end(); ++it) {
+    for (auto it = data0.begin(); it != data0.end(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 0);
@@ -2100,7 +2052,7 @@ TEST(LWWGraph, iteratorTest_end) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.end(); it != data0.end(); ++it) {
+    for (auto it = data0.end(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -2109,12 +2061,11 @@ TEST(LWWGraph, iteratorTest_end) {
     data0.add_vertex("v2", 10);
     data0.add_vertex("v3", 10);
     k = 0;
-    for(auto it = data0.end(); it != data0.end(); ++it) {
+    for (auto it = data0.end(); it != data0.end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // LWWGraph::const_iterator
@@ -2134,7 +2085,7 @@ TEST(LWWGraph, constIteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2145,7 +2096,7 @@ TEST(LWWGraph, constIteratorTest) {
     data0.remove_vertex("v1", 20);
     k = 0;
     total = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2161,7 +2112,7 @@ TEST(LWWGraph, constIteratorTest) {
     data0.at_vertex("v5") = 500;
     k = 0;
     total = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
         total += it->second.content();
     }
@@ -2173,7 +2124,7 @@ TEST(LWWGraph, constIteratorTest_EmptyGraph) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 0);
@@ -2193,7 +2144,7 @@ TEST(LWWGraph, constIteratorTest_EmptyGraphAfterRemove) {
     data0.remove_vertex("v4", 20);
 
     int k = 0;
-    for(auto it = data0.cbegin(); it != data0.cend(); ++it) {
+    for (auto it = data0.cbegin(); it != data0.cend(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 0);
@@ -2203,7 +2154,7 @@ TEST(LWWGraph, constIteratorTest_end) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+    for (auto it = data0.cend(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -2212,12 +2163,11 @@ TEST(LWWGraph, constIteratorTest_end) {
     data0.add_vertex("v2", 10);
     data0.add_vertex("v3", 10);
     k = 0;
-    for(auto it = data0.cend(); it != data0.cend(); ++it) {
+    for (auto it = data0.cend(); it != data0.cend(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
-
 
 // -----------------------------------------------------------------------------
 // LWWGraph::crdt_iterator
@@ -2237,7 +2187,7 @@ TEST(LWWGraph, crdtIteratorTest) {
 
     int k = 0;
     int total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
         total += it->second.value().content();
     }
@@ -2248,7 +2198,7 @@ TEST(LWWGraph, crdtIteratorTest) {
     data0.remove_vertex("v1", 20);
     k = 0;
     total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
         total += it->second.value().content();
     }
@@ -2264,7 +2214,7 @@ TEST(LWWGraph, crdtIteratorTest) {
     data0.at_vertex("v5") = 500;
     k = 0;
     total = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
         total += it->second.value().content();
     }
@@ -2276,7 +2226,7 @@ TEST(LWWGraph, crdtIteratorTest_EmptyGraph) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 0);
@@ -2296,7 +2246,7 @@ TEST(LWWGraph, crdtIteratorTest_EmptyGraphAfterRemove) {
     data0.remove_vertex("v4", 20);
 
     int k = 0;
-    for(auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_begin(); it != data0.crdt_end(); ++it) {
         k++;
     }
     ASSERT_EQ(k, 4);
@@ -2306,7 +2256,7 @@ TEST(LWWGraph, crdtIteratorTest_end) {
     LWWGraph<const char*, int, int> data0;
 
     int k = 0;
-    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
@@ -2315,13 +2265,11 @@ TEST(LWWGraph, crdtIteratorTest_end) {
     data0.add_vertex("v2", 10);
     data0.add_vertex("v3", 10);
     k = 0;
-    for(auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
+    for (auto it = data0.crdt_end(); it != data0.crdt_end(); ++it) {
         k++;
     }
     EXPECT_EQ(k, 0);
 }
 
-
-}} // End namespaces
-
-
+}  // namespace CmRDT
+}  // namespace collab

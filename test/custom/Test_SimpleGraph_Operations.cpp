@@ -1,14 +1,11 @@
-#include "collabdata/custom/SimpleGraph.h"
-
 #include <gtest/gtest.h>
 
+#include "collabdata/custom/SimpleGraph.h"
 #include "collabdata/custom/Timestamp.h"
 
 namespace collab {
 
-
-static unsigned int localUserID = 42; // See SimpleGraph constructor and Timestamp
-
+static unsigned int localUserID = 42;  // See SimpleGraph constructor and Timestamp
 
 // -----------------------------------------------------------------------------
 // VertexAddOperation
@@ -31,7 +28,6 @@ TEST(SimpleGraph, vertexAddOperation_serializeUnserialize) {
     ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
-
 // -----------------------------------------------------------------------------
 // VertexRemoveOperation
 // -----------------------------------------------------------------------------
@@ -52,7 +48,6 @@ TEST(SimpleGraph, vertexRemoveOperation_serializeUnserialize) {
     ASSERT_EQ(op.getVertexID(), vertexID);
     ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
-
 
 // -----------------------------------------------------------------------------
 // EdgeAddOperation
@@ -77,7 +72,6 @@ TEST(SimpleGraph, edgeAddOperation_serializeUnserialize) {
     ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
 
-
 // -----------------------------------------------------------------------------
 // EdgeRemoveOperation
 // -----------------------------------------------------------------------------
@@ -100,7 +94,6 @@ TEST(SimpleGraph, edgeRemoveOperation_serializeUnserialize) {
     ASSERT_EQ(op.getToID(), vertex2);
     ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
 }
-
 
 // -----------------------------------------------------------------------------
 // AttributeAddOperation
@@ -127,7 +120,6 @@ TEST(SimpleGraph, attributeAddOperation_serializeUnserialize) {
     ASSERT_EQ(op.getAttributeValue(), attrValue);
 }
 
-
 // -----------------------------------------------------------------------------
 // AttributeRemoveOperation
 // -----------------------------------------------------------------------------
@@ -150,7 +142,6 @@ TEST(SimpleGraph, attributeRemoveOperation_serializeUnserialize) {
     ASSERT_EQ(op.getTimestamp().getTime(), oldTime.getTime());
     ASSERT_EQ(op.getAttributeName(), attrName);
 }
-
 
 // -----------------------------------------------------------------------------
 // AttributeSetOperation
@@ -177,7 +168,4 @@ TEST(SimpleGraph, attributeSetOperation_serializeUnserialize) {
     ASSERT_EQ(op.getAttributeValue(), attrValue);
 }
 
-
-} // End namespace
-
-
+}  // namespace collab

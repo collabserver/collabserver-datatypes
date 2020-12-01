@@ -1,13 +1,12 @@
 #pragma once
 
-#include "collabdata/CmRDT/LWWMap.h"
-
 #include <iostream>
 #include <string>
 
+#include "collabdata/CmRDT/LWWMap.h"
+
 namespace collab {
 namespace CmRDT {
-
 
 void LWWMap_example() {
     std::cout << "\n----- CmRDT LWWMap Example ----------\n";
@@ -26,7 +25,6 @@ void LWWMap_example() {
     data0.remove("e5", 180);
     data0.remove("e3", 190);
 
-
     // Initial replicate 1 operations
     data1.add("e1", 111);
     data1.add("e7", 121);
@@ -34,14 +32,12 @@ void LWWMap_example() {
     data1.remove("e8", 141);
     data1.remove("e1", 151);
 
-
     // Broadcast operations from data1 to data0
     data0.add("e1", 111);
     data0.add("e7", 121);
     data0.add("e8", 131);
     data0.remove("e8", 141);
     data0.remove("e1", 151);
-
 
     // Broadcast operations from data0 to data1
     data1.add("e1", 110);
@@ -54,7 +50,6 @@ void LWWMap_example() {
     data1.remove("e5", 180);
     data1.remove("e3", 190);
 
-
     // Final state
     std::cout << "data0 (at the end): " << data0 << "\n";
     std::cout << "data1 (at the end): " << data1 << "\n";
@@ -64,6 +59,5 @@ void LWWMap_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-}} // End namespace
-
-
+}  // namespace CmRDT
+}  // namespace collab

@@ -1,11 +1,11 @@
-#include "collabdata/CmRDT/LWWRegister.h"
-
 #include <gtest/gtest.h>
+
 #include <string>
+
+#include "collabdata/CmRDT/LWWRegister.h"
 
 namespace collab {
 namespace CmRDT {
-
 
 // -----------------------------------------------------------------------------
 // query()
@@ -26,7 +26,6 @@ TEST(LWWRegister, queryTest) {
     ASSERT_EQ(data0.query(), 300);
     ASSERT_EQ(data0.timestamp(), 3);
 }
-
 
 // -----------------------------------------------------------------------------
 // update()
@@ -108,7 +107,6 @@ TEST(LWWRegister, updateTest_Usecase) {
     LWWRegister<int, int> data0;
     LWWRegister<int, int> data1;
 
-
     // At replicate 0
     data0.update(300, 3);
     ASSERT_EQ(data0.query(), 300);
@@ -129,7 +127,6 @@ TEST(LWWRegister, updateTest_Usecase) {
     data0.update(200, 2);
     ASSERT_EQ(data0.query(), 700);
     ASSERT_EQ(data0.timestamp(), 7);
-
 
     // At replicate 1
     data1.update(320, 3);
@@ -152,7 +149,6 @@ TEST(LWWRegister, updateTest_Usecase) {
     ASSERT_EQ(data0.timestamp(), data1.timestamp());
 }
 
-
 // -----------------------------------------------------------------------------
 // crdt_equal()
 // -----------------------------------------------------------------------------
@@ -168,7 +164,6 @@ TEST(LWWRegister, crdtEqualTest) {
     data1.update(42, 1);
     ASSERT_TRUE(data0.crdt_equal(data1));
 }
-
 
 // -----------------------------------------------------------------------------
 // operatorEQ()
@@ -191,7 +186,5 @@ TEST(LWWRegister, operatorEQTest) {
     ASSERT_FALSE(data0 != data1);
 }
 
-
-}} // End namespaces
-
-
+}  // namespace CmRDT
+}  // namespace collab
