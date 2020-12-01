@@ -170,8 +170,8 @@ All operations are commutative.
 # Contribution
 Feel free to ask me any question, share your ideas or open an issue.
 I created this project during my master thesis at University of Montreal.
-I generally try to follow the [Google C++ Coding Style](https://google.github.io/styleguide/cppguide.html)
-with some exceptions (For instance, I use 4 space indentation).
+Format uses clang-format with the Google Coding style <https://google.github.io/styleguide/cppguide.html> (see `.clang-format` for further information).
+Make sure you autoformat on save (see <https://clang.llvm.org/docs/ClangFormat.html>)
 
 
 # Author
