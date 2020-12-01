@@ -18,21 +18,17 @@ is the State based (CvRDT).
 To learn more about CRDTs, checkout the links at the end of this readme.
 
 Custom folder contains several end-user interface to build high level
-data on top of primitive CRDTs. SimpleGraph is a full example of
-CRDT directed graph to end-user application.
+data on top of primitive CRDTs.
 
 
 # Quick Start
 - CRDTs primitive are header only (LWWGraph, LWWMap...)
-- Custom data (Optional) is a static lib (SimpleGraph, Timestamp...)
 
 CRDTs primitives are header only, you only need to include
 the headers you need in order to build your concurrent data.
 For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
 To use you data on a CollabServer, your data must implement `CollabData`
 interface.
-The custom data (`SimpleGraph`) is built as static lib, to use it in your
-project, you must include the header and link the library.
 
 
 # Features
@@ -46,8 +42,6 @@ project, you must include the header and link the library.
     - *Operation*: Represents a modification on a CollabData.
     - *OperationHandler*: Interface to handle operations received from observer.
     - *OperationObserver*: Interface for Operation observer.
-    - *SimpleGraph*: Example of a CollabData: directed graph with attributes.
-    - *Timestamp*: Example of custom timestamp. (Used by SimpleGraph)
 
 
 # Build on Linux (CMake)

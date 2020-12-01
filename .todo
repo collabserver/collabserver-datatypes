@@ -3,7 +3,7 @@
 
 Cleanup:
     ☐ Remove the deprecated code such as CmRDTs
-    ☐ Remove SimpleGraph (and place it in collab-poc)
+    ✔ Remove SimpleGraph (and place it in collab-poc) @done(20-12-01 03:53)
 Build:
     ☐ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder
     ☐ Place dependencies in the folder `extern` (add it in the gitignore)

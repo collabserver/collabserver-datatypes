@@ -88,13 +88,9 @@ namespace collab {
  *  - Create a broadcaster that implements OperationObserver
  *  - Register broadcaster in your CollabData
  *
- * \par Example of custom data
- * You may have a look at the SimpleGraph complete example.
- *
  *
  * \see Operation
  * \see OperationObserver
- * \see SimpleGraph (Full example of CollabData implementation)
  */
 class CollabData {
    private:
