@@ -1,8 +1,8 @@
 #pragma once
 
 namespace collabserver {
-
-class Operation;
+namespace data {
+namespace collabdata {
 
 /**
  * \brief
@@ -51,4 +51,6 @@ class OperationHandler {
     OperationHandler& operator=(const OperationHandler& other) = default;
 };
 
+}  // namespace collabdata
+}  // namespace data
 }  // namespace collabserver

@@ -8,6 +8,7 @@
 #include "LWWSet.h"
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 /**
@@ -802,4 +803,5 @@ class LWWGraph<Key, T, U>::Vertex {
 };
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

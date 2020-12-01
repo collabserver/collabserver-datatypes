@@ -8,6 +8,8 @@
 #include "OperationObserver.h"
 
 namespace collabserver {
+namespace data {
+namespace collabdata {
 
 /**
  * \brief
@@ -221,4 +223,6 @@ class CollabData {
     bool hasBroadcaster() const { return _broadcaster != nullptr; }
 };
 
+}  // namespace collabdata
+}  // namespace data
 }  // namespace collabserver

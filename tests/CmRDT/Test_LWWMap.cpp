@@ -10,6 +10,7 @@
     EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 // -----------------------------------------------------------------------------
@@ -1671,4 +1672,5 @@ TEST(LWWMap, crdtIteratorTest_end) {
 }
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

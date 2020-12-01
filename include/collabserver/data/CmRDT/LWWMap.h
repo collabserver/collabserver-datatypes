@@ -6,6 +6,7 @@
 #include <utility>  // std::pair
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 /**
@@ -814,4 +815,5 @@ class LWWMap<Key, T, U>::const_iterator : public std::iterator<std::input_iterat
 };
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

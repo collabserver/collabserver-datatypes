@@ -6,6 +6,8 @@
 #include "collabserver/data/collabdata/OperationObserver.h"
 
 namespace collabserver {
+namespace data {
+namespace collabdata {
 
 // -----------------------------------------------------------------------------
 // Mock classes
@@ -205,4 +207,6 @@ TEST(CollabData, notifyOperationBroadcasterTest) {
     ASSERT_EQ(nbNotified, 1);
 }
 
+}  // namespace collabdata
+}  // namespace data
 }  // namespace collabserver

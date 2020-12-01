@@ -3,6 +3,7 @@
 #include <ostream>
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 /**
@@ -147,4 +148,5 @@ class LWWRegister {
 };
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

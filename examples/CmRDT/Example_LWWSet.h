@@ -6,6 +6,7 @@
 #include "collabserver/data/CmRDT/LWWSet.h"
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 void LWWSet_example() {
@@ -60,4 +61,5 @@ void LWWSet_example() {
 }
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

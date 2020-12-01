@@ -5,6 +5,8 @@
 #include "OperationHandler.h"
 
 namespace collabserver {
+namespace data {
+namespace collabdata {
 
 /**
  * \brief
@@ -59,4 +61,6 @@ class Operation {
     virtual void accept(OperationHandler& handler) const = 0;
 };
 
+}  // namespace collabdata
+}  // namespace data
 }  // namespace collabserver

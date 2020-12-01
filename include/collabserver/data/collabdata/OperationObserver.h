@@ -1,8 +1,10 @@
 #pragma once
 
-namespace collabserver {
+#include "Operation.h"
 
-class Operation;
+namespace collabserver {
+namespace data {
+namespace collabdata {
 
 /**
  * \brief
@@ -53,4 +55,6 @@ class OperationObserver {
     virtual void onOperation(const Operation& op) = 0;
 };
 
+}  // namespace collabdata
+}  // namespace data
 }  // namespace collabserver

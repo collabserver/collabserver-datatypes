@@ -5,6 +5,7 @@
 #include <utility>  // std::pair
 
 namespace collabserver {
+namespace data {
 namespace CmRDT {
 
 /**
@@ -588,4 +589,5 @@ class LWWSet<Key, U>::const_iterator : public std::iterator<std::input_iterator_
 };
 
 }  // namespace CmRDT
+}  // namespace data
 }  // namespace collabserver

@@ -2,7 +2,7 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ☐ Rename the namespace `collab` to `collabserver`
+    ✔ Rename the namespace `collab` to `collabserver` @done(20-12-01 23:43)
     ☐ Update all pointers with safer type (e.g., `std::unique_ptr`)
 Readme:
     ☐ Update README content
