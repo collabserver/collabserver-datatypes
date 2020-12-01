@@ -49,7 +49,7 @@ interface.
 ```bash
 mkdir build
 cd build
-cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_TESTS=ON ..
+cmake -DCOLLAB_TESTS=ON ..
 make
 make runTests
 
@@ -61,20 +61,19 @@ make runTests
 ```bash
 mkdir build
 cd build
-cmake -DCOLLAB_DEPENDENCIES_DOWNLOAD=ON -DCOLLAB_EXAMPLES=ON ..
+cmake -DCOLLAB_EXAMPLES=ON ..
 make
 make runExamplesCmRDT
 ```
 
 **CMake options**
 
-| CMake option name | Description |
+| CMake option | Description |
 | --- | --- |
-| COLLAB_DEPENDENCIES_DIR | (STRING) Path to a directory where to find all dependencies (By default, uses current cmake build). If this option is unset but the environment variable `COLLAB_DEPENDENCIES_DIR` exists, this one is used instead of the default value. |
-| COLLAB_DEPENDENCIES_DOWNLOAD | (ON/OFF) Set ON to also download dependencies at cmake time. This is useful the first time you setup the project. Dependencies are placed in COLLAB_DEPENDENCIES_DIR. (By default: OFF).|
-| COLLAB_TESTS | (ON/OFF) Set ON to build unit tests |
-| COLLAB_EXAMPLES | (ON/OFF) Set ON to build examples |
+| COLLAB_TESTS | (ON / OFF) Set ON to build unit tests |
+| COLLAB_EXAMPLES | (ON / OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
+| FETCHCONTENT_FULLY_DISCONNECTED=ON | To skip download of the `extern` depencencies |
 
 
 # Requirements
@@ -86,19 +85,10 @@ make runExamplesCmRDT
 
 
 # Dependencies
-- Automatically downloaded and built by CMake
-    - [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
 
-**Option: save dependencies for offline use**
-> Dependencies downloaded by CMake are placed in the current CMake build folder
-> (in `dependencies` folder).
-> This is useful the firs time.
-> To speedup the cmake process, you may keep these downloaded and built dependencies
-> in a safe place and change the CMake dependencies path (See CMake options).
+> Downloaded and placed in `extern` by CMake
 
-**Option: use environment variable for dependencies path**
-> If `COLLAB_DEPENDENCIES_DIR` environment variable is set, CMake will use
-> it as the current dependencies path.
+- [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
 
 
 # CRDTs theoretical description
