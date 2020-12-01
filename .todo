@@ -2,14 +2,14 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ✔ Rename the namespace `collab` to `collabserver` @done(20-12-01 23:43)
     ☐ Update all pointers with safer type (e.g., `std::unique_ptr`)
 Readme:
     ☐ Update README content
-    ☐ Update README with valid Markdown format
+    ✔ Update README with valid Markdown format @done(20-12-02 00:29)
     ☐ Update README with a custom logo
 
 Archive:
+  ✔ Rename the namespace `collab` to `collabserver` @done(20-12-01 23:43) @project(Cleanup)
   ✔ Remove the `custom` folder (place directly in `collabdata`) @done(20-12-01 23:16) @project(Cleanup)
   ✔ Rename `include/collabdata` to `include collabserver/data` @done(20-12-01 23:16) @project(Cleanup)
   ✘ Remove examples as the tests are doing exactly the same things @cancelled(20-12-01 22:35) @project(Cleanup) @project(Cleanup)

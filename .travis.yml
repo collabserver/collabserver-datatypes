@@ -6,16 +6,16 @@ matrix:
     include:
         - os: linux
           compiler: gcc
-          env: BUILD_TYPE=Debug VERBOSE=1
+          env: ENV_BUILD_TYPE=Debug VERBOSE=1
         - os: linux
           compiler: gcc
-          env: BUILD_TYPE=Release VERBOSE=1
+          env: ENV_BUILD_TYPE=Release VERBOSE=1
         - os: linux
           compiler: clang
-          env: BUILD_TYPE=Debug VERBOSE=1
+          env: ENV_BUILD_TYPE=Debug VERBOSE=1
         - os: linux
           compiler: clang
-          env: BUILD_TYPE=Release VERBOSE=1
+          env: ENV_BUILD_TYPE=Release VERBOSE=1
 
 script: ./build.sh
 

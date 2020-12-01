@@ -1,4 +1,4 @@
-# CollabServer - Conflict-free Replicated DataTypes (CRDTs)
+# CollabServer - Data (CRDTs)
 
 [![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
 [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
@@ -7,43 +7,58 @@
 | :-----: | :----: |
 | [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts) | [![build-status-dev](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=dev)](https://travis-ci.org/CollabServer/collab-data-crdts) |
 
+## Overview
 
-# Overview
-Defines a set of basic CRDTs that may be used to build your more complex data
-(on top of these structures).
+---
+
+> Conflict-free Replicated DataTypes (CRDTs)
+
+Defines a set of CRDTs that may be used to build your more complex data
+(on top of these structures) and used with the CollabServer framework.
 CRDTs stands for Conflict-free Replicated Data Structure.
 The letter C in CRDT may either stands for "Commutative" or "Convergent".
 Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent
 is the State based (CvRDT).
 To learn more about CRDTs, checkout the links at the end of this readme.
 
+## Quick Start
 
-# Quick Start
-- CRDTs primitive are header only (LWWGraph, LWWMap...)
+---
 
-CRDTs primitives are header only, you only need to include
-the headers you need in order to build your concurrent data.
-For instance, to use CmRDT::LWWSet, add `#include "collabserver/data/CmRDT/LWWSet.h"`.
-To use you data on a CollabServer, your data must implement `CollabData`
-interface.
+- This library is header only, you only have to include the headers in your project.
+- To use your data with the CollabServer framework, your data have to implement `CollabData`.
 
+## Features
 
-# Features
-- **CmRDT** (Operation-based)
-    - *LWWGraph*: Last-Write-Wins Graph
-    - *LWWMap*: Last-Write-Wins Map
-    - *LWWRegister*: Last-Write-Wins Register
-    - *LWWSet*: Last-Write-Wins Set
-- **"collabserver/data** (Assets classes to implements data for CollabServer)
-    - *CollabData*: High level abstraction for data built on tope of CRDTs.
-    - *Operation*: Represents a modification on a CollabData.
-    - *OperationHandler*: Interface to handle operations received from observer.
-    - *OperationObserver*: Interface for Operation observer.
+---
 
+- **CmRDT** (Operation-based CRDT)
+  - *LWWGraph*: Last-Write-Wins Graph
+  - *LWWMap*: Last-Write-Wins Map
+  - *LWWRegister*: Last-Write-Wins Register
+  - *LWWSet*: Last-Write-Wins Set
+- **collabdata** (Interfaces to implements for CollabServer)
+  - *CollabData*: High level abstraction for data built on tope of CRDTs.
+  - *Operation*: Represents a modification on a CollabData.
+  - *OperationHandler*: Interface to handle operations received from observer.
+  - *OperationObserver*: Interface for Operation observer.
 
-# Build on Linux (CMake)
-**Build tests**
+## Build (CMake)
+
+---
+
+- Requirements
+  - C++11
+  - `pragma once` support
+  - Tested with gcc 4.8.4
+  - Tested with clang 5.0.0
+  - Tested only on Linux. No support certified for Mac and Windows
+- Dependencies (downloaded and placed in `extern` by CMake)
+  - [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
+
 ```bash
+# Build tests
+
 mkdir build
 cd build
 cmake -DCOLLAB_TESTS=ON ..
@@ -54,16 +69,15 @@ make runTests
 ./build.sh
 ```
 
-**Build examples**
 ```bash
+# Build examples
+
 mkdir build
 cd build
 cmake -DCOLLAB_EXAMPLES=ON ..
 make
 make runExamplesCmRDT
 ```
-
-**CMake options**
 
 | CMake option | Description |
 | --- | --- |
@@ -72,29 +86,16 @@ make runExamplesCmRDT
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
 | FETCHCONTENT_FULLY_DISCONNECTED=ON | To skip download of the `extern` depencencies |
 
+## CRDTs theoretical description
 
-# Requirements
-- C++11
-- `pragma once` support
-- Tested with gcc 4.8.4
-- Tested with clang 5.0.0
-- Tested only on Linux. No support certified for Mac and Windows
+---
 
-
-# Dependencies
-
-> Downloaded and placed in `extern` by CMake
-
-- [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
-
-
-# CRDTs theoretical description
 - **State-based object (CvRDT)** \
 CvRDT stands for Convergent Replicated Data Types.
 Updates are applied locally, then the whole data state is sent to others.
 A merge method integrate two states so that all replicates convergent.
 
-```
+```txt
     State CvRDT is defined by (S s0 q u m)
         S   -> Global State
         s0  -> State at beginning
@@ -108,7 +109,7 @@ CmRDT stands for Commutative Replicated Data Types.
 Only delta of change (Operation) are broadcasted and applied to others.
 All operations are commutative.
 
-```
+```txt
     Operation CmRDT is defined by (S s0 q t u P)
         S   -> Global State
         s0  -> State at beginning
@@ -118,32 +119,38 @@ All operations are commutative.
         P   -> Delivery relation P for communication protocol
 ```
 
+## Papers and Resources
 
-# Papers and Resources
+---
+
 - Conflict-free Replicated Data Types \
-  (https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf)
+  (<https://pages.lip6.fr/Marc.Shapiro/papers/CRDTs_SSS-2011.pdf>)
 - A comprehensive study of Convergent and Commutative Replicated Data Types \
-  (https://pages.lip6.fr/Marc.Shapiro/papers/Comprehensive-CRDTs-RR7506-2011-01.pdf)
+  (<https://pages.lip6.fr/Marc.Shapiro/papers/Comprehensive-CRDTs-RR7506-2011-01.pdf>)
 - A Look at Conflict-Free Replicated Data Types (CRDT) \
-  (https://medium.com/@istanbul_techie/a-look-at-conflict-free-replicated-data-types-crdt-221a5f629e7e)
+  (<https://medium.com/@istanbul_techie/a-look-at-conflict-free-replicated-data-types-crdt-221a5f629e7e>)
 - CRDT for collaborative editing by Irisate \
-  (https://irisate.com/crdt-for-real-time-collaborative-apps/)
+  (<https://irisate.com/crdt-for-real-time-collaborative-apps/>)
 
+## Generate Documentation
 
-# Generate Documentation
+---
+
 1. Install [Doxygen](https://www.stack.nl/~dimitri/doxygen/)
-1. `doxygen Doxyfile`
+1. Run `doxygen Doxyfile`
 1. Files are placed in `doc` folder
 
+## Contribution
 
-# Contribution
+---
+
 Feel free to ask me any question, share your ideas or open an issue.
-I created this project during my master thesis at University of Montreal.
+I started this project during my master thesis at University of Montreal.
 Format uses clang-format with the Google Coding style <https://google.github.io/styleguide/cppguide.html> (see `.clang-format` for further information).
 Make sure you autoformat on save (see <https://clang.llvm.org/docs/ClangFormat.html>)
 
+## Author
 
-# Author
-- Constantin Masson ([constantinmasson.com](http://constantinmasson.com/))
+---
 
-
+- Constantin Masson (geekymoose)
