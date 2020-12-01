@@ -2,23 +2,22 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ✘ Rename `CmRDT` to `LWW` (because the conflict resolution technique is what matters) @cancelled(20-12-01 13:10)
     ☐ Remove the `custom` folder (place directly in `collabdata`)
     ☐ Rename the namespace `collab` to `collabserver`
     ☐ Rename `include/collabdata` to `include collabserver/collabdata`
-    ☐ Remove examples as the tests are doing exactly the same things
-    ☐ Rename `test` to `tests`
-Build:
-    ☐ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder
-    ✔ Place dependencies in the folder `extern` (add it in the gitignore) @done(20-12-01 13:48)
-    ✔ Remove the dependency with `msgpack` (when SimpleGraph is removed) @done(20-12-01 13:48)
-    ✘ In `build` folder, separate builds type (e.g., `build-debug`, `build-release`) @cancelled(20-12-01 13:49)
+    ✘ Remove examples as the tests are doing exactly the same things @cancelled(20-12-01 22:35) @project(Cleanup)
+    ✔ Rename `test` to `tests` @done(20-12-01 22:34) @project(Cleanup)
 Readme:
     ☐ Update README content
     ☐ Update README with valid Markdown format
     ☐ Update README with a custom logo
 
 Archive:
+  ✘ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder @cancelled(20-12-01 22:35) @project(Build)
+  ✘ Rename `CmRDT` to `LWW` (because the conflict resolution technique is what matters) @cancelled(20-12-01 13:10) @project(Cleanup)
+  ✔ Place dependencies in the folder `extern` (add it in the gitignore) @done(20-12-01 13:48) @project(Build)
+  ✔ Remove the dependency with `msgpack` (when SimpleGraph is removed) @done(20-12-01 13:48) @project(Build)
+  ✘ In `build` folder, separate builds type (e.g., `build-debug`, `build-release`) @cancelled(20-12-01 13:49) @project(Build)
   ✔ Remove the deprecated code such as CmRDTs @done(20-12-01 03:55) @project(Cleanup)
   ✔ Remove SimpleGraph (and place it in collab-poc) @done(20-12-01 03:53) @project(Cleanup)
   ✔ Add autoformat with `clang-format` @done(20-12-01 03:03) @project(Cleanup)
