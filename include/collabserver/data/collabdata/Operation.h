@@ -4,7 +4,7 @@
 
 #include "OperationHandler.h"
 
-namespace collab {
+namespace collabserver {
 
 /**
  * \brief
@@ -59,4 +59,4 @@ class Operation {
     virtual void accept(OperationHandler& handler) const = 0;
 };
 
-}  // namespace collab
+}  // namespace collabserver

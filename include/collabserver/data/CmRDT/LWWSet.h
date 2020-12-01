@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <utility>  // std::pair
 
-namespace collab {
+namespace collabserver {
 namespace CmRDT {
 
 /**
@@ -588,4 +588,4 @@ class LWWSet<Key, U>::const_iterator : public std::iterator<std::input_iterator_
 };
 
 }  // namespace CmRDT
-}  // namespace collab
+}  // namespace collabserver

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace collab {
+namespace collabserver {
 
 class Operation;
 
@@ -15,7 +15,7 @@ class Operation;
  * \par Example
  * \code{.cpp}
  * #include <iostream>
- * namespace collab {
+ * namespace collabserver {
  *
  * class HandlerExample : public YourData::OpHandler {
  *     public:
@@ -51,4 +51,4 @@ class OperationHandler {
     OperationHandler& operator=(const OperationHandler& other) = default;
 };
 
-}  // namespace collab
+}  // namespace collabserver

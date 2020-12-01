@@ -5,7 +5,7 @@
 #include "collabserver/data/collabdata/OperationHandler.h"
 #include "collabserver/data/collabdata/OperationObserver.h"
 
-namespace collab {
+namespace collabserver {
 
 // -----------------------------------------------------------------------------
 // Mock classes
@@ -205,4 +205,4 @@ TEST(CollabData, notifyOperationBroadcasterTest) {
     ASSERT_EQ(nbNotified, 1);
 }
 
-}  // namespace collab
+}  // namespace collabserver

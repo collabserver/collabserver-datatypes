@@ -4,7 +4,7 @@
 
 #include "collabserver/data/CmRDT/LWWRegister.h"
 
-namespace collab {
+namespace collabserver {
 namespace CmRDT {
 
 // -----------------------------------------------------------------------------
@@ -187,4 +187,4 @@ TEST(LWWRegister, operatorEQTest) {
 }
 
 }  // namespace CmRDT
-}  // namespace collab
+}  // namespace collabserver

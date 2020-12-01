@@ -2,7 +2,7 @@
 
 #include <ostream>
 
-namespace collab {
+namespace collabserver {
 namespace CmRDT {
 
 /**
@@ -147,4 +147,4 @@ class LWWRegister {
 };
 
 }  // namespace CmRDT
-}  // namespace collab
+}  // namespace collabserver

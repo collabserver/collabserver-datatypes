@@ -9,7 +9,7 @@
     EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_);          \
     EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
 
-namespace collab {
+namespace collabserver {
 namespace CmRDT {
 
 // -----------------------------------------------------------------------------
@@ -1282,4 +1282,4 @@ TEST(LWWSet, operatorEQTest_DifferentTimestamp) {
 }
 
 }  // namespace CmRDT
-}  // namespace collab
+}  // namespace collabserver

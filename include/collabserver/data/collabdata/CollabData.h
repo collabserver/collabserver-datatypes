@@ -7,7 +7,7 @@
 #include "Operation.h"
 #include "OperationObserver.h"
 
-namespace collab {
+namespace collabserver {
 
 /**
  * \brief
@@ -221,4 +221,4 @@ class CollabData {
     bool hasBroadcaster() const { return _broadcaster != nullptr; }
 };
 
-}  // namespace collab
+}  // namespace collabserver

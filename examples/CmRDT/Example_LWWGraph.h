@@ -5,7 +5,7 @@
 
 #include "collabserver/data/CmRDT/LWWGraph.h"
 
-namespace collab {
+namespace collabserver {
 namespace CmRDT {
 
 void LWWGraph_example() {
@@ -59,4 +59,4 @@ void LWWGraph_example() {
 }
 
 }  // namespace CmRDT
-}  // namespace collab
+}  // namespace collabserver

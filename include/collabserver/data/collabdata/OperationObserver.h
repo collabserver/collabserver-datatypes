@@ -1,6 +1,6 @@
 #pragma once
 
-namespace collab {
+namespace collabserver {
 
 class Operation;
 
@@ -53,4 +53,4 @@ class OperationObserver {
     virtual void onOperation(const Operation& op) = 0;
 };
 
-}  // namespace collab
+}  // namespace collabserver
