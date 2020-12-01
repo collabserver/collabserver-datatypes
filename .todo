@@ -2,11 +2,12 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ☐ Remove the deprecated code such as CmRDTs
+    ✔ Remove the deprecated code such as CmRDTs @done(20-12-01 03:55)
     ✔ Remove SimpleGraph (and place it in collab-poc) @done(20-12-01 03:53)
 Build:
     ☐ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder
     ☐ Place dependencies in the folder `extern` (add it in the gitignore)
+    ☐ Remove the dependency with `msgpack` (when SimpleGraph is removed)
 Readme:
     ☐ Update README content
     ☐ Update README with valid Markdown format

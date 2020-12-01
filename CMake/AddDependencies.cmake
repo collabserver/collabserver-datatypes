@@ -32,7 +32,6 @@ endif()
 # Add Dependencies
 # ------------------------------------------------------------------------------
 
-include("CMake/Dependencies/AddMsgPack.cmake")
 include("CMake/Dependencies/AddGoogleTest.cmake")
 
 

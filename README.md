@@ -87,7 +87,6 @@ make runExamplesCmRDT
 
 # Dependencies
 - Automatically downloaded and built by CMake
-    - [MessagePack](https://msgpack.org/) (Release 3.1.1)
     - [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
 
 **Option: save dependencies for offline use**
