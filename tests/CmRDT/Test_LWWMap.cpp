@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "collabdata/CmRDT/LWWMap.h"
+#include "collabserver/data/CmRDT/LWWMap.h"
 
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it_, key_, is_removed_, stamp_, data_) \

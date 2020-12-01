@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "collabdata/CmRDT/LWWGraph.h"
+#include "collabserver/data/CmRDT/LWWGraph.h"
 
 // Check the whole internal data of a vertex
 #define _ASSERT_VERTEX_EQ(vertex_it, key_, is_removed, stamp_, data_) \

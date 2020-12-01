@@ -2,17 +2,17 @@
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
 Cleanup:
-    ☐ Remove the `custom` folder (place directly in `collabdata`)
+    ✔ Remove the `custom` folder (place directly in `collabdata`) @done(20-12-01 23:16)
     ☐ Rename the namespace `collab` to `collabserver`
-    ☐ Rename `include/collabdata` to `include collabserver/collabdata`
-    ✘ Remove examples as the tests are doing exactly the same things @cancelled(20-12-01 22:35) @project(Cleanup)
-    ✔ Rename `test` to `tests` @done(20-12-01 22:34) @project(Cleanup)
+    ✔ Rename `include/collabdata` to `include collabserver/data` @done(20-12-01 23:16)
 Readme:
     ☐ Update README content
     ☐ Update README with valid Markdown format
     ☐ Update README with a custom logo
 
 Archive:
+  ✘ Remove examples as the tests are doing exactly the same things @cancelled(20-12-01 22:35) @project(Cleanup) @project(Cleanup)
+  ✔ Rename `test` to `tests` @done(20-12-01 22:34) @project(Cleanup) @project(Cleanup)
   ✘ Place `CMakeLists.txt` in the `src` folders instead of `CMake` folder @cancelled(20-12-01 22:35) @project(Build)
   ✘ Rename `CmRDT` to `LWW` (because the conflict resolution technique is what matters) @cancelled(20-12-01 13:10) @project(Cleanup)
   ✔ Place dependencies in the folder `extern` (add it in the gitignore) @done(20-12-01 13:48) @project(Build)

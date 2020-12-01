@@ -17,16 +17,13 @@ Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent
 is the State based (CvRDT).
 To learn more about CRDTs, checkout the links at the end of this readme.
 
-Custom folder contains several end-user interface to build high level
-data on top of primitive CRDTs.
-
 
 # Quick Start
 - CRDTs primitive are header only (LWWGraph, LWWMap...)
 
 CRDTs primitives are header only, you only need to include
 the headers you need in order to build your concurrent data.
-For instance, to use CmRDT::LWWSet, add `#include "collabdata/CmRDT/LWWSet.h"`.
+For instance, to use CmRDT::LWWSet, add `#include "collabserver/data/CmRDT/LWWSet.h"`.
 To use you data on a CollabServer, your data must implement `CollabData`
 interface.
 
@@ -37,7 +34,7 @@ interface.
     - *LWWMap*: Last-Write-Wins Map
     - *LWWRegister*: Last-Write-Wins Register
     - *LWWSet*: Last-Write-Wins Set
-- **custom** (Assets classes to implements data for CollabServer)
+- **"collabserver/data** (Assets classes to implements data for CollabServer)
     - *CollabData*: High level abstraction for data built on tope of CRDTs.
     - *Operation*: Represents a modification on a CollabData.
     - *OperationHandler*: Interface to handle operations received from observer.

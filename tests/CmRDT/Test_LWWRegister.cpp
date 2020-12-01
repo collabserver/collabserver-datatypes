@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "collabdata/CmRDT/LWWRegister.h"
+#include "collabserver/data/CmRDT/LWWRegister.h"
 
 namespace collab {
 namespace CmRDT {

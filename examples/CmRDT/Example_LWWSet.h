@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "collabdata/CmRDT/LWWSet.h"
+#include "collabserver/data/CmRDT/LWWSet.h"
 
 namespace collab {
 namespace CmRDT {
