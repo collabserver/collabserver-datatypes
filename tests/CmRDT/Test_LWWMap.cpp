@@ -2,14 +2,14 @@
 
 #include "collabserver/data/CmRDT/LWWMap.h"
 
+namespace collabserver {
+
 // Check the whole internal state of an element
 #define _ASSERT_ELT_EQ(elt_it_, key_, is_removed_, stamp_, data_) \
     ASSERT_TRUE(elt_it_ != data_.crdt_end());                     \
     EXPECT_EQ(elt_it_->first, key_);                              \
     EXPECT_EQ(elt_it_->second.isRemoved(), is_removed_);          \
     EXPECT_EQ(elt_it_->second.timestamp(), stamp_)
-
-namespace collabserver {
 
 // -----------------------------------------------------------------------------
 // empty()

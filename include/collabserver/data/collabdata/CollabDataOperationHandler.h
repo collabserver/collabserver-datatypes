@@ -4,7 +4,7 @@ namespace collabserver {
 
 /**
  * \brief
- * Interface for a Handler of Operation.
+ * Interface for a Handler of CollabDataOperation.
  *
  * This class is only an interface to use in concrete CollabData.
  * Therefore, no methods are given. This is based on a visitor pattern.
@@ -25,11 +25,11 @@ namespace collabserver {
  *         }
  * };
  *
- * class ObserverExample : public OperationObserver {
+ * class ObserverExample : public CollabDataOperationObserver {
  *     private:
  *         HandlerExample _handler;
  *     public:
- *         void onOperation(const Operation& op) override {
+ *         void onOperation(const CollabDataOperation& op) override {
  *             op.accept(_handler);
  *         }
  * };
@@ -39,14 +39,14 @@ namespace collabserver {
  *
  *
  * \see CollabData
- * \see Operation
- * \see OperationObserver
+ * \see CollabDataOperation
+ * \see CollabDataOperationObserver
  */
-class OperationHandler {
+class CollabDataOperationHandler {
    protected:
-    OperationHandler() = default;
-    OperationHandler(const OperationHandler& other) = default;
-    OperationHandler& operator=(const OperationHandler& other) = default;
+    CollabDataOperationHandler() = default;
+    CollabDataOperationHandler(const CollabDataOperationHandler& other) = default;
+    CollabDataOperationHandler& operator=(const CollabDataOperationHandler& other) = default;
 };
 
 }  // namespace collabserver

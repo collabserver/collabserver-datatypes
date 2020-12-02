@@ -5,6 +5,8 @@
 
 #include "collabserver/data/CmRDT/LWWGraph.h"
 
+namespace collabserver {
+
 // Check the whole internal data of a vertex
 #define _ASSERT_VERTEX_EQ(vertex_it, key_, is_removed, stamp_, data_) \
     EXPECT_TRUE(vertex_it != data_.crdt_end());                       \
@@ -17,8 +19,6 @@
     ASSERT_EQ(info_.isEdgeAdded, edge_added_);                               \
     ASSERT_EQ(info_.isFromAdded, from_added_);                               \
     ASSERT_EQ(info_.isToAdded, to_added_)
-
-namespace collabserver {
 
 // -----------------------------------------------------------------------------
 // empty()

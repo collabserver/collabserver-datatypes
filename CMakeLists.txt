@@ -10,15 +10,15 @@ include("CMake/AddCompilerFlags.cmake")
 include("CMake/AddDependencies.cmake")
 
 # Examples
-option(COLLAB_EXAMPLES "Build examples" OFF)
-if(COLLAB_EXAMPLES)
+option(COLLABSERVER_EXAMPLES "Build examples" OFF)
+if(COLLABSERVER_EXAMPLES)
     message(STATUS "Building examples")
     include("CMake/AddExamples.cmake")
 endif()
 
 # Tests
-option(COLLAB_TESTS "Build tests" OFF)
-if(COLLAB_TESTS)
+option(COLLABSERVER_TESTS "Build tests" OFF)
+if(COLLABSERVER_TESTS)
     message(STATUS "Building tests")
     include("CMake/AddTests.cmake")
 endif()

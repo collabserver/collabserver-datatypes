@@ -2,7 +2,7 @@
 
 #include <sstream>
 
-#include "OperationHandler.h"
+#include "CollabDataOperationHandler.h"
 
 namespace collabserver {
 
@@ -13,17 +13,17 @@ namespace collabserver {
  * Each operation on a CollabData has a unique ID for this data.
  *
  * \see CollabData
- * \see OperationObserver
- * \see OperationHandler
+ * \see CollabDataOperationObserver
+ * \see CollabDataOperationHandler
  */
-class Operation {
+class CollabDataOperation {
    protected:
-    Operation() = default;
-    Operation(const Operation& other) = default;
-    Operation& operator=(const Operation& other) = default;
+    CollabDataOperation() = default;
+    CollabDataOperation(const CollabDataOperation& other) = default;
+    CollabDataOperation& operator=(const CollabDataOperation& other) = default;
 
    public:
-    virtual ~Operation() = default;
+    virtual ~CollabDataOperation() = default;
 
    public:
     /**
@@ -56,7 +56,7 @@ class Operation {
      *
      * \param handler The famous concrete handler to use.
      */
-    virtual void accept(OperationHandler& handler) const = 0;
+    virtual void accept(CollabDataOperationHandler& handler) const = 0;
 };
 
 }  // namespace collabserver

@@ -1,13 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "collabserver/data/collabdata/CollabData.h"
-#include "collabserver/data/collabdata/Operation.h"
-#include "collabserver/data/collabdata/OperationHandler.h"
-#include "collabserver/data/collabdata/OperationObserver.h"
+#include "collabserver/data/collabdata/CollabDataOperation.h"
+#include "collabserver/data/collabdata/CollabDataOperationHandler.h"
+#include "collabserver/data/collabdata/CollabDataOperationObserver.h"
 
 namespace collabserver {
-namespace data {
-namespace collabdata {
 
 // -----------------------------------------------------------------------------
 // Mock classes
@@ -22,21 +20,21 @@ class MockCollabData : public CollabData {
 };
 
 // -----------------------------------------------------------------------------
-class MockOperationObserver : public OperationObserver {
+class MockOperationObserver : public CollabDataOperationObserver {
    public:
     MockOperationObserver() = default;
 
    public:
-    void onOperation(const Operation& op) override { nbNotified++; }
+    void onOperation(const CollabDataOperation& op) override { nbNotified++; }
 };
 
 // -----------------------------------------------------------------------------
-class MockOperation : public Operation {
+class MockOperation : public CollabDataOperation {
    public:
     unsigned int getType() const override { return 1; }
     bool serialize(std::stringstream& buffer) const override { return false; }
     bool unserialize(const std::stringstream& buffer) override { return false; }
-    void accept(OperationHandler& visitor) const override {}
+    void accept(CollabDataOperationHandler& visitor) const override {}
 };
 
 // -----------------------------------------------------------------------------
@@ -207,6 +205,4 @@ TEST(CollabData, notifyOperationBroadcasterTest) {
     ASSERT_EQ(nbNotified, 1);
 }
 
-}  // namespace collabdata
-}  // namespace data
 }  // namespace collabserver

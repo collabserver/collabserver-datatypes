@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "Operation.h"
-#include "OperationObserver.h"
+#include "CollabDataOperation.h"
+#include "CollabDataOperationObserver.h"
 
 namespace collabserver {
 
@@ -94,8 +94,8 @@ namespace collabserver {
  */
 class CollabData {
    private:
-    std::vector<OperationObserver*> _operationObservers;
-    OperationObserver* _broadcaster = nullptr;
+    std::vector<CollabDataOperationObserver*> _operationObservers;
+    CollabDataOperationObserver* _broadcaster = nullptr;
 
     // -------------------------------------------------------------------------
     // Initialization
@@ -116,28 +116,28 @@ class CollabData {
    public:
     /**
      * Apply an operation received from external component.
-     * Operation is received in its serialized form.
+     * CollabDataOperation is received in its serialized form.
      * Do nothing if unable to unserialize and return false.
-     * This doesn't notify the broadcaster but only the Operation Observers.
+     * This doesn't notify the broadcaster but only the CollabDataOperation Observers.
      *
      * This may for instance be used by a network component to apply an
-     * operation just received. Operation is in its serialized form since
+     * operation just received. CollabDataOperation is in its serialized form since
      * other components doesn't know anything about the concrete operations.
      * (Only concrete CollabData implementation knowns)
      *
-     * \param id Operation's ID.
+     * \param id CollabDataOperation's ID.
      * \param buffer Serialized version of the operation.
      * \return True if operation is valid, otherwise, return false.
      */
     virtual bool applyExternOperation(unsigned int id, const std::string& buffer) = 0;
 
     // -------------------------------------------------------------------------
-    // OperationObservers Methods
+    // CollabDataOperationObservers Methods
     // -------------------------------------------------------------------------
 
    public:
     /**
-     * Send a local operation to all OperationObservers.
+     * Send a local operation to all CollabDataOperationObservers.
      *
      * Method that modifies data creates an operations that describes this
      * modification. Several components may request to know about these
@@ -145,25 +145,25 @@ class CollabData {
      *
      * \param Reference to the operation.
      */
-    void notifyOperationObservers(const Operation& op) const {
+    void notifyOperationObservers(const CollabDataOperation& op) const {
         assert(op.getType() != 0);  // If 0, you probably forgot to set type
 
-        for (OperationObserver* superman : _operationObservers) {
+        for (CollabDataOperationObserver* superman : _operationObservers) {
             assert(superman != nullptr);
             superman->onOperation(op);
         }
     }
 
     /**
-     * Registers a OperationObserver in this data.
+     * Registers a CollabDataOperationObserver in this data.
      * Does nothing if this observer is already registered (Returns false).
      * Does nothing if nullptr is given (Returns false).
      *
      * \param observer The observer to add.
      * \return True if added, otherwise, return false.
      */
-    bool addOperationObserver(OperationObserver& observer) {
-        for (OperationObserver* const obs : _operationObservers) {
+    bool addOperationObserver(CollabDataOperationObserver& observer) {
+        for (CollabDataOperationObserver* const obs : _operationObservers) {
             if (obs == &observer) {
                 return false;
             }
@@ -180,9 +180,11 @@ class CollabData {
     /**
      * Returns the number of operation observer registered in this data.
      *
-     * \return Number of registered OperationObserver.
+     * \return Number of registered CollabDataOperationObserver.
      */
-    std::vector<OperationObserver>::size_type sizeOperationObserver() const { return _operationObservers.size(); }
+    std::vector<CollabDataOperationObserver>::size_type sizeOperationObserver() const {
+        return _operationObservers.size();
+    }
 
     // -------------------------------------------------------------------------
     // Broadcaster Methods
@@ -195,7 +197,7 @@ class CollabData {
      *
      * \param Reference to the operation to broadcast.
      */
-    void notifyOperationBroadcaster(const Operation& op) const {
+    void notifyOperationBroadcaster(const CollabDataOperation& op) const {
         if (_broadcaster != nullptr) {
             _broadcaster->onOperation(op);
         }
@@ -205,7 +207,7 @@ class CollabData {
      * Associate a broadcaster for this data.
      * If data already has a broadcaster, it is updated with this one.
      */
-    void setOperationBroadcaster(OperationObserver& observer) { _broadcaster = &observer; }
+    void setOperationBroadcaster(CollabDataOperationObserver& observer) { _broadcaster = &observer; }
 
     /**
      * Removes broadcaster for this data.

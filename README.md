@@ -48,41 +48,32 @@ To learn more about CRDTs, checkout the links at the end of this readme.
 ---
 
 - Requirements
+  - [CMake](https://cmake.org/)
   - C++11
   - `pragma once` support
   - Tested with gcc 4.8.4
   - Tested with clang 5.0.0
   - Tested only on Linux. No support certified for Mac and Windows
 - Dependencies (downloaded and placed in `extern` by CMake)
-  - [GoogleTest](https://github.com/google/googletest) (Release 1.8.1)
+  - [GoogleTest](https://github.com/google/googletest)
 
 ```bash
-# Build tests
+# Build the tests and examples
 
 mkdir build
 cd build
-cmake -DCOLLAB_TESTS=ON ..
+cmake -DCOLLABSERVER_TESTS=ON -DCOLLABSERVER_EXAMPLES=ON ..
 make
 make runTests
 
-# Or use build script
+# Or use the build script
 ./build.sh
-```
-
-```bash
-# Build examples
-
-mkdir build
-cd build
-cmake -DCOLLAB_EXAMPLES=ON ..
-make
-make runExamplesCmRDT
 ```
 
 | CMake option | Description |
 | --- | --- |
-| COLLAB_TESTS | (ON / OFF) Set ON to build unit tests |
-| COLLAB_EXAMPLES | (ON / OFF) Set ON to build examples |
+| COLLABSERVER_TESTS | (ON / OFF) Set ON to build unit tests |
+| COLLABSERVER_EXAMPLES | (ON / OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
 | FETCHCONTENT_FULLY_DISCONNECTED=ON | To skip download of the `extern` depencencies |
 
