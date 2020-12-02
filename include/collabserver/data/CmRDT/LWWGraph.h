@@ -10,18 +10,6 @@
 namespace collabserver {
 
 /**
- * Information used by add_edge method.
- * Describe return status of add_edge. (LWWGraph)
- *
- * \see LWWGraph
- */
-struct AddEdgeInfo {
-    bool isEdgeAdded;
-    bool isFromAdded;
-    bool isToAdded;
-};
-
-/**
  * \brief
  * Last-Writer-Wins Directed Graph (LWW Graph).
  * CmRDT (Operation-based)
@@ -94,6 +82,18 @@ template <typename Key, typename T, typename U>
 class LWWGraph {
    public:
     class Vertex;
+
+    /**
+     * Information used by add_edge method.
+     * Describe return status of add_edge. (LWWGraph)
+     *
+     * \see LWWGraph
+     */
+    struct AddEdgeInfo {
+        bool isEdgeAdded;
+        bool isFromAdded;
+        bool isToAdded;
+    };
 
     typedef typename LWWMap<Key, Vertex, U>::size_type size_type;
     typedef typename LWWMap<Key, Vertex, U>::iterator iterator;
