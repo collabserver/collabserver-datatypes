@@ -8,8 +8,6 @@
 #include "LWWSet.h"
 
 namespace collabserver {
-namespace data {
-namespace CmRDT {
 
 /**
  * Information used by add_edge method.
@@ -802,6 +800,4 @@ class LWWGraph<Key, T, U>::Vertex {
     friend bool operator!=(const Vertex& lhs, const Vertex& rhs) { return !(lhs == rhs); }
 };
 
-}  // namespace CmRDT
-}  // namespace data
 }  // namespace collabserver

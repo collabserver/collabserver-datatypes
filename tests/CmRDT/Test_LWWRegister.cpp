@@ -5,8 +5,6 @@
 #include "collabserver/data/CmRDT/LWWRegister.h"
 
 namespace collabserver {
-namespace data {
-namespace CmRDT {
 
 // -----------------------------------------------------------------------------
 // query()
@@ -187,6 +185,4 @@ TEST(LWWRegister, operatorEQTest) {
     ASSERT_FALSE(data0 != data1);
 }
 
-}  // namespace CmRDT
-}  // namespace data
 }  // namespace collabserver

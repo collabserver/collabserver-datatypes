@@ -3,6 +3,7 @@
 
 Cleanup:
     ☐ Update all pointers with safer type (e.g., `std::unique_ptr`)
+    ☐ Fix issue with Travis (CMake 3.19 not supported on the current setup)
 Readme:
     ☐ Update README content
     ☐ Update README with a custom logo

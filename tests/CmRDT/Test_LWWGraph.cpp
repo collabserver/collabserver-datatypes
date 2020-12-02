@@ -19,8 +19,6 @@
     ASSERT_EQ(info_.isToAdded, to_added_)
 
 namespace collabserver {
-namespace data {
-namespace CmRDT {
 
 // -----------------------------------------------------------------------------
 // empty()
@@ -2272,6 +2270,4 @@ TEST(LWWGraph, crdtIteratorTest_end) {
     EXPECT_EQ(k, 0);
 }
 
-}  // namespace CmRDT
-}  // namespace data
 }  // namespace collabserver

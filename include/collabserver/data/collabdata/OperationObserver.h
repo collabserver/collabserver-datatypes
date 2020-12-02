@@ -3,8 +3,6 @@
 #include "Operation.h"
 
 namespace collabserver {
-namespace data {
-namespace collabdata {
 
 /**
  * \brief
@@ -55,6 +53,4 @@ class OperationObserver {
     virtual void onOperation(const Operation& op) = 0;
 };
 
-}  // namespace collabdata
-}  // namespace data
 }  // namespace collabserver

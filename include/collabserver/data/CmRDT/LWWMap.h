@@ -6,8 +6,6 @@
 #include <utility>  // std::pair
 
 namespace collabserver {
-namespace data {
-namespace CmRDT {
 
 /**
  * \brief
@@ -814,6 +812,4 @@ class LWWMap<Key, T, U>::const_iterator : public std::iterator<std::input_iterat
     const_pointer operator->() const { return &(_it->second._internalValue); }
 };
 
-}  // namespace CmRDT
-}  // namespace data
 }  // namespace collabserver

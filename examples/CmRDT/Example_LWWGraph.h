@@ -6,8 +6,6 @@
 #include "collabserver/data/CmRDT/LWWGraph.h"
 
 namespace collabserver {
-namespace data {
-namespace CmRDT {
 
 void LWWGraph_example() {
     std::cout << "\n----- CmRDT LWWGraph Example ----------\n";
@@ -59,6 +57,4 @@ void LWWGraph_example() {
     std::cout << "(data0 != data1) = " << (data0 != data1) << "\n";
 }
 
-}  // namespace CmRDT
-}  // namespace data
 }  // namespace collabserver
