@@ -1,11 +1,11 @@
 # CollabServer - Data (CRDTs)
 
-[![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collab-data-crdts/blob/master/LICENSE.txt)
-[![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts)
+[![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collabserver-data/blob/master/LICENSE.txt)
+[![build-status-master](https://travis-ci.org/CollabServer/collabserver-data.svg?branch=master)](https://travis-ci.org/CollabServer/collabserver-data)
 
 | master | dev |
 | :-----: | :----: |
-| [![build-status-master](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=master)](https://travis-ci.org/CollabServer/collab-data-crdts) | [![build-status-dev](https://travis-ci.org/CollabServer/collab-data-crdts.svg?branch=dev)](https://travis-ci.org/CollabServer/collab-data-crdts) |
+| [![build-status-master](https://travis-ci.org/CollabServer/collabserver-data.svg?branch=master)](https://travis-ci.org/CollabServer/collabserver-data) | [![build-status-dev](https://travis-ci.org/CollabServer/collabserver-data.svg?branch=dev)](https://travis-ci.org/CollabServer/collabserver-data) |
 
 ## Overview
 
