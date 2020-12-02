@@ -32,7 +32,7 @@ namespace collabserver {
  *      (a + b) + c = a + (b + c)
  *  - Commutative
  *      (a + b) = (b + a)
- *  - idempotent
+ *  - Idempotent
  *      (a + b) = (a + b) + b
  *
  * \par CollabDataOperation
