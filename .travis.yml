@@ -1,26 +1,18 @@
 language: cpp
 
+os: linux
+dist: focal
+arch: amd64
+
 jobs:
   include:
-    - os: linux
-      dist: focal
-      arch: amd64
-      compiler: gcc
+    - compiler: gcc
       env: ENV_BUILD_TYPE=Debug VERBOSE=1
-    - os: linux
-      dist: focal
-      arch: amd64
-      compiler: gcc
+    - compiler: gcc
       env: ENV_BUILD_TYPE=Release VERBOSE=1
-    - os: linux
-      dist: focal
-      arch: amd64
-      compiler: clang
+    - compiler: clang
       env: ENV_BUILD_TYPE=Debug VERBOSE=1
-    - os: linux
-      dist: focal
-      arch: amd64
-      compiler: clang
+    - compiler: clang
       env: ENV_BUILD_TYPE=Release VERBOSE=1
 
 script: ./build.sh
