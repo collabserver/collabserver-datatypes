@@ -21,6 +21,8 @@ Commutative is implemented as Operation based CRDT (CmRDT) whereas Convergent
 is the State based (CvRDT).
 To learn more about CRDTs, checkout the links at the end of this readme.
 
+Link to my thesis: <https://papyrus.bib.umontreal.ca/xmlui/handle/1866/22532>
+
 ## Quick Start
 
 ---
@@ -139,9 +141,3 @@ Feel free to ask me any question, share your ideas or open an issue.
 I started this project during my master thesis at University of Montreal.
 Format uses clang-format with the Google Coding style <https://google.github.io/styleguide/cppguide.html> (see `.clang-format` for further information).
 Make sure you autoformat on save (see <https://clang.llvm.org/docs/ClangFormat.html>)
-
-## Author
-
----
-
-- Constantin Masson (geekymoose)
