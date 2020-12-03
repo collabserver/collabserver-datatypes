@@ -10,10 +10,6 @@ jobs:
       env: ENV_BUILD_TYPE=Debug VERBOSE=1
     - compiler: gcc
       env: ENV_BUILD_TYPE=Release VERBOSE=1
-    - compiler: clang
-      env: ENV_BUILD_TYPE=Debug VERBOSE=1
-    - compiler: clang
-      env: ENV_BUILD_TYPE=Release VERBOSE=1
 
 script: ./build.sh
 

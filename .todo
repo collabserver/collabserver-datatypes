@@ -3,12 +3,13 @@
 
 Cleanup:
     ☐ Update all pointers with safer type (e.g., `std::unique_ptr`)
-    ✔ Fix issue with Travis (CMake 3.19 not supported on the current setup) @done(20-12-03 00:19)
+    ☐ Fix the tag v0.1 (broken because of the git history cleanup)
 Readme:
     ☐ Update README content
     ☐ Update README with a custom logo
 
 Archive:
+  ✔ Fix issue with Travis (CMake 3.19 not supported on the current setup) @done(20-12-03 00:19) @project(Cleanup)
   ✔ Update README with valid Markdown format @done(20-12-02 00:29) @project(Readme)
   ✔ Rename the namespace `collab` to `collabserver` @done(20-12-01 23:43) @project(Cleanup)
   ✔ Remove the `custom` folder (place directly in `collabdata`) @done(20-12-01 23:16) @project(Cleanup)

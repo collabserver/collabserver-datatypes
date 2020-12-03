@@ -52,11 +52,9 @@ Link to my thesis: <https://papyrus.bib.umontreal.ca/xmlui/handle/1866/22532>
 - Requirements
   - [CMake](https://cmake.org/)
   - C++11
-  - `pragma once` support
-  - Tested with gcc 4.8.4
-  - Tested with clang 5.0.0
-  - Tested only on Linux. No support certified for Mac and Windows
-- Dependencies (downloaded and placed in `extern` by CMake)
+  - Tested only on Linux with gcc 4.8.4
+  - No support certified for Mac and Windows
+- Dependencies (automatically downloaded and placed in `extern` by CMake)
   - [GoogleTest](https://github.com/google/googletest)
 
 ```bash
