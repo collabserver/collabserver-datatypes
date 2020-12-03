@@ -1,4 +1,4 @@
-# CollabServer - Data (CRDTs)
+# CollabServer - DataTypes (CRDTs)
 
 [![license](https://img.shields.io/badge/license-LGPLv3.0-blue.svg)](https://github.com/CollabServer/collabserver-data/blob/master/LICENSE.txt)
 [![build-status-master](https://travis-ci.org/CollabServer/collabserver-data.svg?branch=master)](https://travis-ci.org/CollabServer/collabserver-data)

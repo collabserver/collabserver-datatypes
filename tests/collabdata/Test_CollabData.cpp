@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "collabserver/data/collabdata/CollabData.h"
-#include "collabserver/data/collabdata/CollabDataOperation.h"
-#include "collabserver/data/collabdata/CollabDataOperationHandler.h"
-#include "collabserver/data/collabdata/CollabDataOperationObserver.h"
+#include "collabserver/datatypes/collabdata/CollabData.h"
+#include "collabserver/datatypes/collabdata/CollabDataOperation.h"
+#include "collabserver/datatypes/collabdata/CollabDataOperationHandler.h"
+#include "collabserver/datatypes/collabdata/CollabDataOperationObserver.h"
 
 namespace collabserver {
 

@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "collabserver/data/CmRDT/LWWMap.h"
+#include "collabserver/datatypes/CmRDT/LWWMap.h"
 
 namespace collabserver {
 

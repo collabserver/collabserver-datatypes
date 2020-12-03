@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "collabserver/data/CmRDT/LWWMap.h"
+#include "collabserver/datatypes/CmRDT/LWWMap.h"
 
 namespace collabserver {
 
