@@ -23,4 +23,3 @@ if(COLLABSERVER_TESTS)
     include("CMake/AddTests.cmake")
 endif()
 
-
