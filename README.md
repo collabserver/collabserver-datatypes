@@ -54,7 +54,7 @@ Link to my thesis: <https://papyrus.bib.umontreal.ca/xmlui/handle/1866/22532>
   - C++11
   - Tested only on Linux with gcc 4.8.4
   - No support certified for Mac and Windows
-- Dependencies (automatically downloaded and placed in `extern` by CMake)
+- Dependencies (already in the repo and built by CMake)
   - [GoogleTest](https://github.com/google/googletest)
 
 ```bash
