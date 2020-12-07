@@ -62,7 +62,7 @@ Link to my thesis: <https://papyrus.bib.umontreal.ca/xmlui/handle/1866/22532>
 
 mkdir build
 cd build
-cmake -DCOLLABSERVER_TESTS=ON -DCOLLABSERVER_EXAMPLES=ON ..
+cmake -DCOLLABSERVER_DATATYPES_TESTS=ON -DCOLLABSERVER_DATATYPES_EXAMPLES=ON ..
 make
 make runTests
 
@@ -72,8 +72,8 @@ make runTests
 
 | CMake option | Description |
 | --- | --- |
-| COLLABSERVER_TESTS | (ON / OFF) Set ON to build unit tests |
-| COLLABSERVER_EXAMPLES | (ON / OFF) Set ON to build examples |
+| COLLABSERVER_DATATYPES_TESTS | (ON / OFF) Set ON to build unit tests |
+| COLLABSERVER_DATATYPES_EXAMPLES | (ON / OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
 
 ## CRDTs theoretical description

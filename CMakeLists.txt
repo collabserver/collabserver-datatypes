@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(collabserver-datatypes)
-message(STATUS "[${PROJECT_NAME}] Building project")
+message(STATUS "Building project ${PROJECT_NAME}")
 
 if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     message(FATAL_ERROR "in-source build not allowed. Use another directory.")
@@ -22,8 +22,8 @@ message(STATUS "BUILD_TYPE for ${PROJECT_NAME}: ${CMAKE_BUILD_TYPE}")
 
 
 # Examples
-option(COLLABSERVER_EXAMPLES "Build examples" OFF)
-if(COLLABSERVER_EXAMPLES)
+option(COLLABSERVER_DATATYPES_EXAMPLES "Build examples" OFF)
+if(COLLABSERVER_DATATYPES_EXAMPLES)
     message(STATUS "Building examples for ${PROJECT_NAME}")
     include_directories("${PROJECT_SOURCE_DIR}/include/")
     add_executable(${PROJECT_NAME}-examplesCmRDT "${PROJECT_SOURCE_DIR}/examples/CmRDT/runAllExamples.cpp")
@@ -32,8 +32,8 @@ endif()
 
 
 # Tests
-option(COLLABSERVER_TESTS "Build tests" OFF)
-if(COLLABSERVER_TESTS)
+option(COLLABSERVER_DATATYPES_TESTS "Build tests" OFF)
+if(COLLABSERVER_DATATYPES_TESTS)
     message(STATUS "Building tests for ${PROJECT_NAME}")
     enable_testing()
 
