@@ -75,7 +75,6 @@ make runTests
 | COLLABSERVER_TESTS | (ON / OFF) Set ON to build unit tests |
 | COLLABSERVER_EXAMPLES | (ON / OFF) Set ON to build examples |
 | CMAKE_BUILD_TYPE | Debug, Release, RelWithDebInfo, MinSizeRel |
-| FETCHCONTENT_FULLY_DISCONNECTED=ON | To skip download of the `extern` depencencies |
 
 ## CRDTs theoretical description
 
