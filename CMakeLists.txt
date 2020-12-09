@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14)
 project(collabserver-datatypes)
 message(STATUS "Building project ${PROJECT_NAME}")
 
-if("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+if("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
     message(FATAL_ERROR "in-source build not allowed. Use another directory.")
 endif()
 
@@ -14,11 +14,11 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-    message(WARNING "No BUILD_TYPE set for ${PROJECT_NAME}: uses default Release")
+    message(WARNING "No CMAKE_BUILD_TYPE set for ${PROJECT_NAME}: uses default Release")
     message(STATUS "Available build types: Debug Release RelWithDebInfo MinSizeRel")
     set(CMAKE_BUILD_TYPE Release)
 endif()
-message(STATUS "BUILD_TYPE for ${PROJECT_NAME}: ${CMAKE_BUILD_TYPE}")
+message(STATUS "CMAKE_BUILD_TYPE for ${PROJECT_NAME}: ${CMAKE_BUILD_TYPE}")
 
 
 # Examples
