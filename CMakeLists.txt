@@ -21,11 +21,14 @@ endif()
 message(STATUS "BUILD_TYPE for ${PROJECT_NAME}: ${CMAKE_BUILD_TYPE}")
 
 
+# Add lib headers
+include_directories("${PROJECT_SOURCE_DIR}/include/")
+
+
 # Examples
 option(COLLABSERVER_DATATYPES_EXAMPLES "Build examples" OFF)
 if(COLLABSERVER_DATATYPES_EXAMPLES)
     message(STATUS "Building examples for ${PROJECT_NAME}")
-    include_directories("${PROJECT_SOURCE_DIR}/include/")
     add_executable(${PROJECT_NAME}-examplesCmRDT "${PROJECT_SOURCE_DIR}/examples/CmRDT/runAllExamples.cpp")
     add_custom_target(runExamplesCmRDT ${PROJECT_NAME}-examplesCmRDT)
 endif()
@@ -38,7 +41,6 @@ if(COLLABSERVER_DATATYPES_TESTS)
     enable_testing()
 
     # Tests executable
-    include_directories("${PROJECT_SOURCE_DIR}/include/")
     file(GLOB_RECURSE srcFilesTests "${PROJECT_SOURCE_DIR}/tests/*.cpp")
     add_executable(${PROJECT_NAME}-tests ${srcFilesTests})
 
