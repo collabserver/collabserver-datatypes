@@ -1,8 +1,16 @@
 # Uses vscode TODO+ for nice highlight
 # https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-todo-plus
 
-Cleanup:
+CmRDT:
+    ☐ In `LWWRegister`, rename `update` to `set` (easier to understand)
+    ☐ In `LWWRegister`, rename `query` to `read` (easier to understand)
+    ☐ In `LWWRegister`, update with a contructor to force timestamp initialization (and remove `U _timestamp = {0}`)
+    ☐ In `LWWMap`, change the value to be CRDT by default (using `LWWRegister`)
+    ☐ In `LWWMap`, rename the `add` to `set` or `insert` and also take a value
+    ☐ In `LWWGraph`, change the value to be CRDT by default (using `LWWRegister`)
+Collabdata:
     ☐ Update all pointers with safer type (e.g., `std::unique_ptr`)
+    ☐ Create a end user API (e.g., `CollabGraph`, `CollabRegister`) that doesn't require CRDT knowledges
 Readme:
     ☐ Update README content
     ☐ Update README with a custom logo
